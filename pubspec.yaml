@@ -1,0 +1,21 @@
+name: pluto_layout
+description: PlutoLayout is a package for UI configuration such as CMS or admin service.
+version: 0.0.1
+homepage: https://pluto.weblaze.dev
+repository: https://github.com/bosskmk/pluto_layout
+
+environment:
+  sdk: '>=2.18.2 <3.0.0'
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  collection: ^1.16.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
