@@ -35,7 +35,7 @@ class _DemoPageState extends State<DemoPage> {
     super.initState();
 
     controller = PlutoLayoutController(
-      leftSideMenus: [
+      leftMenus: [
         PlutoLayoutMenuItem(
           id: 'Files',
           title: 'Files',
@@ -91,7 +91,7 @@ class _DemoPageState extends State<DemoPage> {
           ),
         ),
       ],
-      rightSideMenus: [
+      rightMenus: [
         PlutoLayoutMenuItem(
           id: 'Settings',
           title: 'Settings',

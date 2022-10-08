@@ -1,5 +1,3 @@
-// ignore_for_file: invalid_use_of_protected_member
-
 import 'package:flutter/material.dart';
 import 'package:pluto_layout/pluto_layout.dart';
 import 'package:pluto_layout/src/ui/ui.dart';
@@ -21,25 +19,25 @@ class PlutoLayout extends StatefulWidget {
 class _PlutoLayoutState extends State<PlutoLayout> {
   final resizeNotifier = ChangeNotifier();
 
-  bool _hasLeftSideMenus = false;
+  bool _hasLeftMenus = false;
 
-  bool _hasLeftSideTabViews = false;
+  bool _hasLeftTabViews = false;
 
-  bool _hasRightSideMenus = false;
+  bool _hasRightMenus = false;
 
-  bool _hasRightSideTabViews = false;
+  bool _hasRightTabViews = false;
 
   @override
   void initState() {
     super.initState();
 
-    _hasLeftSideMenus = widget.controller.hasLeftSideMenus;
+    _hasLeftMenus = widget.controller.hasLeftMenus;
 
-    _hasLeftSideTabViews = widget.controller.hasEnabledLeftSideTabViews;
+    _hasLeftTabViews = widget.controller.hasEnabledLeftTabViews;
 
-    _hasRightSideMenus = widget.controller.hasRightSideMenus;
+    _hasRightMenus = widget.controller.hasRightMenus;
 
-    _hasRightSideTabViews = widget.controller.hasEnabledRightSideTabViews;
+    _hasRightTabViews = widget.controller.hasEnabledRightTabViews;
 
     widget.controller.addListener(listener);
   }
@@ -54,26 +52,25 @@ class _PlutoLayoutState extends State<PlutoLayout> {
   }
 
   void listener() {
-    if (_hasLeftSideMenus == widget.controller.hasLeftSideMenus &&
-        _hasLeftSideTabViews == widget.controller.hasEnabledLeftSideTabViews &&
-        _hasRightSideMenus == widget.controller.hasRightSideMenus &&
-        _hasRightSideTabViews ==
-            widget.controller.hasEnabledRightSideTabViews) {
+    if (_hasLeftMenus == widget.controller.hasLeftMenus &&
+        _hasLeftTabViews == widget.controller.hasEnabledLeftTabViews &&
+        _hasRightMenus == widget.controller.hasRightMenus &&
+        _hasRightTabViews == widget.controller.hasEnabledRightTabViews) {
       return;
     }
 
     setState(() {
-      _hasLeftSideMenus = widget.controller.hasLeftSideMenus;
-      _hasLeftSideTabViews = widget.controller.hasEnabledLeftSideTabViews;
-      _hasRightSideMenus = widget.controller.hasRightSideMenus;
-      _hasRightSideTabViews = widget.controller.hasEnabledRightSideTabViews;
+      _hasLeftMenus = widget.controller.hasLeftMenus;
+      _hasLeftTabViews = widget.controller.hasEnabledLeftTabViews;
+      _hasRightMenus = widget.controller.hasRightMenus;
+      _hasRightTabViews = widget.controller.hasEnabledRightTabViews;
     });
   }
 
   void resize(Object id, Offset offset) {
-    widget.controller.resizeSideTabViewWidth(id, offset);
+    widget.controller.resizeTabViewWidth(id, offset);
 
-    // ignore: invalid_use_of_visible_for_testing_member
+    // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
     resizeNotifier.notifyListeners();
   }
 
@@ -83,22 +80,29 @@ class _PlutoLayoutState extends State<PlutoLayout> {
       delegate: _PlutoLayoutDelegate(resizeNotifier, widget.controller),
       children: [
         LayoutId(
-          id: PlutoLayoutId.topSideMenu,
-          child: const TopMenus(),
+          id: PlutoLayoutId.topMenu,
+          child: const MenuContainer(direction: PlutoLayoutMenuDirection.top),
         ),
-        if (_hasLeftSideMenus) ...[
+        if (_hasLeftMenus) ...[
           LayoutId(
-            id: PlutoLayoutId.leftSideMenu,
-            child: LeftMenus(controller: widget.controller),
+            id: PlutoLayoutId.leftMenu,
+            child: MenuContainer(
+              direction: PlutoLayoutMenuDirection.left,
+              onTap: widget.controller.setEnabledLeftMenuItem,
+              items: widget.controller.leftMenus.reversed.toList(),
+            ),
           ),
-          if (_hasLeftSideTabViews)
+          if (_hasLeftTabViews)
             LayoutId(
-              id: PlutoLayoutId.leftSideTabView,
+              id: PlutoLayoutId.leftTabView,
               child: ResizeIndicator(
-                id: PlutoLayoutId.leftSideTabView,
+                id: PlutoLayoutId.leftTabView,
                 onResize: resize,
                 position: ResizeIndicatorPosition.right,
-                child: LeftTabView(controller: widget.controller),
+                child: TabViewContainer(
+                  controller: widget.controller,
+                  direction: TabViewDirection.left,
+                ),
               ),
             ),
         ],
@@ -106,25 +110,34 @@ class _PlutoLayoutState extends State<PlutoLayout> {
           id: PlutoLayoutId.bodyContainer,
           child: const BodyContainer(),
         ),
-        if (_hasRightSideMenus) ...[
+        if (_hasRightMenus) ...[
           LayoutId(
-            id: PlutoLayoutId.rightSideMenu,
-            child: RightMenus(controller: widget.controller),
+            id: PlutoLayoutId.rightMenu,
+            child: MenuContainer(
+              direction: PlutoLayoutMenuDirection.right,
+              onTap: widget.controller.setEnabledRightMenuItem,
+              items: widget.controller.rightMenus,
+            ),
           ),
-          if (_hasRightSideTabViews)
+          if (_hasRightTabViews)
             LayoutId(
-              id: PlutoLayoutId.rightSideTabView,
+              id: PlutoLayoutId.rightTabView,
               child: ResizeIndicator(
-                id: PlutoLayoutId.rightSideTabView,
+                id: PlutoLayoutId.rightTabView,
                 onResize: resize,
                 position: ResizeIndicatorPosition.left,
-                child: RightTabView(controller: widget.controller),
+                child: TabViewContainer(
+                  controller: widget.controller,
+                  direction: TabViewDirection.right,
+                ),
               ),
             ),
         ],
         LayoutId(
-          id: PlutoLayoutId.bottomSideMenu,
-          child: const BottomMenus(),
+          id: PlutoLayoutId.bottomMenu,
+          child: const MenuContainer(
+            direction: PlutoLayoutMenuDirection.bottom,
+          ),
         ),
       ],
     );
@@ -139,126 +152,138 @@ class _PlutoLayoutDelegate extends MultiChildLayoutDelegate {
 
   final PlutoLayoutController controller;
 
-  @override
-  void performLayout(Size size) {
+  void _updateBeforeLayout(Size size) {
     if (size.width != controller.contentWidth && controller.contentWidth != 0) {
       controller.updateLayout(size);
     }
 
-    controller.contentWidth = size.width;
-    final double minSideTabViewWidth = controller.minSideTabViewWidth;
+    controller.setLayout(contentWidth: size.width);
+  }
+
+  @override
+  void performLayout(Size size) {
+    _updateBeforeLayout(size);
+
+    final double minTabViewWidth = controller.minTabViewWidth;
     double bodyTop = 0;
     double bodyLeft = 0;
     double bodyRight = 0;
     double bodyBottom = 0;
-    bool keepBodyContainerWidth =
-        controller.bodyContainerWidth <= minSideTabViewWidth;
-    double takeForBodyWidth =
-        minSideTabViewWidth - controller.bodyContainerWidth;
+    bool bodyNeedsWidth = controller.bodyContainerWidth <= minTabViewWidth;
+    double widthBodyNeed = minTabViewWidth - controller.bodyContainerWidth;
 
-    if (hasChild(PlutoLayoutId.topSideMenu)) {
+    if (hasChild(PlutoLayoutId.topMenu)) {
       final s = layoutChild(
-        PlutoLayoutId.topSideMenu,
+        PlutoLayoutId.topMenu,
         BoxConstraints.tightFor(width: size.width),
       );
 
       bodyTop += s.height;
 
       positionChild(
-        PlutoLayoutId.topSideMenu,
+        PlutoLayoutId.topMenu,
         Offset.zero,
       );
     }
 
-    if (hasChild(PlutoLayoutId.bottomSideMenu)) {
+    if (hasChild(PlutoLayoutId.bottomMenu)) {
       final s = layoutChild(
-        PlutoLayoutId.bottomSideMenu,
+        PlutoLayoutId.bottomMenu,
         BoxConstraints.tightFor(width: size.width),
       );
 
       bodyBottom += s.height;
 
       positionChild(
-        PlutoLayoutId.bottomSideMenu,
+        PlutoLayoutId.bottomMenu,
         Offset(size.width - s.width, size.height - s.height),
       );
     }
 
-    if (hasChild(PlutoLayoutId.leftSideMenu)) {
+    if (hasChild(PlutoLayoutId.leftMenu)) {
       final s = layoutChild(
-        PlutoLayoutId.leftSideMenu,
+        PlutoLayoutId.leftMenu,
         BoxConstraints.tightFor(height: size.height - bodyTop - bodyBottom),
       );
 
       bodyLeft += s.width;
 
       positionChild(
-        PlutoLayoutId.leftSideMenu,
+        PlutoLayoutId.leftMenu,
         Offset(0, bodyTop),
       );
     }
 
-    if (hasChild(PlutoLayoutId.leftSideTabView)) {
-      if (keepBodyContainerWidth &&
-          controller.leftSideTabViewWidth > minSideTabViewWidth) {
-        if (controller.leftSideTabViewWidth >= takeForBodyWidth) {
-          controller.bodyContainerWidth = minSideTabViewWidth;
-          controller.leftSideTabViewWidth -= takeForBodyWidth;
+    if (hasChild(PlutoLayoutId.leftTabView)) {
+      if (bodyNeedsWidth && controller.leftTabViewWidth > minTabViewWidth) {
+        if (controller.leftTabViewWidth >= widthBodyNeed) {
+          controller.setLayout(
+            bodyContainerWidth: minTabViewWidth,
+            leftTabViewWidth: controller.leftTabViewWidth - widthBodyNeed,
+          );
         } else {
-          final take = controller.leftSideTabViewWidth - takeForBodyWidth;
-          takeForBodyWidth -= take;
-          controller.bodyContainerWidth += take;
+          final take = controller.leftTabViewWidth - widthBodyNeed;
+          widthBodyNeed -= take;
+          controller.setLayout(
+            bodyContainerWidth: controller.bodyContainerWidth + take,
+            leftTabViewWidth: controller.leftTabViewWidth - take,
+          );
         }
       }
 
       final s = layoutChild(
-        PlutoLayoutId.leftSideTabView,
+        PlutoLayoutId.leftTabView,
         BoxConstraints.tightFor(
-          width: controller.leftSideTabViewWidth,
+          width: controller.leftTabViewWidth,
           height: size.height - bodyTop - bodyBottom,
         ),
       );
 
       positionChild(
-        PlutoLayoutId.leftSideTabView,
+        PlutoLayoutId.leftTabView,
         Offset(bodyLeft, bodyTop),
       );
 
       bodyLeft += s.width;
     }
 
-    if (hasChild(PlutoLayoutId.rightSideMenu)) {
+    if (hasChild(PlutoLayoutId.rightMenu)) {
       final s = layoutChild(
-        PlutoLayoutId.rightSideMenu,
+        PlutoLayoutId.rightMenu,
         BoxConstraints.tightFor(height: size.height - bodyTop - bodyBottom),
       );
 
       bodyRight += s.width;
 
       positionChild(
-        PlutoLayoutId.rightSideMenu,
+        PlutoLayoutId.rightMenu,
         Offset(size.width - s.width, bodyTop),
       );
     }
 
-    if (hasChild(PlutoLayoutId.rightSideTabView)) {
-      if (keepBodyContainerWidth &&
-          controller.rightSideTabViewWidth > minSideTabViewWidth &&
-          takeForBodyWidth > 0) {
-        if (controller.leftSideTabViewWidth >= takeForBodyWidth) {
-          controller.bodyContainerWidth = minSideTabViewWidth;
-          controller.rightSideTabViewWidth -= takeForBodyWidth;
+    if (hasChild(PlutoLayoutId.rightTabView)) {
+      if (bodyNeedsWidth &&
+          widthBodyNeed > 0 &&
+          controller.rightTabViewWidth > minTabViewWidth) {
+        if (controller.rightTabViewWidth >= widthBodyNeed) {
+          controller.setLayout(
+            bodyContainerWidth: minTabViewWidth,
+            rightTabViewWidth: controller.rightTabViewWidth - widthBodyNeed,
+          );
         } else {
-          final take = controller.rightSideTabViewWidth - takeForBodyWidth;
-          takeForBodyWidth -= take;
-          controller.bodyContainerWidth += take;
+          final take = controller.rightTabViewWidth - widthBodyNeed;
+          widthBodyNeed -= take;
+          controller.setLayout(
+            bodyContainerWidth: controller.bodyContainerWidth + take,
+            rightTabViewWidth: controller.rightTabViewWidth - take,
+          );
         }
       }
 
       final s = layoutChild(
-        PlutoLayoutId.rightSideTabView,
+        PlutoLayoutId.rightTabView,
         BoxConstraints.tightFor(
-          width: controller.rightSideTabViewWidth,
+          width: controller.rightTabViewWidth,
           height: size.height - bodyTop - bodyBottom,
         ),
       );
@@ -266,7 +291,7 @@ class _PlutoLayoutDelegate extends MultiChildLayoutDelegate {
       bodyRight += s.width;
 
       positionChild(
-        PlutoLayoutId.rightSideTabView,
+        PlutoLayoutId.rightTabView,
         Offset(size.width - bodyRight, bodyTop),
       );
     }
@@ -280,7 +305,7 @@ class _PlutoLayoutDelegate extends MultiChildLayoutDelegate {
         )),
       );
 
-      controller.bodyContainerWidth = s.width;
+      controller.setLayout(bodyContainerWidth: s.width);
 
       positionChild(
         PlutoLayoutId.bodyContainer,
@@ -297,10 +322,10 @@ class _PlutoLayoutDelegate extends MultiChildLayoutDelegate {
 
 enum PlutoLayoutId {
   bodyContainer,
-  bottomSideMenu,
-  leftSideMenu,
-  leftSideTabView,
-  rightSideMenu,
-  rightSideTabView,
-  topSideMenu,
+  bottomMenu,
+  leftMenu,
+  leftTabView,
+  rightMenu,
+  rightTabView,
+  topMenu,
 }
