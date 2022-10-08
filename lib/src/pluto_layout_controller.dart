@@ -10,27 +10,9 @@ class PlutoLayoutController extends ChangeNotifier {
   PlutoLayoutController({
     List<SideMenuItem>? leftSideMenus,
     List<SideMenuItem>? rightSideMenus,
-    this.leftSideTabViewWidth = 200.0,
+    this.minSideTabViewWidth = 32.0,
   })  : _leftSideMenus = leftSideMenus ?? const [],
         _rightSideMenus = rightSideMenus ?? const [];
-
-  double minSideTabViewWidth = 32;
-
-  double leftSideHeight = 0;
-
-  double rightSideHeight = 0;
-
-  double leftSideTabViewWidth = 200;
-
-  double rightSideTabViewWidth = 200;
-
-  double bodyContainerWidth = 200;
-
-  double contentWidth = 0;
-
-  bool previousEnabledLeftSideTabView = false;
-
-  bool previousEnabledRightSideTabView = false;
 
   final List<SideMenuItem> _leftSideMenus;
 
@@ -39,6 +21,30 @@ class PlutoLayoutController extends ChangeNotifier {
   final Map<Object, Widget> _leftSideWidgets = {};
 
   final Map<Object, Widget> _rightSideWidgets = {};
+
+  final double minSideTabViewWidth;
+
+  @protected
+  double leftSideHeight = 0;
+
+  @protected
+  double rightSideHeight = 0;
+
+  @protected
+  double leftSideTabViewWidth = 200;
+
+  @protected
+  double rightSideTabViewWidth = 200;
+
+  @protected
+  double bodyContainerWidth = 200;
+
+  @protected
+  double contentWidth = 0;
+
+  bool _previousEnabledLeftSideTabView = false;
+
+  bool _previousEnabledRightSideTabView = false;
 
   List<SideMenuItem> get leftSideMenus => _leftSideMenus;
 
@@ -159,13 +165,14 @@ class PlutoLayoutController extends ChangeNotifier {
   }
 
   void resetTabViewWidth() {
-    if (previousEnabledLeftSideTabView != hasEnabledLeftSideTabViews) {
+    if (_previousEnabledLeftSideTabView != hasEnabledLeftSideTabViews) {
       if (hasEnabledLeftSideTabViews) {
         bodyContainerWidth -= leftSideTabViewWidth;
       } else {
         bodyContainerWidth += leftSideTabViewWidth;
       }
-    } else if (previousEnabledRightSideTabView != hasEnabledRightSideTabViews) {
+    } else if (_previousEnabledRightSideTabView !=
+        hasEnabledRightSideTabViews) {
       if (hasEnabledRightSideTabViews) {
         bodyContainerWidth -= rightSideTabViewWidth;
       } else {
@@ -197,7 +204,7 @@ class PlutoLayoutController extends ChangeNotifier {
   }
 
   void updatePreviousEnabledSideTabView() {
-    previousEnabledLeftSideTabView = hasEnabledLeftSideTabViews;
-    previousEnabledRightSideTabView = hasEnabledRightSideTabViews;
+    _previousEnabledLeftSideTabView = hasEnabledLeftSideTabViews;
+    _previousEnabledRightSideTabView = hasEnabledRightSideTabViews;
   }
 }
