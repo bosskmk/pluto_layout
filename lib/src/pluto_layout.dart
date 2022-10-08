@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:pluto_layout/pluto_layout.dart';
 import 'package:pluto_layout/src/ui/ui.dart';
 
+import 'widgets/widgets.dart';
+
 class PlutoLayout extends StatefulWidget {
   PlutoLayout({
     PlutoLayoutController? controller,
@@ -78,16 +80,16 @@ class _PlutoLayoutState extends State<PlutoLayout> {
   @override
   Widget build(BuildContext context) {
     return CustomMultiChildLayout(
-      delegate: PlutoLayoutDelegate(resizeNotifier, widget.controller),
+      delegate: _PlutoLayoutDelegate(resizeNotifier, widget.controller),
       children: [
         LayoutId(
           id: PlutoLayoutId.topSideMenu,
-          child: const TopSideMenu(),
+          child: const TopMenus(),
         ),
         if (_hasLeftSideMenus) ...[
           LayoutId(
             id: PlutoLayoutId.leftSideMenu,
-            child: LeftSideMenu(controller: widget.controller),
+            child: LeftMenus(controller: widget.controller),
           ),
           if (_hasLeftSideTabViews)
             LayoutId(
@@ -96,7 +98,7 @@ class _PlutoLayoutState extends State<PlutoLayout> {
                 id: PlutoLayoutId.leftSideTabView,
                 onResize: resize,
                 position: ResizeIndicatorPosition.right,
-                child: LeftSideTabView(controller: widget.controller),
+                child: LeftTabView(controller: widget.controller),
               ),
             ),
         ],
@@ -107,7 +109,7 @@ class _PlutoLayoutState extends State<PlutoLayout> {
         if (_hasRightSideMenus) ...[
           LayoutId(
             id: PlutoLayoutId.rightSideMenu,
-            child: RightSideMenu(controller: widget.controller),
+            child: RightMenus(controller: widget.controller),
           ),
           if (_hasRightSideTabViews)
             LayoutId(
@@ -116,21 +118,21 @@ class _PlutoLayoutState extends State<PlutoLayout> {
                 id: PlutoLayoutId.rightSideTabView,
                 onResize: resize,
                 position: ResizeIndicatorPosition.left,
-                child: RightSideTabView(controller: widget.controller),
+                child: RightTabView(controller: widget.controller),
               ),
             ),
         ],
         LayoutId(
           id: PlutoLayoutId.bottomSideMenu,
-          child: const BottomSideMenu(),
+          child: const BottomMenus(),
         ),
       ],
     );
   }
 }
 
-class PlutoLayoutDelegate extends MultiChildLayoutDelegate {
-  PlutoLayoutDelegate(this.resizeNotifier, this.controller)
+class _PlutoLayoutDelegate extends MultiChildLayoutDelegate {
+  _PlutoLayoutDelegate(this.resizeNotifier, this.controller)
       : super(relayout: resizeNotifier);
 
   final ChangeNotifier resizeNotifier;

@@ -4,19 +4,19 @@ import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pluto_layout/pluto_layout.dart';
 
-import 'helper/pluto_resize_helper.dart';
+import 'helper/resize_helper.dart';
 
 class PlutoLayoutController extends ChangeNotifier {
   PlutoLayoutController({
-    List<SideMenuItem>? leftSideMenus,
-    List<SideMenuItem>? rightSideMenus,
+    List<PlutoLayoutMenuItem>? leftSideMenus,
+    List<PlutoLayoutMenuItem>? rightSideMenus,
     this.minSideTabViewWidth = 32.0,
   })  : _leftSideMenus = leftSideMenus ?? const [],
         _rightSideMenus = rightSideMenus ?? const [];
 
-  final List<SideMenuItem> _leftSideMenus;
+  final List<PlutoLayoutMenuItem> _leftSideMenus;
 
-  final List<SideMenuItem> _rightSideMenus;
+  final List<PlutoLayoutMenuItem> _rightSideMenus;
 
   final Map<Object, Widget> _leftSideWidgets = {};
 
@@ -46,14 +46,14 @@ class PlutoLayoutController extends ChangeNotifier {
 
   bool _previousEnabledRightSideTabView = false;
 
-  List<SideMenuItem> get leftSideMenus => _leftSideMenus;
+  List<PlutoLayoutMenuItem> get leftSideMenus => _leftSideMenus;
 
-  List<SideMenuItem> get rightSideMenus => _rightSideMenus;
+  List<PlutoLayoutMenuItem> get rightSideMenus => _rightSideMenus;
 
-  Iterable<SideMenuItem> get enabledLeftSideMenus =>
+  Iterable<PlutoLayoutMenuItem> get enabledLeftSideMenus =>
       _leftSideMenus.where((e) => e.tabViewBuilder != null && e.enabled);
 
-  Iterable<SideMenuItem> get enabledRightSideMenus =>
+  Iterable<PlutoLayoutMenuItem> get enabledRightSideMenus =>
       _rightSideMenus.where((e) => e.tabViewBuilder != null && e.enabled);
 
   bool get hasLeftSideMenus => _leftSideMenus.isNotEmpty;
@@ -78,11 +78,11 @@ class PlutoLayoutController extends ChangeNotifier {
 
     found.enabled = flag;
 
-    final sizing = PlutoAutoSizeHelper.items(
+    final sizing = AutoSizeHelper.items(
       maxSize: leftSideHeight,
       length: enabledLeftSideMenus.length,
       itemMinSize: 45,
-      mode: PlutoAutoSizeMode.equal,
+      mode: AutoSizeMode.equal,
     );
 
     for (final item in enabledLeftSideMenus) {
@@ -103,11 +103,11 @@ class PlutoLayoutController extends ChangeNotifier {
 
     found.enabled = flag;
 
-    final sizing = PlutoAutoSizeHelper.items(
+    final sizing = AutoSizeHelper.items(
       maxSize: rightSideHeight,
       length: enabledRightSideMenus.length,
       itemMinSize: 45,
-      mode: PlutoAutoSizeMode.equal,
+      mode: AutoSizeMode.equal,
     );
 
     for (final item in enabledRightSideMenus) {
@@ -119,7 +119,10 @@ class PlutoLayoutController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Widget getEnabledLeftSideTabView(BuildContext context, SideMenuItem item) {
+  Widget getEnabledLeftSideTabView(
+    BuildContext context,
+    PlutoLayoutMenuItem item,
+  ) {
     if (_leftSideWidgets[item.id] == null) {
       _leftSideWidgets[item.id] = item.tabViewBuilder!(context);
     }
@@ -127,7 +130,10 @@ class PlutoLayoutController extends ChangeNotifier {
     return _leftSideWidgets[item.id]!;
   }
 
-  Widget getEnabledRightSideTabView(BuildContext context, SideMenuItem item) {
+  Widget getEnabledRightSideTabView(
+    BuildContext context,
+    PlutoLayoutMenuItem item,
+  ) {
     if (_rightSideWidgets[item.id] == null) {
       _rightSideWidgets[item.id] = item.tabViewBuilder!(context);
     }
@@ -142,7 +148,7 @@ class PlutoLayoutController extends ChangeNotifier {
       if (hasEnabledRightSideTabViews) PlutoLayoutId.rightSideTabView,
     ];
 
-    final resizing = PlutoResizeHelper.items<PlutoLayoutId>(
+    final resizing = ResizeHelper.items<PlutoLayoutId>(
       offset: id == PlutoLayoutId.leftSideTabView ? offset.dx : -offset.dx,
       items: items,
       isMainItem: (e) => e == id,
@@ -158,7 +164,7 @@ class PlutoLayoutController extends ChangeNotifier {
         if (e == PlutoLayoutId.bodyContainer) bodyContainerWidth = size;
         if (e == PlutoLayoutId.rightSideTabView) rightSideTabViewWidth = size;
       },
-      mode: PlutoResizeMode.pushAndPull,
+      mode: ResizeMode.pushAndPull,
     );
 
     resizing.update();

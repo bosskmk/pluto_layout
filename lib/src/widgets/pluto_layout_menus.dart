@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:pluto_layout/pluto_layout.dart';
+import 'package:pluto_layout/src/widgets/widgets.dart';
 
-class SideMenus extends StatelessWidget {
-  const SideMenus({
+class PlutoLayoutMenus extends StatelessWidget {
+  const PlutoLayoutMenus({
     required this.items,
     required this.onToggledItem,
-    this.direction = SideMenuDirection.left,
+    this.direction = PlutoLayoutMenuDirection.left,
     Key? key,
   }) : super(key: key);
 
-  final List<SideMenuItem> items;
+  final List<PlutoLayoutMenuItem> items;
 
-  final SideMenuDirection direction;
+  final PlutoLayoutMenuDirection direction;
 
   final void Function(Object id, bool flag) onToggledItem;
 
@@ -43,19 +43,8 @@ class SideMenus extends StatelessWidget {
   }
 }
 
-enum SideMenuDirection {
-  left,
-  right;
-
-  int get turns => this == SideMenuDirection.left ? -45 : 45;
-
-  MainAxisAlignment get alignment => this == SideMenuDirection.left
-      ? MainAxisAlignment.end
-      : MainAxisAlignment.start;
-}
-
-class SideMenuItem {
-  SideMenuItem({
+class PlutoLayoutMenuItem {
+  PlutoLayoutMenuItem({
     required this.id,
     required this.title,
     this.icon,
@@ -76,4 +65,15 @@ class SideMenuItem {
   bool enabled = false;
 
   double? tabViewHeight;
+}
+
+enum PlutoLayoutMenuDirection {
+  left,
+  right;
+
+  int get turns => this == PlutoLayoutMenuDirection.left ? -45 : 45;
+
+  MainAxisAlignment get alignment => this == PlutoLayoutMenuDirection.left
+      ? MainAxisAlignment.end
+      : MainAxisAlignment.start;
 }

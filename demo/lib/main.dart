@@ -4,30 +4,30 @@ import 'package:flutter/material.dart';
 import 'package:pluto_layout/pluto_layout.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const DemoApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class DemoApp extends StatelessWidget {
+  const DemoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(useMaterial3: true),
-      home: const MyHomePage(),
+      home: const DemoPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class DemoPage extends StatefulWidget {
+  const DemoPage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<DemoPage> createState() => _DemoPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _DemoPageState extends State<DemoPage> {
   late final PlutoLayoutController controller;
 
   @override
@@ -36,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     controller = PlutoLayoutController(
       leftSideMenus: [
-        SideMenuItem(
+        PlutoLayoutMenuItem(
           id: 'Files',
           title: 'Files',
           icon: const Icon(Icons.folder, size: 18),
@@ -54,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
-        SideMenuItem(
+        PlutoLayoutMenuItem(
           id: 'Docs',
           title: 'Docs',
           icon: const Icon(Icons.my_library_books, size: 18),
@@ -72,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
-        SideMenuItem(
+        PlutoLayoutMenuItem(
           id: 'Docs2',
           title: 'Docs2',
           icon: const Icon(Icons.my_library_books, size: 18),
@@ -92,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ],
       rightSideMenus: [
-        SideMenuItem(
+        PlutoLayoutMenuItem(
           id: 'Settings',
           title: 'Settings',
           icon: const Icon(Icons.settings, size: 18),
@@ -110,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
-        SideMenuItem(
+        PlutoLayoutMenuItem(
           id: 'Profile',
           title: 'Profile',
           icon: const Icon(Icons.account_box, size: 18),

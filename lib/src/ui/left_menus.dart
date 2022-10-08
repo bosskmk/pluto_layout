@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pluto_layout/pluto_layout.dart';
 
-class LeftSideMenu extends StatefulWidget {
-  const LeftSideMenu({
+class LeftMenus extends StatefulWidget {
+  const LeftMenus({
     required this.controller,
     super.key,
   });
@@ -10,10 +10,10 @@ class LeftSideMenu extends StatefulWidget {
   final PlutoLayoutController controller;
 
   @override
-  State<LeftSideMenu> createState() => _LeftSideMenuState();
+  State<LeftMenus> createState() => _LeftMenusState();
 }
 
-class _LeftSideMenuState extends State<LeftSideMenu> {
+class _LeftMenusState extends State<LeftMenus> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -25,10 +25,10 @@ class _LeftSideMenuState extends State<LeftSideMenu> {
           right: BorderSide(color: theme.dividerColor),
         ),
       ),
-      child: SideMenus(
+      child: PlutoLayoutMenus(
         items: widget.controller.leftSideMenus.reversed.toList(),
         onToggledItem: widget.controller.setEnabledLeftSideMenuItem,
-        direction: SideMenuDirection.left,
+        direction: PlutoLayoutMenuDirection.left,
       ),
     );
   }

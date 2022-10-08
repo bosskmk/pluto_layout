@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class BottomSideMenu extends StatefulWidget {
-  const BottomSideMenu({Key? key}) : super(key: key);
+class TopMenus extends StatefulWidget {
+  const TopMenus({Key? key}) : super(key: key);
 
   @override
-  State<BottomSideMenu> createState() => _BottomSideMenuState();
+  State<TopMenus> createState() => _TopMenusState();
 }
 
-class _BottomSideMenuState extends State<BottomSideMenu> {
+class _TopMenusState extends State<TopMenus> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -17,10 +17,10 @@ class _BottomSideMenuState extends State<BottomSideMenu> {
       decoration: BoxDecoration(
         color: theme.dialogBackgroundColor,
         border: Border(
-          top: BorderSide(color: theme.dividerColor),
+          bottom: BorderSide(color: theme.dividerColor),
         ),
       ),
-      child: const Text('bottom tab'),
+      child: const Text('top tab'),
     );
   }
 }

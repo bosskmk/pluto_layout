@@ -1,14 +1,15 @@
-// ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: invalid_use_of_protected_member
 
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:pluto_layout/pluto_layout.dart';
 
-import '../helper/pluto_resize_helper.dart';
+import '../helper/resize_helper.dart';
+import '../widgets/widgets.dart';
 
-class LeftSideTabView extends StatefulWidget {
-  const LeftSideTabView({
+class RightTabView extends StatefulWidget {
+  const RightTabView({
     required this.controller,
     super.key,
   });
@@ -16,20 +17,20 @@ class LeftSideTabView extends StatefulWidget {
   final PlutoLayoutController controller;
 
   @override
-  State<LeftSideTabView> createState() => _LeftSideTabViewState();
+  State<RightTabView> createState() => _RightTabViewState();
 }
 
-class _LeftSideTabViewState extends State<LeftSideTabView> {
+class _RightTabViewState extends State<RightTabView> {
   final resizeNotifier = ChangeNotifier();
 
-  List<SideMenuItem> _enabledSideMenus = [];
+  List<PlutoLayoutMenuItem> _enabledSideMenus = [];
 
   @override
   void initState() {
     super.initState();
 
     _enabledSideMenus =
-        widget.controller.enabledLeftSideMenus.toList(growable: false);
+        widget.controller.enabledRightSideMenus.toList(growable: false);
 
     widget.controller.addListener(listener);
   }
@@ -46,23 +47,24 @@ class _LeftSideTabViewState extends State<LeftSideTabView> {
   void listener() {
     setState(() {
       _enabledSideMenus =
-          widget.controller.enabledLeftSideMenus.toList(growable: false);
+          widget.controller.enabledRightSideMenus.toList(growable: false);
     });
   }
 
   void resize(Object id, Offset offset) {
-    final resizing = PlutoResizeHelper.items<SideMenuItem>(
+    final sizing = ResizeHelper.items<PlutoLayoutMenuItem>(
       offset: offset.dy,
       items: _enabledSideMenus,
       isMainItem: (e) => e.id == id,
       getItemSize: (e) => e.tabViewHeight ?? 200,
       getItemMinSize: (e) => 45,
       setItemSize: (e, size) => e.tabViewHeight = size,
-      mode: PlutoResizeMode.pushAndPull,
+      mode: ResizeMode.pushAndPull,
     );
 
-    resizing.update();
+    sizing.update();
 
+    // ignore: invalid_use_of_visible_for_testing_member
     resizeNotifier.notifyListeners();
   }
 
@@ -73,7 +75,8 @@ class _LeftSideTabViewState extends State<LeftSideTabView> {
     int count = 0;
 
     for (final item in _enabledSideMenus) {
-      Widget child = widget.controller.getEnabledLeftSideTabView(context, item);
+      Widget child =
+          widget.controller.getEnabledRightSideTabView(context, item);
 
       if (count < total - 1) {
         child = ResizeIndicator(
@@ -109,7 +112,7 @@ class _Delegate extends MultiChildLayoutDelegate {
   _Delegate(this.menuItems, this.resizeNotifier, this.controller)
       : super(relayout: resizeNotifier);
 
-  final List<SideMenuItem> menuItems;
+  final List<PlutoLayoutMenuItem> menuItems;
 
   final ChangeNotifier resizeNotifier;
 
@@ -117,7 +120,7 @@ class _Delegate extends MultiChildLayoutDelegate {
 
   @override
   void performLayout(Size size) {
-    controller.leftSideHeight = size.height;
+    controller.rightSideHeight = size.height;
     int length = menuItems.length;
     int count = 0;
     double remainingHeight = size.height;
