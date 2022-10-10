@@ -30,20 +30,20 @@ enum ResizeIndicatorPosition {
   }
 }
 
-class ResizeIndicator extends StatelessWidget {
+class ResizeIndicator<T> extends StatelessWidget {
   const ResizeIndicator({
-    required this.id,
+    required this.item,
     required this.position,
     required this.onResize,
     required this.child,
     super.key,
   });
 
-  final Object id;
+  final T item;
 
   final ResizeIndicatorPosition position;
 
-  final void Function(Object, Offset) onResize;
+  final void Function(T, Offset) onResize;
 
   final Widget child;
 
@@ -67,10 +67,10 @@ class ResizeIndicator extends StatelessWidget {
                 : SystemMouseCursors.resizeLeftRight,
             child: GestureDetector(
               onHorizontalDragUpdate: position.vertical
-                  ? (details) => onResize(id, details.delta)
+                  ? (details) => onResize(item, details.delta)
                   : null,
               onVerticalDragUpdate: position.horizontal
-                  ? (details) => onResize(id, details.delta)
+                  ? (details) => onResize(item, details.delta)
                   : null,
               child: Container(
                 width: position.horizontal ? size.width : 5,

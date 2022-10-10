@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   collection: ^1.16.0
+  flutter_riverpod: ^2.0.2
 
 dev_dependencies:
   flutter_test:

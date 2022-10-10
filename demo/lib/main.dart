@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -28,110 +30,6 @@ class DemoPage extends StatefulWidget {
 }
 
 class _DemoPageState extends State<DemoPage> {
-  late final PlutoLayoutController controller;
-
-  @override
-  void initState() {
-    super.initState();
-
-    controller = PlutoLayoutController(
-      leftMenus: [
-        PlutoLayoutMenuItem(
-          id: 'Files',
-          title: 'Files',
-          icon: const Icon(Icons.folder, size: 18),
-          tabViewBuilder: (c) => SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SizedBox(
-              height: 500,
-              width: 500,
-              child: ListView(
-                children: List.generate(
-                  30,
-                  (i) => Text('files $i'),
-                ),
-              ),
-            ),
-          ),
-        ),
-        PlutoLayoutMenuItem(
-          id: 'Docs',
-          title: 'Docs',
-          icon: const Icon(Icons.my_library_books, size: 18),
-          tabViewBuilder: (c) => SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SizedBox(
-              height: 500,
-              width: 500,
-              child: ListView(
-                children: List.generate(
-                  30,
-                  (i) => Text('docs $i'),
-                ),
-              ),
-            ),
-          ),
-        ),
-        PlutoLayoutMenuItem(
-          id: 'Docs2',
-          title: 'Docs2',
-          icon: const Icon(Icons.my_library_books, size: 18),
-          tabViewBuilder: (c) => SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SizedBox(
-              height: 500,
-              width: 500,
-              child: ListView(
-                children: List.generate(
-                  30,
-                  (i) => Text('docs2 $i'),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-      rightMenus: [
-        PlutoLayoutMenuItem(
-          id: 'Settings',
-          title: 'Settings',
-          icon: const Icon(Icons.settings, size: 18),
-          tabViewBuilder: (c) => SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SizedBox(
-              height: 500,
-              width: 500,
-              child: ListView(
-                children: List.generate(
-                  30,
-                  (i) => Text('Settings $i'),
-                ),
-              ),
-            ),
-          ),
-        ),
-        PlutoLayoutMenuItem(
-          id: 'Profile',
-          title: 'Profile',
-          icon: const Icon(Icons.account_box, size: 18),
-          tabViewBuilder: (c) => SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SizedBox(
-              height: 500,
-              width: 500,
-              child: ListView(
-                children: List.generate(
-                  30,
-                  (i) => Text('Profile $i'),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -144,7 +42,91 @@ class _DemoPageState extends State<DemoPage> {
           scrollbars: false,
         ),
         child: PlutoLayout(
-          controller: controller,
+          top: PlutoLayoutContainer(
+            child: PlutoLayoutTabs(
+              items: [
+                PlutoLayoutTabItem(
+                  id: 'File',
+                  title: 'File',
+                  tabViewBuilder: (c) {
+                    return Text('File View');
+                  },
+                ),
+                PlutoLayoutTabItem(
+                  id: 'Edit',
+                  title: 'Edit',
+                  tabViewBuilder: (c) {
+                    return Text('Edit View');
+                  },
+                ),
+              ],
+            ),
+          ),
+          left: PlutoLayoutContainer(
+            // backgroundColor: Colors.blueAccent,
+            child: PlutoLayoutTabs(
+              items: [
+                PlutoLayoutTabItem(
+                  id: 'Project',
+                  title: 'Project',
+                  tabViewBuilder: (c) {
+                    return Text('Project View');
+                  },
+                ),
+                PlutoLayoutTabItem(
+                  id: 'Bookmark',
+                  title: 'Bookmark',
+                  tabViewBuilder: (c) {
+                    return Text('Bookmark View');
+                  },
+                ),
+              ],
+            ),
+          ),
+          right: PlutoLayoutContainer(
+            child: PlutoLayoutTabs(
+              items: [
+                PlutoLayoutTabItem(
+                  id: 'Flutter Inspector',
+                  title: 'Flutter Inspector',
+                  tabViewBuilder: (c) {
+                    return Text('Flutter Inspector View');
+                  },
+                ),
+                PlutoLayoutTabItem(
+                  id: 'Flutter Performance',
+                  title: 'Flutter Performance',
+                  tabViewBuilder: (c) {
+                    return Text('Flutter Performance View');
+                  },
+                ),
+              ],
+            ),
+          ),
+          bottom: PlutoLayoutContainer(
+            child: PlutoLayoutTabs(
+              items: [
+                PlutoLayoutTabItem(
+                  id: 'Terminal',
+                  title: 'Terminal',
+                  tabViewBuilder: (c) {
+                    return Text('Terminal View');
+                  },
+                ),
+                PlutoLayoutTabItem(
+                  id: 'Git',
+                  title: 'Git',
+                  tabViewBuilder: (c) {
+                    return Text('Git View');
+                  },
+                ),
+              ],
+            ),
+          ),
+          body: PlutoLayoutContainer(
+            // backgroundColor: Colors.green,
+            child: Text('body'),
+          ),
         ),
       ),
     );

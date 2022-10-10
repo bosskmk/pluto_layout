@@ -61,6 +61,7 @@ class _ToggleButtonState extends State<ToggleButton> {
             label: title,
           )
         : TextButton(
+            style: style,
             onPressed: onTap,
             child: title,
           );
