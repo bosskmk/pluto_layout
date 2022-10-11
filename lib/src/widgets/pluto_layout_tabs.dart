@@ -1,14 +1,22 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pluto_layout/pluto_layout.dart';
+import 'package:pluto_layout/src/helper/resize_helper.dart';
 
 class _ItemsNotifier extends StateNotifier<List<PlutoLayoutTabItem>> {
   _ItemsNotifier(List<PlutoLayoutTabItem> items) : super(items);
 
-  void setEnabled(Object id, bool flag) {
+  void setEnabled(Object id, bool flag, [bool disableOther = false]) {
+    PlutoLayoutTabItem disableOrNot(PlutoLayoutTabItem item) {
+      if (!disableOther) return item;
+      return item.copyWith(enabled: false);
+    }
+
     state = [
       for (final item in state)
-        if (item.id == id) item.copyWith(enabled: flag) else item,
+        if (item.id == id) item.copyWith(enabled: flag) else disableOrNot(item),
     ];
   }
 }
@@ -21,10 +29,13 @@ final _itemProvider =
 class PlutoLayoutTabs extends ConsumerWidget {
   const PlutoLayoutTabs({
     this.items = const [],
+    this.mode = PlutoLayoutTabMode.showOne,
     super.key,
   });
 
   final List<PlutoLayoutTabItem> items;
+
+  final PlutoLayoutTabMode mode;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -35,7 +46,7 @@ class PlutoLayoutTabs extends ConsumerWidget {
     final containerDirection = ref.read(layoutContainerDirectionProvider);
 
     List<Widget> children = [
-      _Menus(direction: containerDirection),
+      _Menus(direction: containerDirection, mode: mode),
       _TabView(direction: containerDirection),
     ];
 
@@ -71,9 +82,11 @@ class PlutoLayoutTabs extends ConsumerWidget {
 }
 
 class _Menus extends ConsumerWidget {
-  const _Menus({required this.direction});
+  const _Menus({required this.direction, required this.mode});
 
   final PlutoLayoutContainerDirection direction;
+
+  final PlutoLayoutTabMode mode;
 
   MainAxisAlignment getMenuAlignment(PlutoLayoutId id) {
     switch (id) {
@@ -105,6 +118,28 @@ class _Menus extends ConsumerWidget {
     }
   }
 
+  void toggleTab(WidgetRef ref, PlutoLayoutTabItem item, bool flag) {
+    final layoutData = ref.read(layoutDataProvider);
+
+    final layoutId = ref.read(layoutIdProvider);
+
+    ref.read(_itemProvider.notifier).setEnabled(item.id, flag, mode.isShowOne);
+
+    final items = ref.read(_itemProvider).where((e) => e.enabled);
+
+    final maxSize = layoutData.getMaxTabSize(layoutId);
+
+    final sizing = AutoSizeHelper.items(
+      maxSize: maxSize,
+      length: items.length,
+      itemMinSize: PlutoLayoutData.minTabSize,
+      mode: AutoSizeMode.equal,
+    );
+
+    setSize(e) => e.size = sizing.getItemSize(e.size);
+    items.forEach(setSize);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final layoutId = ref.read(layoutIdProvider);
@@ -126,8 +161,8 @@ class _Menus extends ConsumerWidget {
                   (e) => ToggleButton(
                     title: e.title,
                     icon: e.icon,
-                    changed: (flag) =>
-                        ref.read(_itemProvider.notifier).setEnabled(e.id, flag),
+                    enabled: e.enabled,
+                    changed: (flag) => toggleTab(ref, e, flag),
                   ),
                 )
                 .toList(),
@@ -149,6 +184,8 @@ class _TabView extends ConsumerStatefulWidget {
 
 class _TabViewState extends ConsumerState<_TabView> {
   final ValueNotifier<double?> tabSize = ValueNotifier(null);
+
+  final ChangeNotifier itemResizeNotifier = ChangeNotifier();
 
   Size get maxSize => MediaQuery.of(context).size;
 
@@ -212,13 +249,40 @@ class _TabViewState extends ConsumerState<_TabView> {
         break;
     }
 
-    if (size <= 32) return;
+    if (size <= PlutoLayoutData.minTabSize) return;
 
     tabSize.value = size;
   }
 
   void resizeTabItem(PlutoLayoutTabItem item, Offset offset) {
-    // todo
+    final layoutData = ref.read(layoutDataProvider);
+
+    final items = ref.read(_itemProvider).where(isEnabledItem).toList();
+
+    final maxSize = direction.isHorizontal
+        ? layoutData.leftSize.height
+        : layoutData.topSize.width;
+
+    final defaultSize = maxSize / items.length;
+
+    for (final item in items) {
+      if (item.size == 0) item.size = defaultSize;
+    }
+
+    final resizing = ResizeHelper.items(
+      offset: direction.isHorizontal ? offset.dy : offset.dx,
+      items: items,
+      isMainItem: (i) => i.id == item.id,
+      getItemSize: (i) => i.size,
+      getItemMinSize: (i) => PlutoLayoutData.minTabSize,
+      setItemSize: (i, size) => i.size = size,
+      mode: ResizeMode.pushAndPull,
+    );
+
+    resizing.update();
+
+    // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
+    itemResizeNotifier.notifyListeners();
   }
 
   bool isEnabledItem(e) => e.enabled && e.tabViewBuilder != null;
@@ -270,7 +334,11 @@ class _TabViewState extends ConsumerState<_TabView> {
             ),
           ),
           child: CustomMultiChildLayout(
-            delegate: _TabItemsDelegate(direction, enabledItems),
+            delegate: _TabItemsDelegate(
+              direction,
+              enabledItems,
+              itemResizeNotifier,
+            ),
             children: children,
           ),
         ),
@@ -345,30 +413,50 @@ class _TabViewDelegate extends SingleChildLayoutDelegate {
 }
 
 class _TabItemsDelegate extends MultiChildLayoutDelegate {
-  _TabItemsDelegate(this.direction, this.items);
+  _TabItemsDelegate(this.direction, this.items, Listenable notifier)
+      : super(relayout: notifier);
 
   final PlutoLayoutContainerDirection direction;
 
   final Iterable<PlutoLayoutTabItem> items;
 
+  Size _previousSize = Size.zero;
+
   @override
   void performLayout(Size size) {
+    _reset(size);
+
     final length = items.length;
-    final defaultSize =
-        direction.isHorizontal ? size.height / length : size.width / length;
+    final double defaultSize = max(
+      direction.isHorizontal ? size.height / length : size.width / length,
+      0,
+    );
+    int count = 0;
     double position = 0;
+    double remaining = direction.isHorizontal ? size.height : size.width;
+    isLast(int c) => c + 1 == length;
 
     for (final item in items) {
+      if (item.size.isNaN) item.size = defaultSize;
+      if (isLast(count)) item.size = max(remaining, 0);
+
       final constrain = direction.isHorizontal
           ? BoxConstraints.tight(
-              Size(size.width, item.size == 0 ? defaultSize : item.size),
+              Size(
+                max(size.width, 0),
+                max(item.size == 0 ? defaultSize : item.size, 0),
+              ),
             )
           : BoxConstraints.tight(
-              Size(item.size == 0 ? defaultSize : item.size, size.height),
+              Size(
+                max(item.size == 0 ? defaultSize : item.size, 0),
+                max(size.height, 0),
+              ),
             );
 
       if (hasChild(item.id)) {
         final s = layoutChild(item.id, constrain);
+        item.size = direction.isHorizontal ? s.height : s.width;
         positionChild(
           item.id,
           Offset(
@@ -377,7 +465,24 @@ class _TabItemsDelegate extends MultiChildLayoutDelegate {
           ),
         );
         position += direction.isHorizontal ? s.height : s.width;
+        remaining -= item.size;
       }
+    }
+
+    _previousSize = size;
+  }
+
+  void _reset(Size size) {
+    if (_previousSize == Size.zero) return;
+    if (_previousSize == size) return;
+
+    final current = direction.isHorizontal ? size.height : size.width;
+    final previous =
+        direction.isHorizontal ? _previousSize.height : _previousSize.width;
+    final diff = current - previous;
+
+    for (final item in items) {
+      item.size += (item.size / previous) * diff;
     }
   }
 
@@ -426,4 +531,12 @@ class PlutoLayoutTabItem {
       size: size ?? this.size,
     );
   }
+}
+
+enum PlutoLayoutTabMode {
+  showOne,
+  showSelected;
+
+  bool get isShowOne => this == PlutoLayoutTabMode.showOne;
+  bool get isShowSelected => this == PlutoLayoutTabMode.showSelected;
 }

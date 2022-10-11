@@ -1,42 +1,24 @@
 import 'package:flutter/material.dart';
 
-class ToggleButton extends StatefulWidget {
+class ToggleButton extends StatelessWidget {
   const ToggleButton({
     required this.title,
+    required this.enabled,
     this.icon,
-    this.enabled,
     this.changed,
     super.key,
   });
 
   final String title;
 
-  final bool? enabled;
+  final bool enabled;
 
   final Widget? icon;
 
   final void Function(bool)? changed;
 
-  @override
-  State<ToggleButton> createState() => _ToggleButtonState();
-}
-
-class _ToggleButtonState extends State<ToggleButton> {
-  bool _enabled = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _enabled = widget.enabled == true;
-  }
-
   void onTap() {
-    setState(() {
-      _enabled = !_enabled;
-    });
-
-    if (widget.changed != null) widget.changed!(_enabled);
+    if (changed != null) changed!(!enabled);
   }
 
   @override
@@ -45,25 +27,25 @@ class _ToggleButtonState extends State<ToggleButton> {
 
     final style = TextButton.styleFrom(
       foregroundColor:
-          _enabled ? theme.toggleableActiveColor : theme.disabledColor,
+          enabled ? theme.toggleableActiveColor : theme.disabledColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.zero,
       ),
     );
 
-    final title = Text(widget.title);
+    final label = Text(title);
 
-    return widget.icon != null
+    return icon != null
         ? TextButton.icon(
             style: style,
-            icon: widget.icon!,
+            icon: icon!,
             onPressed: onTap,
-            label: title,
+            label: label,
           )
         : TextButton(
             style: style,
             onPressed: onTap,
-            child: title,
+            child: label,
           );
   }
 }

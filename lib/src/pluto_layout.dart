@@ -203,6 +203,23 @@ class PlutoLayoutData {
   double get defaultTabWidth => size.width / 4;
 
   double get defaultTabHeight => size.height / 6;
+
+  static const double minTabSize = 32;
+
+  double getMaxTabSize(PlutoLayoutId id) {
+    switch (id) {
+      case PlutoLayoutId.top:
+        return topSize.width;
+      case PlutoLayoutId.left:
+        return leftSize.height;
+      case PlutoLayoutId.right:
+        return rightSize.height;
+      case PlutoLayoutId.bottom:
+        return bottomSize.width;
+      case PlutoLayoutId.body:
+        return bodySize.width;
+    }
+  }
 }
 
 enum PlutoLayoutId {

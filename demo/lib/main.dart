@@ -49,14 +49,24 @@ class _DemoPageState extends State<DemoPage> {
                   id: 'File',
                   title: 'File',
                   tabViewBuilder: (c) {
-                    return Text('File View');
+                    return ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: List.generate(20, (i) => i)
+                          .map((e) => Text('$e'))
+                          .toList(),
+                    );
                   },
                 ),
                 PlutoLayoutTabItem(
                   id: 'Edit',
                   title: 'Edit',
                   tabViewBuilder: (c) {
-                    return Text('Edit View');
+                    return ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: List.generate(20, (i) => i)
+                          .map((e) => Text('$e'))
+                          .toList(),
+                    );
                   },
                 ),
               ],
@@ -80,11 +90,23 @@ class _DemoPageState extends State<DemoPage> {
                     return Text('Bookmark View');
                   },
                 ),
+                PlutoLayoutTabItem(
+                  id: 'Structure',
+                  title: 'Structure',
+                  tabViewBuilder: (c) {
+                    return ListView(
+                      children: List.generate(20, (i) => i)
+                          .map((e) => Text('$e'))
+                          .toList(),
+                    );
+                  },
+                ),
               ],
             ),
           ),
           right: PlutoLayoutContainer(
             child: PlutoLayoutTabs(
+              mode: PlutoLayoutTabMode.showSelected,
               items: [
                 PlutoLayoutTabItem(
                   id: 'Flutter Inspector',
