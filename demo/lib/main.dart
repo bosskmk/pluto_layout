@@ -44,6 +44,7 @@ class _DemoPageState extends State<DemoPage> {
         child: PlutoLayout(
           top: PlutoLayoutContainer(
             child: PlutoLayoutTabs(
+              mode: PlutoLayoutTabMode.showSelected,
               items: [
                 PlutoLayoutTabItem(
                   id: 'File',
@@ -75,6 +76,7 @@ class _DemoPageState extends State<DemoPage> {
           left: PlutoLayoutContainer(
             // backgroundColor: Colors.blueAccent,
             child: PlutoLayoutTabs(
+              mode: PlutoLayoutTabMode.showSelected,
               items: [
                 PlutoLayoutTabItem(
                   id: 'Project',
@@ -127,6 +129,7 @@ class _DemoPageState extends State<DemoPage> {
           ),
           bottom: PlutoLayoutContainer(
             child: PlutoLayoutTabs(
+              mode: PlutoLayoutTabMode.showSelected,
               items: [
                 PlutoLayoutTabItem(
                   id: 'Terminal',

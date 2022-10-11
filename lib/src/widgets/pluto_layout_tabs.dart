@@ -27,7 +27,7 @@ final _itemProvider =
 });
 
 class PlutoLayoutTabs extends ConsumerWidget {
-  const PlutoLayoutTabs({
+  PlutoLayoutTabs({
     this.items = const [],
     this.mode = PlutoLayoutTabMode.showOne,
     super.key,
@@ -36,6 +36,8 @@ class PlutoLayoutTabs extends ConsumerWidget {
   final List<PlutoLayoutTabItem> items;
 
   final PlutoLayoutTabMode mode;
+
+  final GlobalKey<_MenusState> _menuKey = GlobalKey();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -46,8 +48,8 @@ class PlutoLayoutTabs extends ConsumerWidget {
     final containerDirection = ref.read(layoutContainerDirectionProvider);
 
     List<Widget> children = [
-      _Menus(direction: containerDirection, mode: mode),
-      _TabView(direction: containerDirection),
+      _Menus(direction: containerDirection, mode: mode, menuKey: _menuKey),
+      _TabView(direction: containerDirection, menuKey: _menuKey),
     ];
 
     Widget container = containerDirection.isHorizontal
@@ -81,13 +83,24 @@ class PlutoLayoutTabs extends ConsumerWidget {
   }
 }
 
-class _Menus extends ConsumerWidget {
-  const _Menus({required this.direction, required this.mode});
+class _Menus extends ConsumerStatefulWidget {
+  const _Menus({
+    required this.direction,
+    required this.mode,
+    required this.menuKey,
+  });
 
   final PlutoLayoutContainerDirection direction;
 
   final PlutoLayoutTabMode mode;
 
+  final GlobalKey<_MenusState> menuKey;
+
+  @override
+  ConsumerState<_Menus> createState() => _MenusState();
+}
+
+class _MenusState extends ConsumerState<_Menus> {
   MainAxisAlignment getMenuAlignment(PlutoLayoutId id) {
     switch (id) {
       case PlutoLayoutId.top:
@@ -119,15 +132,19 @@ class _Menus extends ConsumerWidget {
   }
 
   void toggleTab(WidgetRef ref, PlutoLayoutTabItem item, bool flag) {
-    final layoutData = ref.read(layoutDataProvider);
-
     final layoutId = ref.read(layoutIdProvider);
 
-    ref.read(_itemProvider.notifier).setEnabled(item.id, flag, mode.isShowOne);
+    ref.read(layoutFocusedIdProvider.notifier).state = layoutId;
+
+    final layoutData = ref.read(layoutDataProvider);
+
+    ref
+        .read(_itemProvider.notifier)
+        .setEnabled(item.id, flag, widget.mode.isShowOne);
 
     final items = ref.read(_itemProvider).where((e) => e.enabled);
 
-    final maxSize = layoutData.getMaxTabSize(layoutId);
+    final maxSize = layoutData.getMaxTabItemViewSize(layoutId);
 
     final sizing = AutoSizeHelper.items(
       maxSize: maxSize,
@@ -141,22 +158,24 @@ class _Menus extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final layoutId = ref.read(layoutIdProvider);
 
     final items = ref.watch(_itemProvider);
 
     return Align(
-      alignment:
-          direction.isVertical ? Alignment.centerLeft : Alignment.topCenter,
+      key: widget.menuKey,
+      alignment: widget.direction.isVertical
+          ? Alignment.centerLeft
+          : Alignment.topCenter,
       child: RotatedBox(
         quarterTurns: getMenuRotate(layoutId),
         child: SingleChildScrollView(
-          reverse: direction.isLeft,
+          reverse: widget.direction.isLeft,
           scrollDirection: Axis.horizontal,
           child: Row(
             mainAxisAlignment: getMenuAlignment(layoutId),
-            children: (direction.isLeft ? items.reversed : items)
+            children: (widget.direction.isLeft ? items.reversed : items)
                 .map(
                   (e) => ToggleButton(
                     title: e.title,
@@ -174,9 +193,11 @@ class _Menus extends ConsumerWidget {
 }
 
 class _TabView extends ConsumerStatefulWidget {
-  const _TabView({required this.direction});
+  const _TabView({required this.direction, required this.menuKey});
 
   final PlutoLayoutContainerDirection direction;
+
+  final GlobalKey<_MenusState> menuKey;
 
   @override
   ConsumerState<_TabView> createState() => _TabViewState();
@@ -186,6 +207,25 @@ class _TabViewState extends ConsumerState<_TabView> {
   final ValueNotifier<double?> tabSize = ValueNotifier(null);
 
   final ChangeNotifier itemResizeNotifier = ChangeNotifier();
+
+  Size? get menuSize {
+    final c = widget.menuKey.currentContext;
+    if (c == null || widget.menuKey.currentState?.mounted != true) return null;
+    return widget.menuKey.currentContext?.size;
+  }
+
+  double get menuSizeByDirection {
+    final safeMenuSize = menuSize ??
+        const Size(PlutoLayoutData.minTabSize, PlutoLayoutData.minTabSize);
+    switch (direction) {
+      case PlutoLayoutContainerDirection.top:
+      case PlutoLayoutContainerDirection.bottom:
+        return safeMenuSize.height;
+      case PlutoLayoutContainerDirection.left:
+      case PlutoLayoutContainerDirection.right:
+        return safeMenuSize.width;
+    }
+  }
 
   Size get maxSize => MediaQuery.of(context).size;
 
@@ -249,7 +289,14 @@ class _TabViewState extends ConsumerState<_TabView> {
         break;
     }
 
-    if (size <= PlutoLayoutData.minTabSize) return;
+    final menuSize = menuSizeByDirection;
+
+    if (size <= menuSize) return;
+    final layoutData = ref.read(layoutDataProvider);
+    final maximumSize = layoutData.getTabViewConstrains(id) - (menuSize * 2);
+    if (size >= maximumSize) {
+      size = maximumSize;
+    }
 
     tabSize.value = size;
   }
@@ -319,7 +366,13 @@ class _TabViewState extends ConsumerState<_TabView> {
     }
 
     return CustomSingleChildLayout(
-      delegate: _TabViewDelegate(direction, tabSize, layoutData),
+      delegate: _TabViewDelegate(
+        layoutId,
+        direction,
+        tabSize,
+        menuSizeByDirection,
+        layoutData,
+      ),
       child: ResizeIndicator<PlutoLayoutId>(
         item: layoutId,
         position: tabViewResizePosition,
@@ -336,6 +389,7 @@ class _TabViewState extends ConsumerState<_TabView> {
           child: CustomMultiChildLayout(
             delegate: _TabItemsDelegate(
               direction,
+              layoutData,
               enabledItems,
               itemResizeNotifier,
             ),
@@ -348,12 +402,21 @@ class _TabViewState extends ConsumerState<_TabView> {
 }
 
 class _TabViewDelegate extends SingleChildLayoutDelegate {
-  _TabViewDelegate(this.direction, this.tabSize, this.layoutData)
-      : super(relayout: tabSize);
+  _TabViewDelegate(
+    this.layoutId,
+    this.direction,
+    this.tabSize,
+    this.menuSize,
+    this.layoutData,
+  ) : super(relayout: tabSize);
+
+  final PlutoLayoutId layoutId;
 
   final PlutoLayoutContainerDirection direction;
 
   final ValueNotifier<double?> tabSize;
+
+  final double menuSize;
 
   final PlutoLayoutData layoutData;
 
@@ -361,17 +424,43 @@ class _TabViewDelegate extends SingleChildLayoutDelegate {
 
   double get defaultWidth => layoutData.defaultTabWidth;
 
+  double get safeHeight {
+    if (tabSize.value == null) return defaultHeight;
+
+    final maxSize = layoutData.getTabViewConstrains(layoutId) - (menuSize * 2);
+    if (tabSize.value! >= maxSize) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        tabSize.value = maxSize;
+      });
+      return maxSize;
+    }
+
+    return tabSize.value!;
+  }
+
+  double get safeWidth {
+    if (tabSize.value == null) return defaultWidth;
+
+    final maxSize = layoutData.getTabViewConstrains(layoutId) - (menuSize * 2);
+    if (tabSize.value! >= maxSize) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        tabSize.value = maxSize;
+      });
+      return maxSize;
+    }
+
+    return tabSize.value!;
+  }
+
   @override
   Size getSize(BoxConstraints constraints) {
     switch (direction) {
       case PlutoLayoutContainerDirection.top:
-        return Size(constraints.maxWidth, tabSize.value ?? defaultHeight);
-      case PlutoLayoutContainerDirection.left:
-        return Size(tabSize.value ?? defaultWidth, constraints.maxHeight);
-      case PlutoLayoutContainerDirection.right:
-        return Size(tabSize.value ?? defaultWidth, constraints.maxHeight);
       case PlutoLayoutContainerDirection.bottom:
-        return Size(constraints.maxWidth, tabSize.value ?? defaultHeight);
+        return Size(constraints.maxWidth, safeHeight);
+      case PlutoLayoutContainerDirection.left:
+      case PlutoLayoutContainerDirection.right:
+        return Size(safeWidth, constraints.maxHeight);
     }
   }
 
@@ -384,24 +473,16 @@ class _TabViewDelegate extends SingleChildLayoutDelegate {
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
     switch (direction) {
       case PlutoLayoutContainerDirection.top:
-        return constraints.tighten(
-          width: constraints.maxWidth,
-          height: tabSize.value ?? defaultHeight,
-        );
-      case PlutoLayoutContainerDirection.left:
-        return constraints.tighten(
-          width: tabSize.value ?? defaultWidth,
-          height: constraints.maxHeight,
-        );
-      case PlutoLayoutContainerDirection.right:
-        return constraints.tighten(
-          width: tabSize.value ?? defaultWidth,
-          height: constraints.maxHeight,
-        );
       case PlutoLayoutContainerDirection.bottom:
         return constraints.tighten(
           width: constraints.maxWidth,
-          height: tabSize.value ?? defaultHeight,
+          height: safeHeight,
+        );
+      case PlutoLayoutContainerDirection.left:
+      case PlutoLayoutContainerDirection.right:
+        return constraints.tighten(
+          width: safeWidth,
+          height: constraints.maxHeight,
         );
     }
   }
@@ -413,10 +494,16 @@ class _TabViewDelegate extends SingleChildLayoutDelegate {
 }
 
 class _TabItemsDelegate extends MultiChildLayoutDelegate {
-  _TabItemsDelegate(this.direction, this.items, Listenable notifier)
-      : super(relayout: notifier);
+  _TabItemsDelegate(
+    this.direction,
+    this.layoutData,
+    this.items,
+    Listenable notifier,
+  ) : super(relayout: notifier);
 
   final PlutoLayoutContainerDirection direction;
+
+  final PlutoLayoutData layoutData;
 
   final Iterable<PlutoLayoutTabItem> items;
 

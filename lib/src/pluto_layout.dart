@@ -206,7 +206,7 @@ class PlutoLayoutData {
 
   static const double minTabSize = 32;
 
-  double getMaxTabSize(PlutoLayoutId id) {
+  double getMaxTabItemViewSize(PlutoLayoutId id) {
     switch (id) {
       case PlutoLayoutId.top:
         return topSize.width;
@@ -219,6 +219,30 @@ class PlutoLayoutData {
       case PlutoLayoutId.body:
         return bodySize.width;
     }
+  }
+
+  double getTabViewConstrains(PlutoLayoutId id) {
+    switch (id) {
+      case PlutoLayoutId.top:
+      case PlutoLayoutId.bottom:
+      case PlutoLayoutId.body:
+        return size.height;
+      case PlutoLayoutId.left:
+      case PlutoLayoutId.right:
+        return size.width;
+    }
+  }
+
+  @override
+  String toString() {
+    String text = 'PlutoLayoutData\n';
+    text += 'size: $size\n';
+    text += 'topSize: $topSize\n';
+    text += 'leftSize: $leftSize\n';
+    text += 'rightSize: $rightSize\n';
+    text += 'bottomSize: $bottomSize\n';
+    text += 'bodySize: $bodySize';
+    return text;
   }
 }
 
