@@ -1,6 +1,6 @@
 name: pluto_layout
-description: PlutoLayout is a package for UI configuration such as CMS or admin service.
-version: 0.0.1
+description: PlutoLayout is a Flutter UI package that can configure a menu or tab screen on each side.
+version: 0.1.0
 homepage: https://pluto.weblaze.dev
 repository: https://github.com/bosskmk/pluto_layout
 

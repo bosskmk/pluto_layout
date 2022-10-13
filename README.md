@@ -1,5 +1,7 @@
 ## PlutoLayout - v0.1.0
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 PlutoLayout is a Flutter UI package that can configure a menu or tab screen on each side.
 You can adjust the width of the tab menu by dragging the right border of the tab menu.
 
