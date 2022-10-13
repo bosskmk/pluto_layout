@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pluto_layout/pluto_layout.dart';
-import 'package:pluto_layout/src/ui/pluto_layout_container.dart';
 
 final layoutIdProvider = Provider<PlutoLayoutId>(
   (ref) => throw UnimplementedError(),
@@ -15,6 +14,20 @@ final layoutFocusedIdProvider = StateProvider<PlutoLayoutId>(
 
 final layoutDataProvider = Provider((ref) => PlutoLayoutData());
 
+/// [PlutoLayout] is a UI package that can configure a menu or tab view on each side.
+///
+/// {@template pluto_layout_example}
+/// Check the example code.
+/// https://github.com/bosskmk/pluto_layout/blob/main/example/lib/main.dart
+///
+/// Check out the web demo distributed with the example code.
+/// https://weblaze.dev/pluto_layout/build/web/#/
+/// {@endtemplate}
+///
+/// The [body], [top], [left], [right], [bottom] properties must pass a [PlutoLayoutContainer] as a child.
+/// [body] must be passed. The rest of the properties can be optionally passed.
+///
+/// You can configure tab views by passing [PlutoLayoutTabs] as children of [PlutoLayoutContainer].
 class PlutoLayout extends StatefulWidget {
   const PlutoLayout({
     this.top,
@@ -25,10 +38,19 @@ class PlutoLayout extends StatefulWidget {
     super.key,
   });
 
+  /// You can configure tab views or menus at the top.
   final PlutoLayoutContainer? top;
+
+  /// You can configure tab views and menus on the left side.
   final PlutoLayoutContainer? left;
+
+  /// You can configure tab views or menus on the right side.
   final PlutoLayoutContainer? right;
+
+  /// You can configure tab views or menus at the bottom.
   final PlutoLayoutContainer? bottom;
+
+  /// This is the basic body screen.
   final PlutoLayoutContainer body;
 
   @override

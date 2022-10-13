@@ -8,6 +8,11 @@ final layoutContainerDirectionProvider =
   (ref) => throw UnimplementedError(),
 );
 
+/// Widgets passed as children of properties such as [PlutoLayout.body] or [PlutoLayout.top].
+///
+/// You can set the background color with the [backgroundColor] property.
+///
+/// {@macro pluto_layout_example}
 class PlutoLayoutContainer extends ConsumerWidget {
   const PlutoLayoutContainer({
     this.backgroundColor,
@@ -71,6 +76,9 @@ class PlutoLayoutContainer extends ConsumerWidget {
   }
 }
 
+/// Indicates the position of each side container of [PlutoLayout].
+///
+/// Used internally.
 enum PlutoLayoutContainerDirection {
   top,
   left,

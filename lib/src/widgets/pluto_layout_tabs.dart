@@ -26,6 +26,9 @@ final _itemProvider =
   return _ItemsNotifier([]);
 });
 
+/// You can configure the tab view by passing it as a child of [PlutoLayoutContainer].
+///
+/// /// {@macro pluto_layout_example}
 class PlutoLayoutTabs extends ConsumerWidget {
   PlutoLayoutTabs({
     this.items = const [],
@@ -33,8 +36,36 @@ class PlutoLayoutTabs extends ConsumerWidget {
     super.key,
   });
 
+  /// Pass a list of [PlutoLayoutTabItem].
+  ///
+  /// ```dart
+  /// PlutoLayoutTabItem(
+  ///   id: 'Unique ID',
+  ///   title: 'Tab Menu Title',
+  ///   tabViewBuilder: (c) {
+  ///     return Padding(
+  ///       padding: EdgeInsets.all(15),
+  ///       child: ListView(
+  ///         children: const [
+  ///           Text('Tab Menu contents'),
+  ///           SizedBox(height: 15),
+  ///           Text('Tab Menu contents'),
+  ///           SizedBox(height: 10),
+  ///           Text('Tab Menu contents'),
+  ///         ],
+  ///       ),
+  ///     );
+  ///   },
+  /// ),
+  /// ```
   final List<PlutoLayoutTabItem> items;
 
+  /// {@template pluto_layout_tab_mode}
+  /// [mode] determines the operation method of the tab menu.
+  ///
+  /// [PlutoLayoutTabMode.showOne] shows only one tab view of the menu selected from multiple menus.
+  /// [PlutoLayoutTabMode.showSelected] shows the tab view of all selected menus in multiple menus.
+  /// {@endtemplate}
   final PlutoLayoutTabMode mode;
 
   final GlobalKey<_MenusState> _menuKey = GlobalKey();
@@ -579,6 +610,44 @@ class _TabItemsDelegate extends MultiChildLayoutDelegate {
   }
 }
 
+/// Class to pass to [PlutoLayoutTabs.items].
+///
+/// Set the information constituting the tab menu.
+///
+/// {@template pluto_layout_tab_item_id}
+/// [id] must pass a unique value. (Usually, if the title is unique, it will be delivered.)
+/// {@endtemplate}
+///
+/// {@template pluto_layout_tab_item_title}
+/// [title] is the title of the menu to be displayed.
+/// {@endtemplate}
+///
+/// {@template pluto_layout_tab_item_icon}
+/// [icon] is the icon to display before the menu title.
+/// {@endtemplate}
+///
+/// {@template pluto_layout_tab_item_tabViewBuilder}
+/// [tabViewBuilder] is a callback function that returns a tab view widget
+/// that will be displayed when the menu is tapped.
+/// Just pass a function that returns [Widget].
+///
+/// ```dart
+/// tabViewBuilder: (c) {
+///   return Padding(
+///     padding: EdgeInsets.all(15),
+///     child: ListView(
+///       children: const [
+///         Text('Example contents'),
+///         SizedBox(height: 15),
+///         Text('Example contents),
+///         SizedBox(height: 10),
+///         Text('Example contents),
+///       ],
+///     ),
+///   );
+/// },
+/// ```
+/// {@endtemplate}
 class PlutoLayoutTabItem {
   PlutoLayoutTabItem({
     required this.id,
@@ -589,12 +658,16 @@ class PlutoLayoutTabItem {
     this.size = 0,
   });
 
+  /// {@macro pluto_layout_tab_item_id}
   final Object id;
 
+  /// {@macro pluto_layout_tab_item_title}
   final String title;
 
+  /// {@macro pluto_layout_tab_item_icon}
   final Widget? icon;
 
+  /// {@macro pluto_layout_tab_item_tabViewBuilder}
   final Widget Function(BuildContext context)? tabViewBuilder;
 
   final bool enabled;
@@ -620,6 +693,7 @@ class PlutoLayoutTabItem {
   }
 }
 
+/// {@macro pluto_layout_tab_mode}
 enum PlutoLayoutTabMode {
   showOne,
   showSelected;
