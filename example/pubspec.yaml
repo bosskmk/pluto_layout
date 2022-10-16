@@ -16,7 +16,7 @@ dependencies:
   flutter_highlight: ^0.7.0
   highlight: ^0.7.0
   pluto_grid: ^5.1.2
-  pluto_menu_bar: ^2.0.0
+  pluto_menu_bar: ^2.0.1
   pluto_layout:
     path: ../
 
