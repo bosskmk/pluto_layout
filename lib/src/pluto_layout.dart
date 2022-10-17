@@ -167,6 +167,7 @@ class _PlutoLayoutState extends State<PlutoLayout> {
     if (widget.shortcuts != null) {
       layoutWidget = Shortcuts(
         shortcuts: widget.shortcuts!,
+        debugLabel: 'PlutoLayout Shortcuts',
         child: layoutWidget,
       );
     }

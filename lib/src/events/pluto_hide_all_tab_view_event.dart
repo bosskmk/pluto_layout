@@ -1,7 +1,7 @@
 import 'package:pluto_layout/pluto_layout.dart';
 
 class PlutoHideAllTabViewEvent extends PlutoLayoutEvent {
-  PlutoHideAllTabViewEvent({
+  const PlutoHideAllTabViewEvent({
     this.afterFocusToBody = true,
   });
 

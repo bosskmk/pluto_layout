@@ -13,10 +13,9 @@ class PlutoLayoutActionRotateTabViewAction
   PlutoLayoutActionRotateTabViewAction(super.events);
 
   @override
-  Object? invoke(PlutoLayoutActionRotateTabViewIntent intent) {
+  void invoke(PlutoLayoutActionRotateTabViewIntent intent) {
     events.add(PlutoRotateTabViewEvent(
       intent.containerDirection,
     ));
-    return null;
   }
 }

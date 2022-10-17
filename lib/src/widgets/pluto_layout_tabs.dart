@@ -406,15 +406,14 @@ class _TabViewState extends ConsumerState<_TabView> {
   }
 
   void handleEvent(PlutoLayoutEvent event) {
-    if (event is PlutoIncreaseTabViewEvent ||
-        event is PlutoDecreaseTabViewEvent) {
+    if (event is PlutoLayoutHasInDecreaseTabViewEvent) {
       // todo : Refactor.
-      final tabSizeEvent = event as PlutoLayoutHasContainerDirection;
+      final tabSizeEvent = event as PlutoLayoutHasInDecreaseTabViewEvent;
 
       final containerDirection =
           tabSizeEvent.containerDirection ?? getFocusedContainerDirection();
 
-      if (containerDirection != widget.direction) return;
+      if (containerDirection != direction) return;
 
       final hasEnabledItem =
           ref.read(_itemProvider).firstWhereOrNull(isEnabledItem) != null;
@@ -425,14 +424,22 @@ class _TabViewState extends ConsumerState<_TabView> {
 
       final bool isIncreased = event is PlutoIncreaseTabViewEvent;
 
-      final double x = isIncreased ? 10 : -10;
-      final double y = isIncreased ? 10 : -10;
+      final reverse =
+          !tabSizeEvent.reverseByDirection && !direction.isIncreasedOffset;
+
+      final double size = isIncreased
+          ? reverse
+              ? -tabSizeEvent.size
+              : tabSizeEvent.size
+          : reverse
+              ? tabSizeEvent.size
+              : -tabSizeEvent.size;
 
       resizeTabView(
         layoutId,
         Offset(
-          widget.direction.isHorizontal ? x : 0,
-          widget.direction.isHorizontal ? 0 : y,
+          widget.direction.isHorizontal ? size : 0,
+          widget.direction.isHorizontal ? 0 : size,
         ),
       );
     }

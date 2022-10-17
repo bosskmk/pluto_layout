@@ -6,7 +6,7 @@ import 'package:rxdart/rxdart.dart';
 /// by registering keyboard shortcuts.
 ///
 /// {@macro pluto_layout_shortcuts_example}
-class PlutoLayoutActions {
+abstract class PlutoLayoutActions {
   /// Close all tabviews.
   ///
   /// If [afterFocusToBody] is true,
@@ -47,10 +47,26 @@ class PlutoLayoutActions {
   /// If [containerDirection] is null,
   /// adjust the position of the currently focused container.
   /// If no tab views are open, no action is taken.
-  static PlutoLayoutActionIncreaseTabViewIntent increaseTabView([
+  ///
+  /// [size] is the size to change in one call.
+  ///
+  /// [reverseByDirection] converts the increment
+  /// to a negative number depending on the direction.
+  /// In the state where [containerDirection] is not specified,
+  /// use left, right or top, bottom with one arrow key
+  /// to increase the size according to the direction.
+  static PlutoLayoutActionIncreaseTabViewIntent increaseTabView({
     PlutoLayoutContainerDirection? containerDirection,
-  ]) {
-    return PlutoLayoutActionIncreaseTabViewIntent(containerDirection);
+    double size = PlutoLayoutHasInDecreaseTabViewEvent.defaultSize,
+    bool reverseByDirection = false,
+  }) {
+    assert(size > 0);
+
+    return PlutoLayoutActionIncreaseTabViewIntent(
+      containerDirection,
+      size: size,
+      reverseByDirection: reverseByDirection,
+    );
   }
 
   /// Decrease the size of the tab view
@@ -59,10 +75,26 @@ class PlutoLayoutActions {
   /// If [containerDirection] is null,
   /// adjust the position of the currently focused container.
   /// If no tab views are open, no action is taken.
-  static PlutoLayoutActionDecreaseTabViewIntent decreaseTabView([
+  ///
+  /// [size] is the size to change in one call.
+  ///
+  /// [reverseByDirection] converts the decrease
+  /// to a negative number depending on the direction.
+  /// In the state where [containerDirection] is not specified,
+  /// use left, right or top, bottom with one arrow key
+  /// to decrease the size according to the direction.
+  static PlutoLayoutActionDecreaseTabViewIntent decreaseTabView({
     PlutoLayoutContainerDirection? containerDirection,
-  ]) {
-    return PlutoLayoutActionDecreaseTabViewIntent(containerDirection);
+    double size = PlutoLayoutHasInDecreaseTabViewEvent.defaultSize,
+    bool reverseByDirection = false,
+  }) {
+    assert(size > 0);
+
+    return PlutoLayoutActionDecreaseTabViewIntent(
+      containerDirection,
+      size: size,
+      reverseByDirection: reverseByDirection,
+    );
   }
 }
 

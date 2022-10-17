@@ -16,11 +16,10 @@ class PlutoLayoutActionToggleTabViewAction
   PlutoLayoutActionToggleTabViewAction(super.events);
 
   @override
-  Object? invoke(PlutoLayoutActionToggleTabViewIntent intent) {
+  void invoke(PlutoLayoutActionToggleTabViewIntent intent) {
     events.add(PlutoToggleTabViewEvent(
       intent.containerDirection,
       intent.tabItemId,
     ));
-    return null;
   }
 }

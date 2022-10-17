@@ -133,9 +133,9 @@ class _DemoPageState extends State<DemoPage>
             ),
             LogicalKeySet(
                     LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowRight):
-                PlutoLayoutActions.increaseTabView(),
+                PlutoLayoutActions.increaseTabView(reverseByDirection: true),
             LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowLeft):
-                PlutoLayoutActions.decreaseTabView(),
+                PlutoLayoutActions.decreaseTabView(reverseByDirection: true),
           },
           body: PlutoLayoutContainer(
             child: TabBarView(

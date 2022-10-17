@@ -2,10 +2,16 @@ import 'package:pluto_layout/pluto_layout.dart';
 
 class PlutoLayoutActionIncreaseTabViewIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionIncreaseTabViewIntent(
-    this.containerDirection,
-  );
+    this.containerDirection, {
+    this.size = PlutoLayoutHasInDecreaseTabViewEvent.defaultSize,
+    this.reverseByDirection = false,
+  }) : assert(size > 0);
 
   final PlutoLayoutContainerDirection? containerDirection;
+
+  final double size;
+
+  final bool reverseByDirection;
 }
 
 class PlutoLayoutActionIncreaseTabViewAction
@@ -13,10 +19,11 @@ class PlutoLayoutActionIncreaseTabViewAction
   PlutoLayoutActionIncreaseTabViewAction(super.events);
 
   @override
-  Object? invoke(PlutoLayoutActionIncreaseTabViewIntent intent) {
+  void invoke(PlutoLayoutActionIncreaseTabViewIntent intent) {
     events.add(PlutoIncreaseTabViewEvent(
       intent.containerDirection,
+      size: intent.size,
+      reverseByDirection: intent.reverseByDirection,
     ));
-    return null;
   }
 }

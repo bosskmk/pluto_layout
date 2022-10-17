@@ -13,10 +13,9 @@ class PlutoLayoutActionHideAllTabViewAction
   PlutoLayoutActionHideAllTabViewAction(super.events);
 
   @override
-  Object? invoke(PlutoLayoutActionHideAllTabViewIntent intent) {
+  void invoke(PlutoLayoutActionHideAllTabViewIntent intent) {
     events.add(PlutoHideAllTabViewEvent(
       afterFocusToBody: intent.afterFocusToBody,
     ));
-    return null;
   }
 }
