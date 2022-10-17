@@ -1,9 +1,10 @@
-## PlutoLayout - v0.1.0
+## PlutoLayout - v0.2.0
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-PlutoLayout is a Flutter UI package that can configure a menu or tab screen on each side.
-You can adjust the width of the tab menu by dragging the right border of the tab menu.
+PlutoLayout is a Flutter UI package that can configure a menu or tab screen on each side.  
+You can adjust the width of the tab menu by dragging the right border of the tab menu.  
+You can also assign custom shortcut keys to open or close tab views and resize tab views.
 
 ### Demo
 [Demo Web](https://bosskmk.github.io/pluto_layout/build/web/index.html)
@@ -87,6 +88,25 @@ class _DemoPageState extends State<DemoPage>
           scrollbars: true,
         ),
         child: PlutoLayout(
+          // You can assign custom shortcut keys.
+          shortcuts: {
+            // Pressing the Escape key closes all open tabviews.
+            LogicalKeySet(LogicalKeyboardKey.escape):
+            PlutoLayoutActions.hideAllTabView(),
+            // If you press alt + 1, 
+            // the tab views registered in left are opened and closed sequentially.
+            LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
+            PlutoLayoutActions.rotateTabView(
+              PlutoLayoutContainerDirection.left,
+            ),
+            // If the tab view is open, 
+            // you can resize the tab view with alt + left or right keys.
+            LogicalKeySet(
+                LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowRight):
+            PlutoLayoutActions.increaseTabView(reverseByDirection: true),
+            LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowLeft):
+            PlutoLayoutActions.decreaseTabView(reverseByDirection: true),
+          },
           body: PlutoLayoutContainer(
             child: Text('Body container'),
           ),
