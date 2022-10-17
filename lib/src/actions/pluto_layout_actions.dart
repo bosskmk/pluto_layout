@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:pluto_layout/pluto_layout.dart';
-import 'package:rxdart/rxdart.dart';
 
 import '../events/events.dart';
 
@@ -72,5 +71,5 @@ abstract class PlutoLayoutAction<T extends PlutoLayoutIntent>
     extends Action<T> {
   PlutoLayoutAction(this.events);
 
-  final PublishSubject<PlutoLayoutEvent> events;
+  final PlutoLayoutEventStreamController events;
 }

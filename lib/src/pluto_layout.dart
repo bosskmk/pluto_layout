@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -7,21 +8,27 @@ import 'package:rxdart/rxdart.dart';
 
 import 'events/events.dart';
 
+/// Shortcut registration type of [PlutoLayout.shortcuts].
 typedef PlutoLayoutShortcuts = Map<LogicalKeySet, PlutoLayoutIntent>;
 
+/// ID according to the location of [PlutoLayoutContainer].
 final layoutIdProvider = Provider<PlutoLayoutId>(
   (ref) => throw UnimplementedError(),
 );
 
+/// ID of [PlutoLayoutContainer] that currently has focus activated.
 final layoutFocusedIdProvider = StateProvider<PlutoLayoutId>(
   (ref) => PlutoLayoutId.body,
 );
 
+/// Layout information of [PlutoLayout].
 final layoutDataProvider = Provider((ref) => PlutoLayoutData());
 
+/// Shortcut information defined by the user.
 final layoutShortcutsProvider = Provider<PlutoLayoutShortcuts?>((ref) => null);
 
-final layoutEventsProvider = Provider<PublishSubject<PlutoLayoutEvent>>(
+/// Event controller for handling shortcut events, etc.
+final layoutEventsProvider = Provider<PlutoLayoutEventStreamController>(
   (ref) => throw UnimplementedError(),
 );
 
@@ -95,12 +102,12 @@ class PlutoLayout extends StatefulWidget {
 }
 
 class _PlutoLayoutState extends State<PlutoLayout> {
-  final PublishSubject<PlutoLayoutEvent> _subject =
-      PublishSubject<PlutoLayoutEvent>();
+  final PlutoLayoutEventStreamController _eventStreamController =
+      PlutoLayoutEventStreamController();
 
   @override
   void dispose() {
-    _subject.close();
+    _eventStreamController.dispose();
 
     super.dispose();
   }
@@ -110,7 +117,7 @@ class _PlutoLayoutState extends State<PlutoLayout> {
     Widget layoutWidget = ProviderScope(
       overrides: [
         layoutShortcutsProvider.overrideWithValue(widget.shortcuts),
-        layoutEventsProvider.overrideWithValue(_subject),
+        layoutEventsProvider.overrideWithValue(_eventStreamController),
       ],
       child: Consumer(
         builder: (c, r, w) {
@@ -270,23 +277,62 @@ class _LayoutIdProviderScope extends StatelessWidget {
   }
 }
 
+/// Event controller in PlutoLayout
+///
+/// Listen for events to handle keyboard shortcut events, etc.
+/// The received event is handled by listening to the event
+/// in the widget that needs event handling.
+class PlutoLayoutEventStreamController {
+  final PublishSubject<PlutoLayoutEvent> _subject =
+      PublishSubject<PlutoLayoutEvent>();
+
+  /// Register event handlers in widgets that need to handle events.
+  StreamSubscription<PlutoLayoutEvent> listen(
+    void Function(PlutoLayoutEvent) handler,
+  ) {
+    return _subject.listen(handler);
+  }
+
+  void add(PlutoLayoutEvent event) {
+    _subject.add(event);
+  }
+
+  void dispose() {
+    _subject.close();
+  }
+}
+
+/// Information needed for the layout of the widget
 class PlutoLayoutData {
+  /// [PlutoLayout] size constraint
   Size size = Size.zero;
 
+  /// [PlutoLayout.top] size constraint of container
   Size topSize = Size.zero;
 
+  /// [PlutoLayout.left] size constraint of container
   Size leftSize = Size.zero;
 
+  /// [PlutoLayout.right] size constraint of container
   Size rightSize = Size.zero;
 
+  /// [PlutoLayout.bottom] size constraint of container
   Size bottomSize = Size.zero;
 
+  /// [PlutoLayout.body] size constraint of container
   Size bodySize = Size.zero;
 
+  /// Default width of tab view.
+  ///
+  /// Corresponds to left and right tab views.
   double get defaultTabWidth => size.width / 4;
 
+  /// Default height of the tab view.
+  ///
+  /// Corresponds to top and bottom tab views.
   double get defaultTabHeight => size.height / 6;
 
+  /// Minimum size of the tab view.
   static const double minTabSize = 32;
 
   double getMaxTabItemViewSize(PlutoLayoutId id) {
@@ -329,6 +375,7 @@ class PlutoLayoutData {
   }
 }
 
+/// [PlutoLayoutContainer] ID by position of the widget.
 enum PlutoLayoutId {
   top,
   left,
