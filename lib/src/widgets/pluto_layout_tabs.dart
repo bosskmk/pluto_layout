@@ -159,6 +159,36 @@ class _MenusState extends ConsumerState<_Menus> {
     super.dispose();
   }
 
+  MainAxisAlignment getMenuAlignment(PlutoLayoutId id) {
+    switch (id) {
+      case PlutoLayoutId.top:
+        return MainAxisAlignment.start;
+      case PlutoLayoutId.left:
+        return MainAxisAlignment.end;
+      case PlutoLayoutId.right:
+        return MainAxisAlignment.start;
+      case PlutoLayoutId.bottom:
+        return MainAxisAlignment.start;
+      case PlutoLayoutId.body:
+        return MainAxisAlignment.start;
+    }
+  }
+
+  int getMenuRotate(PlutoLayoutId id) {
+    switch (id) {
+      case PlutoLayoutId.top:
+        return 0;
+      case PlutoLayoutId.left:
+        return -45;
+      case PlutoLayoutId.right:
+        return 45;
+      case PlutoLayoutId.bottom:
+        return 0;
+      case PlutoLayoutId.body:
+        return 0;
+    }
+  }
+
   void handleEvent(PlutoLayoutEvent event) {
     // todo : refactor.
     if (event is PlutoToggleTabViewEvent &&
@@ -200,36 +230,6 @@ class _MenusState extends ConsumerState<_Menus> {
       if (event.afterFocusToBody) {
         ref.read(layoutFocusedIdProvider.notifier).state = PlutoLayoutId.body;
       }
-    }
-  }
-
-  MainAxisAlignment getMenuAlignment(PlutoLayoutId id) {
-    switch (id) {
-      case PlutoLayoutId.top:
-        return MainAxisAlignment.start;
-      case PlutoLayoutId.left:
-        return MainAxisAlignment.end;
-      case PlutoLayoutId.right:
-        return MainAxisAlignment.start;
-      case PlutoLayoutId.bottom:
-        return MainAxisAlignment.start;
-      case PlutoLayoutId.body:
-        return MainAxisAlignment.start;
-    }
-  }
-
-  int getMenuRotate(PlutoLayoutId id) {
-    switch (id) {
-      case PlutoLayoutId.top:
-        return 0;
-      case PlutoLayoutId.left:
-        return -45;
-      case PlutoLayoutId.right:
-        return 45;
-      case PlutoLayoutId.bottom:
-        return 0;
-      case PlutoLayoutId.body:
-        return 0;
     }
   }
 
@@ -386,6 +386,8 @@ class _TabViewState extends ConsumerState<_TabView> {
     super.dispose();
   }
 
+  bool isEnabledItem(e) => e.enabled && e.tabViewBuilder != null;
+
   PlutoLayoutContainerDirection? getFocusedContainerDirection() {
     final focusedId = ref.read(layoutFocusedIdProvider);
 
@@ -503,8 +505,6 @@ class _TabViewState extends ConsumerState<_TabView> {
     // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
     itemResizeNotifier.notifyListeners();
   }
-
-  bool isEnabledItem(e) => e.enabled && e.tabViewBuilder != null;
 
   @override
   Widget build(BuildContext context) {

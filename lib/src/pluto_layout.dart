@@ -63,6 +63,29 @@ class PlutoLayout extends StatefulWidget {
   /// This is the basic body screen.
   final PlutoLayoutContainer body;
 
+  /// Specific actions by user registration shortcut keys
+  ///
+  /// {@template pluto_layout_shortcuts_example}
+  /// ```dart
+  /// shortcuts: {
+  ///   LogicalKeySet(LogicalKeyboardKey.escape):
+  ///       PlutoLayoutActions.hideAllTabView(),
+  ///   LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
+  ///       PlutoLayoutActions.rotateTabView(
+  ///     PlutoLayoutContainerDirection.left,
+  ///   ),
+  ///   LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit2):
+  ///       PlutoLayoutActions.rotateTabView(
+  ///     PlutoLayoutContainerDirection.right,
+  ///   ),
+  ///   LogicalKeySet(
+  ///           LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowRight):
+  ///       PlutoLayoutActions.increaseTabView(),
+  ///   LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowLeft):
+  ///       PlutoLayoutActions.decreaseTabView(),
+  /// },
+  /// ```
+  /// {@endtemplate}
   final PlutoLayoutShortcuts? shortcuts;
 
   @override
