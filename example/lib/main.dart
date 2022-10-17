@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_highlight/themes/darcula.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:highlight/languages/dart.dart';
@@ -119,6 +120,23 @@ class _DemoPageState extends State<DemoPage>
           scrollbars: true,
         ),
         child: PlutoLayout(
+          shortcuts: {
+            LogicalKeySet(LogicalKeyboardKey.escape):
+                PlutoLayoutActions.hideAllTabView(),
+            LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
+                PlutoLayoutActions.rotateTabView(
+              PlutoLayoutContainerDirection.left,
+            ),
+            LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit2):
+                PlutoLayoutActions.rotateTabView(
+              PlutoLayoutContainerDirection.right,
+            ),
+            LogicalKeySet(
+                    LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowRight):
+                PlutoLayoutActions.increaseTabView(reverseByDirection: true),
+            LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowLeft):
+                PlutoLayoutActions.decreaseTabView(reverseByDirection: true),
+          },
           body: PlutoLayoutContainer(
             child: TabBarView(
               controller: tabController,
