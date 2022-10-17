@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pluto_layout/pluto_layout.dart';
@@ -17,6 +19,13 @@ class _ItemsNotifier extends StateNotifier<List<PlutoLayoutTabItem>> {
     state = [
       for (final item in state)
         if (item.id == id) item.copyWith(enabled: flag) else disableOrNot(item),
+    ];
+  }
+
+  void toggleAll(bool flag) {
+    state = [
+      for (final item in state)
+        if (item.enabled == flag) item else item.copyWith(enabled: flag),
     ];
   }
 }
@@ -132,6 +141,68 @@ class _Menus extends ConsumerStatefulWidget {
 }
 
 class _MenusState extends ConsumerState<_Menus> {
+  late final StreamSubscription<PlutoLayoutEvent> _eventListener;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final events = ref.read(layoutEventsProvider);
+
+    _eventListener = events.listen(handleEvent);
+  }
+
+  @override
+  void dispose() {
+    _eventListener.cancel();
+
+    super.dispose();
+  }
+
+  void handleEvent(PlutoLayoutEvent event) {
+    // todo : refactor.
+    if (event is PlutoToggleTabViewEvent &&
+        event.containerDirection == widget.direction) {
+      final item = ref
+          .read(_itemProvider)
+          .firstWhereOrNull((e) => e.id == event.tabItemId);
+
+      if (item == null) return;
+
+      toggleTab(ref, item, !item.enabled);
+    } else if (event is PlutoRotateTabViewEvent &&
+        event.containerDirection == widget.direction) {
+      final items = ref.read(_itemProvider);
+
+      if (items.isEmpty) return;
+
+      if (items.length == 1) {
+        toggleTab(ref, items.first, !items.first.enabled);
+        return;
+      }
+
+      final enabledIndex = items.indexWhere((e) => e.enabled);
+
+      if (enabledIndex == -1) {
+        toggleTab(ref, items.first, true);
+        return;
+      }
+
+      if (enabledIndex == items.length - 1) {
+        toggleTab(ref, items.last, false);
+        return;
+      }
+
+      toggleTab(ref, items[enabledIndex + 1], true, showOne: true);
+    } else if (event is PlutoHideAllTabViewEvent) {
+      ref.read(_itemProvider.notifier).toggleAll(false);
+
+      if (event.afterFocusToBody) {
+        ref.read(layoutFocusedIdProvider.notifier).state = PlutoLayoutId.body;
+      }
+    }
+  }
+
   MainAxisAlignment getMenuAlignment(PlutoLayoutId id) {
     switch (id) {
       case PlutoLayoutId.top:
@@ -162,16 +233,21 @@ class _MenusState extends ConsumerState<_Menus> {
     }
   }
 
-  void toggleTab(WidgetRef ref, PlutoLayoutTabItem item, bool flag) {
+  void toggleTab(
+    WidgetRef ref,
+    PlutoLayoutTabItem item,
+    bool flag, {
+    bool? showOne,
+  }) {
+    final isShowOne = showOne ?? widget.mode.isShowOne;
+
     final layoutId = ref.read(layoutIdProvider);
 
     ref.read(layoutFocusedIdProvider.notifier).state = layoutId;
 
     final layoutData = ref.read(layoutDataProvider);
 
-    ref
-        .read(_itemProvider.notifier)
-        .setEnabled(item.id, flag, widget.mode.isShowOne);
+    ref.read(_itemProvider.notifier).setEnabled(item.id, flag, isShowOne);
 
     final items = ref.read(_itemProvider).where((e) => e.enabled);
 
@@ -235,6 +311,8 @@ class _TabView extends ConsumerStatefulWidget {
 }
 
 class _TabViewState extends ConsumerState<_TabView> {
+  late final StreamSubscription<PlutoLayoutEvent> _eventListener;
+
   final ValueNotifier<double?> tabSize = ValueNotifier(null);
 
   final ChangeNotifier itemResizeNotifier = ChangeNotifier();
@@ -289,10 +367,73 @@ class _TabViewState extends ConsumerState<_TabView> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    final events = ref.read(layoutEventsProvider);
+
+    _eventListener = events.listen(handleEvent);
+  }
+
+  @override
   void dispose() {
     tabSize.dispose();
 
+    itemResizeNotifier.dispose();
+
+    _eventListener.cancel();
+
     super.dispose();
+  }
+
+  PlutoLayoutContainerDirection? getFocusedContainerDirection() {
+    final focusedId = ref.read(layoutFocusedIdProvider);
+
+    switch (focusedId) {
+      case PlutoLayoutId.top:
+        return PlutoLayoutContainerDirection.top;
+      case PlutoLayoutId.left:
+        return PlutoLayoutContainerDirection.left;
+      case PlutoLayoutId.right:
+        return PlutoLayoutContainerDirection.right;
+      case PlutoLayoutId.bottom:
+        return PlutoLayoutContainerDirection.bottom;
+      default:
+        return null;
+    }
+  }
+
+  void handleEvent(PlutoLayoutEvent event) {
+    if (event is PlutoIncreaseTabViewEvent ||
+        event is PlutoDecreaseTabViewEvent) {
+      // todo : Refactor.
+      final tabSizeEvent = event as PlutoLayoutHasContainerDirection;
+
+      final containerDirection =
+          tabSizeEvent.containerDirection ?? getFocusedContainerDirection();
+
+      if (containerDirection != widget.direction) return;
+
+      final hasEnabledItem =
+          ref.read(_itemProvider).firstWhereOrNull(isEnabledItem) != null;
+
+      if (!hasEnabledItem) return;
+
+      final layoutId = ref.read(layoutIdProvider);
+
+      final bool isIncreased = event is PlutoIncreaseTabViewEvent;
+
+      final double x = isIncreased ? 10 : -10;
+      final double y = isIncreased ? 10 : -10;
+
+      resizeTabView(
+        layoutId,
+        Offset(
+          widget.direction.isHorizontal ? x : 0,
+          widget.direction.isHorizontal ? 0 : y,
+        ),
+      );
+    }
   }
 
   void resizeTabView(PlutoLayoutId id, Offset offset) {

@@ -3,16 +3,25 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pluto_layout/pluto_layout.dart';
+import 'package:rxdart/rxdart.dart';
+
+typedef PlutoLayoutShortcuts = Map<LogicalKeySet, PlutoLayoutIntent>;
 
 final layoutIdProvider = Provider<PlutoLayoutId>(
   (ref) => throw UnimplementedError(),
 );
 
 final layoutFocusedIdProvider = StateProvider<PlutoLayoutId>(
-  (ref) => PlutoLayoutId.top,
+  (ref) => PlutoLayoutId.body,
 );
 
 final layoutDataProvider = Provider((ref) => PlutoLayoutData());
+
+final layoutShortcutsProvider = Provider<PlutoLayoutShortcuts?>((ref) => null);
+
+final layoutEventsProvider = Provider<PublishSubject<PlutoLayoutEvent>>(
+  (ref) => throw UnimplementedError(),
+);
 
 /// [PlutoLayout] is a UI package that can configure a menu or tab view on each side.
 ///
@@ -35,6 +44,7 @@ class PlutoLayout extends StatefulWidget {
     this.right,
     this.bottom,
     required this.body,
+    this.shortcuts,
     super.key,
   });
 
@@ -53,14 +63,30 @@ class PlutoLayout extends StatefulWidget {
   /// This is the basic body screen.
   final PlutoLayoutContainer body;
 
+  final PlutoLayoutShortcuts? shortcuts;
+
   @override
   State<PlutoLayout> createState() => _PlutoLayoutState();
 }
 
 class _PlutoLayoutState extends State<PlutoLayout> {
+  final PublishSubject<PlutoLayoutEvent> _subject =
+      PublishSubject<PlutoLayoutEvent>();
+
+  @override
+  void dispose() {
+    _subject.close();
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ProviderScope(
+    Widget layoutWidget = ProviderScope(
+      overrides: [
+        layoutShortcutsProvider.overrideWithValue(widget.shortcuts),
+        layoutEventsProvider.overrideWithValue(_subject),
+      ],
       child: Consumer(
         builder: (c, r, w) {
           final layoutData = r.read(layoutDataProvider);
@@ -114,6 +140,15 @@ class _PlutoLayoutState extends State<PlutoLayout> {
         },
       ),
     );
+
+    if (widget.shortcuts != null) {
+      layoutWidget = Shortcuts(
+        shortcuts: widget.shortcuts!,
+        child: layoutWidget,
+      );
+    }
+
+    return layoutWidget;
   }
 }
 

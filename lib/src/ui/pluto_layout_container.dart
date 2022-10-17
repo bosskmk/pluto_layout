@@ -13,7 +13,7 @@ final layoutContainerDirectionProvider =
 /// You can set the background color with the [backgroundColor] property.
 ///
 /// {@macro pluto_layout_example}
-class PlutoLayoutContainer extends ConsumerWidget {
+class PlutoLayoutContainer extends ConsumerStatefulWidget {
   const PlutoLayoutContainer({
     this.backgroundColor,
     required this.child,
@@ -23,6 +23,21 @@ class PlutoLayoutContainer extends ConsumerWidget {
   final Color? backgroundColor;
 
   final Widget child;
+
+  @override
+  ConsumerState<PlutoLayoutContainer> createState() =>
+      _PlutoLayoutContainerState();
+}
+
+class _PlutoLayoutContainerState extends ConsumerState<PlutoLayoutContainer> {
+  final FocusNode focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    focusNode.dispose();
+
+    super.dispose();
+  }
 
   PlutoLayoutContainerDirection _getDirection(PlutoLayoutId id) {
     switch (id) {
@@ -40,38 +55,91 @@ class PlutoLayoutContainer extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-
+  Widget build(BuildContext context) {
     final layoutId = ref.read(layoutIdProvider);
 
-    final border = BorderSide(color: theme.dividerColor);
+    final layoutShortcuts = ref.read(layoutShortcutsProvider);
 
     PlutoLayoutContainerDirection direction = _getDirection(layoutId);
 
-    return ProviderScope(
-      overrides: [
-        layoutContainerDirectionProvider.overrideWithValue(direction),
-      ],
-      child: GestureDetector(
-        onTap: () {
-          ref.read(layoutFocusedIdProvider.notifier).state = layoutId;
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            border: layoutId.isBody
-                ? null
-                : Border(
-                    top: direction.isBottom ? border : BorderSide.none,
-                    left: direction.isRight ? border : BorderSide.none,
-                    right: direction.isLeft ? border : BorderSide.none,
-                    bottom: direction.isTop ? border : BorderSide.none,
-                  ),
+    gestureOnTap() {
+      focusNode.requestFocus();
+      ref.read(layoutFocusedIdProvider.notifier).state = layoutId;
+    }
+
+    Widget containerWidget = Focus(
+      focusNode: focusNode,
+      child: ProviderScope(
+        overrides: [
+          layoutContainerDirectionProvider.overrideWithValue(direction),
+        ],
+        child: GestureDetector(
+          onTap: gestureOnTap,
+          child: _FocusedContainer(
+            layoutId: layoutId,
+            backgroundColor: widget.backgroundColor,
+            child: widget.child,
           ),
-          child: child,
         ),
       ),
+    );
+
+    if (layoutShortcuts != null) {
+      final layoutEvents = ref.read(layoutEventsProvider);
+
+      containerWidget = Actions(
+        actions: {
+          PlutoLayoutActionHideAllTabViewIntent:
+              PlutoLayoutActionHideAllTabViewAction(layoutEvents),
+          PlutoLayoutActionToggleTabViewIntent:
+              PlutoLayoutActionToggleTabViewAction(layoutEvents),
+          PlutoLayoutActionRotateTabViewIntent:
+              PlutoLayoutActionRotateTabViewAction(layoutEvents),
+          PlutoLayoutActionIncreaseTabViewIntent:
+              PlutoLayoutActionIncreaseTabViewAction(layoutEvents),
+          PlutoLayoutActionDecreaseTabViewIntent:
+              PlutoLayoutActionDecreaseTabViewAction(layoutEvents),
+        },
+        child: containerWidget,
+      );
+    }
+
+    return containerWidget;
+  }
+}
+
+class _FocusedContainer extends ConsumerWidget {
+  const _FocusedContainer({
+    required this.layoutId,
+    this.backgroundColor,
+    required this.child,
+  });
+
+  final PlutoLayoutId layoutId;
+
+  final Color? backgroundColor;
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
+    final layoutFocusedId = ref.watch(layoutFocusedIdProvider);
+
+    final bool focused = layoutFocusedId == layoutId;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        border: focused
+            ? Border.all(
+                strokeAlign: StrokeAlign.outside,
+                color: focused ? theme.highlightColor : theme.dividerColor,
+              )
+            : null,
+      ),
+      child: child,
     );
   }
 }
@@ -91,4 +159,5 @@ enum PlutoLayoutContainerDirection {
   bool get isBottom => this == PlutoLayoutContainerDirection.bottom;
   bool get isHorizontal => isLeft || isRight;
   bool get isVertical => isTop || isBottom;
+  bool get isIncreasedOffset => isTop || isLeft;
 }
