@@ -1,5 +1,7 @@
 import 'package:pluto_layout/pluto_layout.dart';
 
+import 'events.dart';
+
 class PlutoDecreaseTabViewEvent extends PlutoLayoutEvent
     implements PlutoLayoutHasInDecreaseTabViewEvent {
   const PlutoDecreaseTabViewEvent(

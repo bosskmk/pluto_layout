@@ -1,4 +1,4 @@
-import 'package:pluto_layout/pluto_layout.dart';
+import 'events.dart';
 
 class PlutoHideAllTabViewEvent extends PlutoLayoutEvent {
   const PlutoHideAllTabViewEvent({

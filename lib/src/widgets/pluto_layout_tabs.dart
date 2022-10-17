@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pluto_layout/pluto_layout.dart';
 import 'package:pluto_layout/src/helper/resize_helper.dart';
 
+import '../events/events.dart';
+
 class _ItemsNotifier extends StateNotifier<List<PlutoLayoutTabItem>> {
   _ItemsNotifier(List<PlutoLayoutTabItem> items) : super(items);
 

@@ -2,15 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:pluto_layout/pluto_layout.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../events/events.dart';
+
 /// [Intent] collection for performing specific actions
 /// by registering keyboard shortcuts.
 ///
 /// {@macro pluto_layout_shortcuts_example}
 abstract class PlutoLayoutActions {
-  /// Close all tabviews.
-  ///
-  /// If [afterFocusToBody] is true,
-  /// close all tabviews and the body container gets focus.
+  /// {@macro pluto_layout_action_hide_all_tab_view_intent}
   static PlutoLayoutActionHideAllTabViewIntent hideAllTabView({
     bool afterFocusToBody = true,
   }) {
@@ -19,13 +18,7 @@ abstract class PlutoLayoutActions {
     );
   }
 
-  /// Toggles the tab view corresponding to [tabItemId].
-  ///
-  /// [containerDirection] specifies the location of the tab view.
-  /// For the left tab view, set it to [PlutoLayoutContainerDirection.left].
-  ///
-  /// [tabItemId] is the [PlutoLayoutTabItem.id] registered in the [PlutoLayoutTabs] widget.
-  /// [tabItemId] must be an item registered in the [containerDirection] location.
+  /// {@macro pluto_layout_action_toggle_tab_view_intent}
   static PlutoLayoutActionToggleTabViewIntent toggleTabView(
     PlutoLayoutContainerDirection containerDirection,
     Object tabItemId,
@@ -33,28 +26,14 @@ abstract class PlutoLayoutActions {
     return PlutoLayoutActionToggleTabViewIntent(containerDirection, tabItemId);
   }
 
-  /// Opens and closes all items in the tab view
-  /// corresponding to the [containerDirection] position in order.
+  /// {@macro pluto_layout_action_rotate_tab_view_intent}
   static PlutoLayoutActionRotateTabViewIntent rotateTabView(
     PlutoLayoutContainerDirection containerDirection,
   ) {
     return PlutoLayoutActionRotateTabViewIntent(containerDirection);
   }
 
-  /// Increase the size of the tab view
-  /// corresponding to the [containerDirection] position by a specific pixel.
-  ///
-  /// If [containerDirection] is null,
-  /// adjust the position of the currently focused container.
-  /// If no tab views are open, no action is taken.
-  ///
-  /// [size] is the size to change in one call.
-  ///
-  /// [reverseByDirection] converts the increment
-  /// to a negative number depending on the direction.
-  /// In the state where [containerDirection] is not specified,
-  /// use left, right or top, bottom with one arrow key
-  /// to increase the size according to the direction.
+  /// {@macro pluto_layout_action_increase_tab_view_intent}
   static PlutoLayoutActionIncreaseTabViewIntent increaseTabView({
     PlutoLayoutContainerDirection? containerDirection,
     double size = PlutoLayoutHasInDecreaseTabViewEvent.defaultSize,
@@ -69,20 +48,7 @@ abstract class PlutoLayoutActions {
     );
   }
 
-  /// Decrease the size of the tab view
-  /// corresponding to the [containerDirection] position by a specific pixel.
-  ///
-  /// If [containerDirection] is null,
-  /// adjust the position of the currently focused container.
-  /// If no tab views are open, no action is taken.
-  ///
-  /// [size] is the size to change in one call.
-  ///
-  /// [reverseByDirection] converts the decrease
-  /// to a negative number depending on the direction.
-  /// In the state where [containerDirection] is not specified,
-  /// use left, right or top, bottom with one arrow key
-  /// to decrease the size according to the direction.
+  /// {@macro pluto_layout_action_decrease_tab_view_intent}
   static PlutoLayoutActionDecreaseTabViewIntent decreaseTabView({
     PlutoLayoutContainerDirection? containerDirection,
     double size = PlutoLayoutHasInDecreaseTabViewEvent.defaultSize,

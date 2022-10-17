@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pluto_layout/pluto_layout.dart';
 import 'package:rxdart/rxdart.dart';
 
+import 'events/events.dart';
+
 typedef PlutoLayoutShortcuts = Map<LogicalKeySet, PlutoLayoutIntent>;
 
 final layoutIdProvider = Provider<PlutoLayoutId>(
