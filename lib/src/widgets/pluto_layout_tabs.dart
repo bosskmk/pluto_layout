@@ -44,6 +44,7 @@ class PlutoLayoutTabs extends ConsumerWidget {
   PlutoLayoutTabs({
     this.items = const [],
     this.mode = PlutoLayoutTabMode.showOne,
+    this.tabViewSizeResolver,
     super.key,
   });
 
@@ -79,6 +80,8 @@ class PlutoLayoutTabs extends ConsumerWidget {
   /// {@endtemplate}
   final PlutoLayoutTabMode mode;
 
+  final PlutoLayoutTabViewSizeResolver? tabViewSizeResolver;
+
   final GlobalKey<_MenusState> _menuKey = GlobalKey();
 
   @override
@@ -91,7 +94,11 @@ class PlutoLayoutTabs extends ConsumerWidget {
 
     List<Widget> children = [
       _Menus(direction: containerDirection, mode: mode, menuKey: _menuKey),
-      _TabView(direction: containerDirection, menuKey: _menuKey),
+      _TabView(
+        direction: containerDirection,
+        tabViewSizeResolver: tabViewSizeResolver,
+        menuKey: _menuKey,
+      ),
     ];
 
     Widget container = containerDirection.isHorizontal
@@ -302,9 +309,15 @@ class _MenusState extends ConsumerState<_Menus> {
 }
 
 class _TabView extends ConsumerStatefulWidget {
-  const _TabView({required this.direction, required this.menuKey});
+  const _TabView({
+    required this.direction,
+    required this.tabViewSizeResolver,
+    required this.menuKey,
+  });
 
   final PlutoLayoutContainerDirection direction;
+
+  final PlutoLayoutTabViewSizeResolver? tabViewSizeResolver;
 
   final GlobalKey<_MenusState> menuKey;
 
@@ -408,7 +421,11 @@ class _TabViewState extends ConsumerState<_TabView> {
   }
 
   void handleEvent(PlutoLayoutEvent event) {
-    if (event is PlutoLayoutHasInDecreaseTabViewEvent) {
+    if (event is PlutoRelayoutEvent) {
+      final layoutId = ref.read(layoutIdProvider);
+
+      resizeTabView(layoutId, Offset.zero);
+    } else if (event is PlutoLayoutHasInDecreaseTabViewEvent) {
       // todo : Refactor.
       final tabSizeEvent = event as PlutoLayoutHasInDecreaseTabViewEvent;
 
@@ -449,13 +466,16 @@ class _TabViewState extends ConsumerState<_TabView> {
 
   void resizeTabView(PlutoLayoutId id, Offset offset) {
     ref.read(layoutFocusedIdProvider.notifier).state = id;
+    final menuSize = menuSizeByDirection;
+    final layoutData = ref.read(layoutDataProvider);
+    final maximumSize = layoutData.getTabViewConstrains(id) - (menuSize * 2);
 
     final constrains = ref.read(layoutDataProvider);
+    final defaultSize = direction.isHorizontal
+        ? constrains.defaultTabWidth
+        : constrains.defaultTabHeight;
     double size = 0;
-    double old = tabSize.value ??
-        (direction.isHorizontal
-            ? constrains.defaultTabWidth
-            : constrains.defaultTabHeight);
+    double old = tabSize.value ?? defaultSize;
 
     switch (direction) {
       case PlutoLayoutContainerDirection.top:
@@ -472,11 +492,16 @@ class _TabViewState extends ConsumerState<_TabView> {
         break;
     }
 
-    final menuSize = menuSizeByDirection;
+    if (widget.tabViewSizeResolver != null) {
+      size = widget.tabViewSizeResolver!.resolve(
+        maxSize: maximumSize,
+        sizeToSet: tabSize.value == null ? null : size,
+        defaultSize: defaultSize,
+      );
+    }
 
     if (size <= menuSize) return;
-    final layoutData = ref.read(layoutDataProvider);
-    final maximumSize = layoutData.getTabViewConstrains(id) - (menuSize * 2);
+
     if (size >= maximumSize) {
       size = maximumSize;
     }
@@ -552,6 +577,7 @@ class _TabViewState extends ConsumerState<_TabView> {
         direction,
         tabSize,
         menuSizeByDirection,
+        widget.tabViewSizeResolver,
         layoutData,
       ),
       child: ResizeIndicator<PlutoLayoutId>(
@@ -588,6 +614,7 @@ class _TabViewDelegate extends SingleChildLayoutDelegate {
     this.direction,
     this.tabSize,
     this.menuSize,
+    this.tabViewSizeResolver,
     this.layoutData,
   ) : super(relayout: tabSize);
 
@@ -599,6 +626,8 @@ class _TabViewDelegate extends SingleChildLayoutDelegate {
 
   final double menuSize;
 
+  final PlutoLayoutTabViewSizeResolver? tabViewSizeResolver;
+
   final PlutoLayoutData layoutData;
 
   double get defaultHeight => layoutData.defaultTabHeight;
@@ -606,9 +635,18 @@ class _TabViewDelegate extends SingleChildLayoutDelegate {
   double get defaultWidth => layoutData.defaultTabWidth;
 
   double get safeHeight {
-    if (tabSize.value == null) return defaultHeight;
-
     final maxSize = layoutData.getTabViewConstrains(layoutId) - (menuSize * 2);
+
+    if (tabSize.value == null) {
+      if (tabViewSizeResolver == null) return defaultHeight;
+
+      return tabViewSizeResolver!.resolve(
+        maxSize: maxSize,
+        sizeToSet: null,
+        defaultSize: defaultHeight,
+      );
+    }
+
     if (tabSize.value! >= maxSize) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         tabSize.value = maxSize;
@@ -620,9 +658,18 @@ class _TabViewDelegate extends SingleChildLayoutDelegate {
   }
 
   double get safeWidth {
-    if (tabSize.value == null) return defaultWidth;
-
     final maxSize = layoutData.getTabViewConstrains(layoutId) - (menuSize * 2);
+
+    if (tabSize.value == null) {
+      if (tabViewSizeResolver == null) return defaultWidth;
+
+      return tabViewSizeResolver!.resolve(
+        maxSize: maxSize,
+        sizeToSet: null,
+        defaultSize: defaultWidth,
+      );
+    }
+
     if (tabSize.value! >= maxSize) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         tabSize.value = maxSize;
@@ -841,6 +888,98 @@ class PlutoLayoutTabItem {
       size: size ?? this.size,
     );
   }
+}
+
+abstract class PlutoLayoutTabViewSizeResolver {
+  const PlutoLayoutTabViewSizeResolver();
+
+  double resolve({
+    required double maxSize,
+    required double? sizeToSet,
+    required double defaultSize,
+  });
+}
+
+class PlutoLayoutTabViewSizeFixed extends PlutoLayoutTabViewSizeResolver {
+  const PlutoLayoutTabViewSizeFixed(this._size)
+      : assert(_size > 0, 'Size must be greater than 0.');
+
+  final double _size;
+
+  @override
+  double resolve({
+    required double maxSize,
+    required double? sizeToSet,
+    required double defaultSize,
+  }) =>
+      _size;
+}
+
+class PlutoLayoutTabViewSizeConstrains extends PlutoLayoutTabViewSizeResolver {
+  const PlutoLayoutTabViewSizeConstrains({
+    double? minSize,
+    double? maxSize,
+    double? initialSize,
+  })  : assert(
+          minSize == null && maxSize == null && initialSize == null
+              ? false
+              : true,
+          'At least one of minSize, maxSize, and initialSize must be set.',
+        ),
+        assert(
+          minSize == null
+              ? true
+              : maxSize == null
+                  ? true
+                  : minSize <= maxSize,
+          'MinSize must be less than or equal to maxSize.',
+        ),
+        assert(
+          initialSize == null ||
+              ((minSize == null ? true : initialSize >= minSize) &&
+                  (maxSize == null ? true : initialSize <= maxSize)),
+          'If initialSize is not null, '
+          'initialSize must be within the range of minSize and maxSize.',
+        ),
+        _minSize = minSize,
+        _maxSize = maxSize,
+        _initialSize = initialSize;
+
+  final double? _minSize;
+
+  final double? _maxSize;
+
+  final double? _initialSize;
+
+  @override
+  double resolve({
+    required double maxSize,
+    required double? sizeToSet,
+    required double defaultSize,
+  }) {
+    sizeToSet ??= _initialSize ?? defaultSize;
+    if (_minSize != null && sizeToSet < _minSize!) return _minSize!;
+    if (_maxSize != null && sizeToSet > _maxSize!) return _maxSize!;
+    return sizeToSet;
+  }
+}
+
+class PlutoLayoutTabViewSizeRatio extends PlutoLayoutTabViewSizeResolver {
+  const PlutoLayoutTabViewSizeRatio(this._ratio)
+      : assert(
+          0 <= _ratio && _ratio <= 1,
+          'The ratio value must be in the range 0 and 1.',
+        );
+
+  final double _ratio;
+
+  @override
+  double resolve({
+    required double maxSize,
+    required double? sizeToSet,
+    required double defaultSize,
+  }) =>
+      maxSize * _ratio;
 }
 
 /// {@macro pluto_layout_tab_mode}

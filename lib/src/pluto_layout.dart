@@ -126,7 +126,7 @@ class _PlutoLayoutState extends State<PlutoLayout> {
           final frontId = r.watch(layoutFocusedIdProvider);
 
           return CustomMultiChildLayout(
-            delegate: _PlutoLayoutDelegate(layoutData),
+            delegate: _PlutoLayoutDelegate(layoutData, _eventStreamController),
             children: <LayoutId>[
               LayoutId(
                 id: PlutoLayoutId.body,
@@ -186,12 +186,16 @@ class _PlutoLayoutState extends State<PlutoLayout> {
 }
 
 class _PlutoLayoutDelegate extends MultiChildLayoutDelegate {
-  _PlutoLayoutDelegate(this._size);
+  _PlutoLayoutDelegate(this._size, this._events);
 
   final PlutoLayoutData _size;
 
+  final PlutoLayoutEventStreamController _events;
+
   @override
   void performLayout(Size size) {
+    _relayoutEvent(size);
+
     _size.size = size;
 
     PlutoLayoutId id = PlutoLayoutId.top;
@@ -255,6 +259,13 @@ class _PlutoLayoutDelegate extends MultiChildLayoutDelegate {
   @override
   bool shouldRelayout(covariant MultiChildLayoutDelegate oldDelegate) {
     return true;
+  }
+
+  void _relayoutEvent(Size size) {
+    if (_size.size == Size.zero) return;
+    if (_size.size == size) return;
+
+    _events.add(const PlutoRelayoutEvent());
   }
 }
 

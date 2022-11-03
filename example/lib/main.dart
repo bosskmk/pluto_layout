@@ -161,6 +161,9 @@ class _DemoPageState extends State<DemoPage>
           left: PlutoLayoutContainer(
             child: PlutoLayoutTabs(
               mode: PlutoLayoutTabMode.showSelected,
+              tabViewSizeResolver: PlutoLayoutTabViewSizeConstrains(
+                minSize: 100,
+              ),
               items: [
                 PlutoLayoutTabItem(
                   id: ExampleText.aboutTitle,
