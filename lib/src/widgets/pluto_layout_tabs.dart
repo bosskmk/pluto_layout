@@ -132,7 +132,7 @@ class _Menus extends ConsumerStatefulWidget {
     required this.direction,
     required this.mode,
     required this.menuKey,
-  });
+  }) : super(key: const ValueKey('_Menus'));
 
   final PlutoLayoutContainerDirection direction;
 
@@ -304,7 +304,7 @@ class _TabView extends ConsumerStatefulWidget {
     required this.direction,
     required this.tabViewSizeResolver,
     required this.menuKey,
-  });
+  }) : super(key: const ValueKey('_TabView'));
 
   final PlutoLayoutContainerDirection direction;
 
