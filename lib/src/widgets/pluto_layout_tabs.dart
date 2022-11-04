@@ -117,12 +117,7 @@ class PlutoLayoutTabs extends ConsumerWidget {
 
     return ProviderScope(
       overrides: [
-        _itemProvider.overrideWithProvider(
-          StateNotifierProvider<_ItemsNotifier, List<PlutoLayoutTabItem>>(
-              (ref) {
-            return _ItemsNotifier(items);
-          }),
-        ),
+        _itemProvider.overrideWith((ref) => _ItemsNotifier(items)),
       ],
       child: ColoredBox(
         color: theme.dialogBackgroundColor,
