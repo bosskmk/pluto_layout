@@ -39,7 +39,7 @@ final _itemProvider =
 
 /// You can configure the tab view by passing it as a child of [PlutoLayoutContainer].
 ///
-/// /// {@macro pluto_layout_example}
+/// {@macro pluto_layout_example}
 class PlutoLayoutTabs extends ConsumerWidget {
   PlutoLayoutTabs({
     this.items = const [],
@@ -80,6 +80,24 @@ class PlutoLayoutTabs extends ConsumerWidget {
   /// {@endtemplate}
   final PlutoLayoutTabMode mode;
 
+  /// Set the size of the tab view.
+  ///
+  /// The size of the tab view is the width in case of left or right tab,
+  /// Means the height if it's a top or bottom tab.
+  ///
+  /// If not set (default behavior), the width of the tab view is as follows.
+  /// For left or right tab: width / 4
+  /// For top or bottom tabs: height / 6
+  ///
+  /// Implemented classes.
+  /// [PlutoLayoutTabViewSizeFixed]
+  /// {@macro pluto_layout_tab_view_size_fixed}
+  ///
+  /// [PlutoLayoutTabViewSizeConstrains]
+  /// {@macro pluto_layout_tab_view_size_constrains}
+  ///
+  /// [PlutoLayoutTabViewSizeRatio]
+  /// {@macro pluto_layout_tab_view_size_ratio}
   final PlutoLayoutTabViewSizeResolver? tabViewSizeResolver;
 
   final GlobalKey<_MenusState> _menuKey = GlobalKey();
@@ -867,8 +885,10 @@ class PlutoLayoutTabItem {
   /// {@macro pluto_layout_tab_item_tabViewBuilder}
   final Widget Function(BuildContext context)? tabViewBuilder;
 
+  /// {@macro pluto_layout_tab_view_size_resolver}
   final PlutoLayoutTabItemSizeResolver sizeResolver;
 
+  /// The open and closed state of the tab view.
   final bool enabled;
 
   double _size = 0;
@@ -894,6 +914,22 @@ class PlutoLayoutTabItem {
   }
 }
 
+/// {@template pluto_layout_tab_view_size_resolver}
+/// Abstract class for setting the size of the tab view.
+///
+/// Implement the [resolve] method that receives the total width,
+/// the size to set, and the default size and returns the width of the tab view.
+///
+/// Implemented classes.
+/// [PlutoLayoutTabViewSizeFixed]
+/// {@macro pluto_layout_tab_view_size_fixed}
+///
+/// [PlutoLayoutTabViewSizeConstrains]
+/// {@macro pluto_layout_tab_view_size_constrains}
+///
+/// [PlutoLayoutTabViewSizeRatio]
+/// {@macro pluto_layout_tab_view_size_ratio}
+/// {@endtemplate}
 abstract class PlutoLayoutTabViewSizeResolver {
   const PlutoLayoutTabViewSizeResolver();
 
@@ -904,6 +940,13 @@ abstract class PlutoLayoutTabViewSizeResolver {
   });
 }
 
+/// {@template pluto_layout_tab_view_size_fixed}
+/// Set the tab view to a fixed size.
+///
+/// After setting, the size cannot be changed.
+/// However, if the parent's size is smaller than the set size,
+/// the size is adjusted to fit the screen size.
+/// {@endtemplate}
 class PlutoLayoutTabViewSizeFixed extends PlutoLayoutTabViewSizeResolver {
   const PlutoLayoutTabViewSizeFixed(this._size)
       : assert(_size > 0, 'Size must be greater than 0.');
@@ -919,6 +962,12 @@ class PlutoLayoutTabViewSizeFixed extends PlutoLayoutTabViewSizeResolver {
       _size;
 }
 
+/// {@template pluto_layout_tab_view_size_constrains}
+/// You can limit the size of the tab view to the minimum and maximum range.
+/// You can also set the initial size.
+///
+/// At least one of [minSize], [maxSize], and [initialSize] must be set.
+/// {@endtemplate}
 class PlutoLayoutTabViewSizeConstrains extends PlutoLayoutTabViewSizeResolver {
   const PlutoLayoutTabViewSizeConstrains({
     double? minSize,
@@ -968,6 +1017,13 @@ class PlutoLayoutTabViewSizeConstrains extends PlutoLayoutTabViewSizeResolver {
   }
 }
 
+/// {@template pluto_layout_tab_view_size_ratio}
+/// Set the size of the tab view according to the ratio of the total size.
+///
+/// After setting, the size cannot be changed.
+/// However, if the parent's size is smaller than the set size,
+/// the size is adjusted to fit the screen size.
+/// {@endtemplate}
 class PlutoLayoutTabViewSizeRatio extends PlutoLayoutTabViewSizeResolver {
   const PlutoLayoutTabViewSizeRatio(this._ratio)
       : assert(
@@ -986,6 +1042,16 @@ class PlutoLayoutTabViewSizeRatio extends PlutoLayoutTabViewSizeResolver {
       maxSize * _ratio;
 }
 
+/// {@template pluto_layout_tab_item_size_resolver}
+/// Abstract class for setting individual tabview sizes of tab items.
+///
+/// Implemented classes.
+/// [PlutoLayoutTabItemSizeFlexible]
+/// {@macro pluto_layout_tab_item_size_flexible}
+///
+/// [PlutoLayoutTabItemSizeInitial]
+/// {@macro pluto_layout_tab_item_size_initial}
+/// {@endtemplate}
 abstract class PlutoLayoutTabItemSizeResolver {
   double resolve({
     required double maxSize,
@@ -1071,6 +1137,15 @@ abstract class PlutoLayoutTabItemSizeResolver {
   }
 }
 
+/// {@template pluto_layout_tab_item_size_flexible}
+/// Set the size of each tab view according to the number of other activated tab views.
+///
+/// You can pass a double value, otherwise it will be set to 1.
+/// Double values must be between 0 and 1.
+///
+/// Assuming that there are two active tab views,
+/// if each double value is equal to 1, the size is set in a ratio of 1:1.
+/// {@endtemplate}
 class PlutoLayoutTabItemSizeFlexible implements PlutoLayoutTabItemSizeResolver {
   const PlutoLayoutTabItemSizeFlexible([double? flex])
       : assert(
@@ -1090,6 +1165,11 @@ class PlutoLayoutTabItemSizeFlexible implements PlutoLayoutTabItemSizeResolver {
   }
 }
 
+/// {@template pluto_layout_tab_item_size_initial}
+/// Set the initial size of the tab view.
+///
+/// Applied when the tab view is activated or the size of the parent widget is changed.
+/// {@endtemplate}
 class PlutoLayoutTabItemSizeInitial implements PlutoLayoutTabItemSizeResolver {
   const PlutoLayoutTabItemSizeInitial(this._size)
       : assert(_size > 0, 'Size must be greater than 0.');
