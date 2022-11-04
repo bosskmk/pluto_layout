@@ -168,6 +168,7 @@ class _DemoPageState extends State<DemoPage>
                 PlutoLayoutTabItem(
                   id: ExampleText.aboutTitle,
                   title: ExampleText.aboutTitle,
+                  sizeResolver: PlutoLayoutTabItemSizeInitial(300),
                   tabViewBuilder: (c) {
                     return Padding(
                       padding: EdgeInsets.all(15),
@@ -186,6 +187,7 @@ class _DemoPageState extends State<DemoPage>
                 PlutoLayoutTabItem(
                   id: ExampleText.aboutLayoutTitle,
                   title: ExampleText.aboutLayoutTitle,
+                  sizeResolver: PlutoLayoutTabItemSizeFlexible(0.7),
                   tabViewBuilder: (c) {
                     return Padding(
                       padding: EdgeInsets.all(15),
@@ -204,6 +206,7 @@ class _DemoPageState extends State<DemoPage>
                 PlutoLayoutTabItem(
                   id: ExampleText.nestedTabsTitle,
                   title: ExampleText.nestedTabsTitle,
+                  sizeResolver: PlutoLayoutTabItemSizeFlexible(0.3),
                   tabViewBuilder: (c) {
                     return Padding(
                       padding: EdgeInsets.all(15),

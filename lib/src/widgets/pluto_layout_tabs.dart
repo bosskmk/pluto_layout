@@ -262,15 +262,11 @@ class _MenusState extends ConsumerState<_Menus> {
 
     final maxSize = layoutData.getMaxTabItemViewSize(layoutId);
 
-    final sizing = AutoSizeHelper.items(
+    PlutoLayoutTabItemSizeResolver._update(
       maxSize: maxSize,
-      length: items.length,
-      itemMinSize: PlutoLayoutData.minTabSize,
-      mode: AutoSizeMode.equal,
+      minSize: PlutoLayoutData.minTabSize,
+      items: items,
     );
-
-    setSize(e) => e.size = sizing.getItemSize(e.size);
-    items.forEach(setSize);
   }
 
   @override
@@ -521,16 +517,16 @@ class _TabViewState extends ConsumerState<_TabView> {
     final defaultSize = maxSize / items.length;
 
     for (final item in items) {
-      if (item.size == 0) item.size = defaultSize;
+      if (item._size == 0) item._size = defaultSize;
     }
 
     final resizing = ResizeHelper.items(
       offset: direction.isHorizontal ? offset.dy : offset.dx,
       items: items,
       isMainItem: (i) => i.id == item.id,
-      getItemSize: (i) => i.size,
+      getItemSize: (i) => i._size,
       getItemMinSize: (i) => PlutoLayoutData.minTabSize,
-      setItemSize: (i, size) => i.size = size,
+      setItemSize: (i, size) => i._size = size,
       mode: ResizeMode.pushAndPull,
     );
 
@@ -752,26 +748,26 @@ class _TabItemsDelegate extends MultiChildLayoutDelegate {
     isLast(int c) => c + 1 == length;
 
     for (final item in items) {
-      if (item.size.isNaN) item.size = defaultSize;
-      if (isLast(count)) item.size = max(remaining, 0);
+      if (item._size.isNaN) item._size = defaultSize;
+      if (isLast(count)) item._size = max(remaining, 0);
 
       final constrain = direction.isHorizontal
           ? BoxConstraints.tight(
               Size(
                 max(size.width, 0),
-                max(item.size == 0 ? defaultSize : item.size, 0),
+                max(item._size == 0 ? defaultSize : item._size, 0),
               ),
             )
           : BoxConstraints.tight(
               Size(
-                max(item.size == 0 ? defaultSize : item.size, 0),
+                max(item._size == 0 ? defaultSize : item._size, 0),
                 max(size.height, 0),
               ),
             );
 
       if (hasChild(item.id)) {
         final s = layoutChild(item.id, constrain);
-        item.size = direction.isHorizontal ? s.height : s.width;
+        item._size = direction.isHorizontal ? s.height : s.width;
         positionChild(
           item.id,
           Offset(
@@ -780,7 +776,7 @@ class _TabItemsDelegate extends MultiChildLayoutDelegate {
           ),
         );
         position += direction.isHorizontal ? s.height : s.width;
-        remaining -= item.size;
+        remaining -= item._size;
       }
     }
 
@@ -791,14 +787,13 @@ class _TabItemsDelegate extends MultiChildLayoutDelegate {
     if (_previousSize == Size.zero) return;
     if (_previousSize == size) return;
 
-    final current = direction.isHorizontal ? size.height : size.width;
-    final previous =
-        direction.isHorizontal ? _previousSize.height : _previousSize.width;
-    final diff = current - previous;
+    final maxSize = direction.isHorizontal ? size.height : size.width;
 
-    for (final item in items) {
-      item.size += (item.size / previous) * diff;
-    }
+    PlutoLayoutTabItemSizeResolver._update(
+      maxSize: maxSize,
+      minSize: PlutoLayoutData.minTabSize,
+      items: items,
+    );
   }
 
   @override
@@ -851,9 +846,19 @@ class PlutoLayoutTabItem {
     required this.title,
     this.icon,
     this.tabViewBuilder,
+    this.sizeResolver = const PlutoLayoutTabItemSizeFlexible(),
     this.enabled = false,
-    this.size = 0,
   });
+
+  PlutoLayoutTabItem._({
+    required this.id,
+    required this.title,
+    this.icon,
+    this.tabViewBuilder,
+    this.sizeResolver = const PlutoLayoutTabItemSizeFlexible(),
+    this.enabled = false,
+    double? size,
+  }) : _size = size ?? 0;
 
   /// {@macro pluto_layout_tab_item_id}
   final Object id;
@@ -867,25 +872,29 @@ class PlutoLayoutTabItem {
   /// {@macro pluto_layout_tab_item_tabViewBuilder}
   final Widget Function(BuildContext context)? tabViewBuilder;
 
+  final PlutoLayoutTabItemSizeResolver sizeResolver;
+
   final bool enabled;
 
-  double size = 0;
+  double _size = 0;
 
   PlutoLayoutTabItem copyWith({
     Object? id,
     String? title,
     Widget? icon,
     Widget Function(BuildContext context)? tabViewBuilder,
+    PlutoLayoutTabItemSizeResolver? sizeResolver,
     bool? enabled,
     double? size,
   }) {
-    return PlutoLayoutTabItem(
+    return PlutoLayoutTabItem._(
       id: id ?? this.id,
       title: title ?? this.title,
       icon: icon ?? this.icon,
       tabViewBuilder: tabViewBuilder ?? this.tabViewBuilder,
+      sizeResolver: sizeResolver ?? this.sizeResolver,
       enabled: enabled ?? this.enabled,
-      size: size ?? this.size,
+      size: size ?? _size,
     );
   }
 }
@@ -980,6 +989,125 @@ class PlutoLayoutTabViewSizeRatio extends PlutoLayoutTabViewSizeResolver {
     required double defaultSize,
   }) =>
       maxSize * _ratio;
+}
+
+abstract class PlutoLayoutTabItemSizeResolver {
+  double resolve({
+    required double maxSize,
+    required double minSize,
+  });
+
+  static void _update({
+    required double maxSize,
+    required double minSize,
+    required Iterable<PlutoLayoutTabItem> items,
+  }) {
+    if (items.isEmpty) return;
+
+    final groupByResolverType = items.groupListsBy(
+      (e) => e.sizeResolver.runtimeType,
+    );
+
+    final double minimumMaxSize = items.length * minSize;
+
+    int countSizedItem = 0;
+    double remaining = maxSize;
+    double remainingMinimum = minimumMaxSize;
+    bool narrowing = maxSize <= minimumMaxSize;
+
+    if (!narrowing &&
+        groupByResolverType.containsKey(PlutoLayoutTabItemSizeInitial)) {
+      for (final item in groupByResolverType[PlutoLayoutTabItemSizeInitial]!) {
+        item._size = min(
+          item.sizeResolver.resolve(maxSize: maxSize, minSize: minSize),
+          remaining,
+        );
+
+        ++countSizedItem;
+        remaining -= item._size;
+        remainingMinimum -= minSize;
+
+        if (remaining <= remainingMinimum) {
+          item._size -= remainingMinimum;
+          narrowing = true;
+          break;
+        }
+      }
+
+      groupByResolverType.remove(PlutoLayoutTabItemSizeInitial);
+    }
+
+    if (groupByResolverType.isEmpty) return;
+
+    assert(groupByResolverType[PlutoLayoutTabItemSizeFlexible] != null);
+    assert(groupByResolverType.length == 1);
+
+    final flexibleItems = groupByResolverType[PlutoLayoutTabItemSizeFlexible]!;
+
+    final sizing = narrowing
+        ? AutoSizeHelper.items(
+            maxSize: remaining,
+            length: items.length - countSizedItem,
+            itemMinSize: PlutoLayoutData.minTabSize,
+            mode: AutoSizeMode.equal,
+          )
+        : AutoSizeHelper.items(
+            maxSize: remaining,
+            length: items.length - countSizedItem,
+            itemMinSize: PlutoLayoutData.minTabSize,
+            mode: AutoSizeMode.scale,
+            scale: remaining /
+                flexibleItems.fold(
+                    0,
+                    (p, e) =>
+                        p +
+                        e.sizeResolver.resolve(
+                          maxSize: maxSize,
+                          minSize: minSize,
+                        )),
+          );
+
+    setSize(e) => e._size = sizing.getItemSize(e.sizeResolver.resolve(
+          maxSize: maxSize,
+          minSize: minSize,
+        ));
+
+    flexibleItems.forEach(setSize);
+  }
+}
+
+class PlutoLayoutTabItemSizeFlexible implements PlutoLayoutTabItemSizeResolver {
+  const PlutoLayoutTabItemSizeFlexible([double? flex])
+      : assert(
+          flex == null || (0 <= flex && flex <= 1),
+          'The flex value must be in the range 0 and 1.',
+        ),
+        _flex = flex ?? 1;
+
+  final double _flex;
+
+  @override
+  double resolve({
+    required double maxSize,
+    required double minSize,
+  }) {
+    return _flex;
+  }
+}
+
+class PlutoLayoutTabItemSizeInitial implements PlutoLayoutTabItemSizeResolver {
+  const PlutoLayoutTabItemSizeInitial(this._size)
+      : assert(_size > 0, 'Size must be greater than 0.');
+
+  final double _size;
+
+  @override
+  double resolve({
+    required double maxSize,
+    required double minSize,
+  }) {
+    return _size;
+  }
 }
 
 /// {@macro pluto_layout_tab_mode}
