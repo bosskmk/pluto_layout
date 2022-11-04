@@ -1,3 +1,7 @@
+## 0.2.2
+
+* Add tab size resolver.
+
 ## 0.2.1
 
 * Fix pub score.
