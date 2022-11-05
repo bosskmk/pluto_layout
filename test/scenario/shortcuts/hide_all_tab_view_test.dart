@@ -18,6 +18,7 @@ void main() {
       body: const PlutoLayoutContainer(child: Text('body container')),
       top: PlutoLayoutContainer(
           child: PlutoLayoutTabs(
+        mode: PlutoLayoutTabMode.showSelected,
         items: [
           PlutoLayoutTabItem(
             id: 'top1',
@@ -35,6 +36,7 @@ void main() {
       )),
       left: PlutoLayoutContainer(
           child: PlutoLayoutTabs(
+        mode: PlutoLayoutTabMode.showSelected,
         items: [
           PlutoLayoutTabItem(
             id: 'left1',
@@ -52,6 +54,7 @@ void main() {
       )),
       right: PlutoLayoutContainer(
           child: PlutoLayoutTabs(
+        mode: PlutoLayoutTabMode.showSelected,
         items: [
           PlutoLayoutTabItem(
             id: 'right1',
@@ -69,6 +72,7 @@ void main() {
       )),
       bottom: PlutoLayoutContainer(
           child: PlutoLayoutTabs(
+        mode: PlutoLayoutTabMode.showSelected,
         items: [
           PlutoLayoutTabItem(
             id: 'bottom1',
