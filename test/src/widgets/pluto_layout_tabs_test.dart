@@ -309,6 +309,263 @@ void main() {
     });
   });
 
+  group('탭뷰 렌더링 테스트', () {
+    group('PlutoLayoutTabMode.showOne', () {
+      const mode = PlutoLayoutTabMode.showOne;
+
+      const layoutId = PlutoLayoutId.left;
+
+      const direction = PlutoLayoutContainerDirection.left;
+
+      final List<PlutoLayoutTabItem> items = [
+        PlutoLayoutTabItem(
+          id: 'tab1',
+          title: 'tab1',
+          tabViewBuilder: (e) => const Text('tab1 view'),
+        ),
+        PlutoLayoutTabItem(
+          id: 'tab2',
+          title: 'tab2',
+          tabViewBuilder: (e) => const Text('tab2 view'),
+        ),
+      ];
+
+      test('두개의 탭이 활성화 된 경우 assertion 에러가 발생 되어야 한다.', () {
+        expect(() {
+          PlutoLayoutTabs(
+            mode: mode,
+            items: [
+              PlutoLayoutTabItem(id: 'tab1', title: 'tab1', enabled: true),
+              PlutoLayoutTabItem(id: 'tab2', title: 'tab2', enabled: true),
+            ],
+          );
+        }, throwsAssertionError);
+      });
+
+      testWidgets(
+        '탭뷰를 두번 탭하면 탭뷰가 렌더링 되었다 사라져야 한다.',
+        (tester) async {
+          await buildWidget(
+            tester,
+            items: items,
+            layoutId: layoutId,
+            direction: direction,
+            mode: mode,
+          );
+
+          await tester.tap(find.text('tab1'));
+          await tester.pump();
+
+          expect(find.text('tab1 view'), findsOneWidget);
+
+          await tester.tap(find.text('tab1'));
+          await tester.pump();
+
+          expect(find.text('tab1 view'), findsNothing);
+        },
+      );
+
+      testWidgets(
+        '두개의 탭을 탭하면 기존의 탭뷰는 사라지고 탭한 탭뷰가 렌더링 되어야 한다.',
+        (tester) async {
+          await buildWidget(
+            tester,
+            items: items,
+            layoutId: layoutId,
+            direction: direction,
+            mode: mode,
+          );
+
+          await tester.tap(find.text('tab1'));
+          await tester.pump();
+
+          expect(find.text('tab1 view'), findsOneWidget);
+          expect(find.text('tab2 view'), findsNothing);
+
+          await tester.tap(find.text('tab2'));
+          await tester.pump();
+
+          expect(find.text('tab1 view'), findsNothing);
+          expect(find.text('tab2 view'), findsOneWidget);
+        },
+      );
+    });
+
+    group('PlutoLayoutTabMode.showOneMust', () {
+      const mode = PlutoLayoutTabMode.showOneMust;
+
+      const layoutId = PlutoLayoutId.left;
+
+      const direction = PlutoLayoutContainerDirection.left;
+
+      final List<PlutoLayoutTabItem> items = [
+        PlutoLayoutTabItem(
+          id: 'tab1',
+          title: 'tab1',
+          tabViewBuilder: (e) => const Text('tab1 view'),
+        ),
+        PlutoLayoutTabItem(
+          id: 'tab2',
+          title: 'tab2',
+          tabViewBuilder: (e) => const Text('tab2 view'),
+        ),
+      ];
+
+      test('두개의 탭이 활성화 된 경우 assertion 에러가 발생 되어야 한다.', () {
+        expect(() {
+          PlutoLayoutTabs(
+            mode: mode,
+            items: [
+              PlutoLayoutTabItem(id: 'tab1', title: 'tab1', enabled: true),
+              PlutoLayoutTabItem(id: 'tab2', title: 'tab2', enabled: true),
+            ],
+          );
+        }, throwsAssertionError);
+      });
+
+      testWidgets(
+        '첫번째 탭뷰가 기본으로 활성화 되어 있어야 한다.',
+        (tester) async {
+          await buildWidget(
+            tester,
+            items: items,
+            layoutId: layoutId,
+            direction: direction,
+            mode: mode,
+          );
+
+          expect(find.text('tab1 view'), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        '활성화된 첫번째 탭뷰를 탭해도 사라지지 않아야 한다.',
+        (tester) async {
+          await buildWidget(
+            tester,
+            items: items,
+            layoutId: layoutId,
+            direction: direction,
+            mode: mode,
+          );
+
+          await tester.tap(find.text('tab1'));
+          await tester.pump();
+
+          expect(find.text('tab1 view'), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        '두번째 탭을 탭하면 첫번째는 사라지고 두번째 탭뷰가 나타나야 한다.',
+        (tester) async {
+          await buildWidget(
+            tester,
+            items: items,
+            layoutId: layoutId,
+            direction: direction,
+            mode: mode,
+          );
+
+          expect(find.text('tab1 view'), findsOneWidget);
+
+          await tester.tap(find.text('tab2'));
+          await tester.pump();
+
+          expect(find.text('tab1 view'), findsNothing);
+          expect(find.text('tab2 view'), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        '두개의 탭을 탭하면 기존의 탭뷰는 사라지고 탭한 탭뷰가 렌더링 되어야 한다.',
+        (tester) async {
+          await buildWidget(
+            tester,
+            items: items,
+            layoutId: layoutId,
+            direction: direction,
+            mode: mode,
+          );
+
+          await tester.tap(find.text('tab1'));
+          await tester.pump();
+
+          expect(find.text('tab1 view'), findsOneWidget);
+          expect(find.text('tab2 view'), findsNothing);
+
+          await tester.tap(find.text('tab2'));
+          await tester.pump();
+
+          expect(find.text('tab1 view'), findsNothing);
+          expect(find.text('tab2 view'), findsOneWidget);
+        },
+      );
+    });
+
+    group('PlutoLayoutTabMode.showSelected', () {
+      const mode = PlutoLayoutTabMode.showSelected;
+
+      const layoutId = PlutoLayoutId.left;
+
+      const direction = PlutoLayoutContainerDirection.left;
+
+      final List<PlutoLayoutTabItem> items = [
+        PlutoLayoutTabItem(
+          id: 'tab1',
+          title: 'tab1',
+          tabViewBuilder: (e) => const Text('tab1 view'),
+        ),
+        PlutoLayoutTabItem(
+          id: 'tab2',
+          title: 'tab2',
+          tabViewBuilder: (e) => const Text('tab2 view'),
+        ),
+      ];
+
+      test('두개의 탭이 활성화 된 경우 assertion 에러가 발생 되지 않아야 한다.', () {
+        final tabs = PlutoLayoutTabs(
+          mode: mode,
+          items: [
+            PlutoLayoutTabItem(id: 'tab1', title: 'tab1', enabled: true),
+            PlutoLayoutTabItem(id: 'tab2', title: 'tab2', enabled: true),
+          ],
+        );
+
+        expect(tabs.items.where((e) => e.enabled).length, 2);
+      });
+
+      testWidgets(
+        '두개의 탭뷰를 모두 활성화 한 상태에서 다시 한번씩 탭하면 탭뷰가 사라져야 한다.',
+        (tester) async {
+          await buildWidget(
+            tester,
+            items: items,
+            layoutId: layoutId,
+            direction: direction,
+            mode: mode,
+          );
+
+          await tester.tap(find.text('tab1'));
+          await tester.pump();
+          await tester.tap(find.text('tab2'));
+          await tester.pump();
+
+          expect(find.text('tab1 view'), findsOneWidget);
+          expect(find.text('tab2 view'), findsOneWidget);
+
+          await tester.tap(find.text('tab1'));
+          await tester.pump();
+          await tester.tap(find.text('tab2'));
+          await tester.pump();
+
+          expect(find.text('tab1 view'), findsNothing);
+          expect(find.text('tab2 view'), findsNothing);
+        },
+      );
+    });
+  });
+
   group('PlutoLayoutTabViewSizeResolver', () {
     group('PlutoLayoutTabViewSizeFixed', () {
       test('size 가 0 인경우 asserting 에러가 발생 되어야 한다.', () {
