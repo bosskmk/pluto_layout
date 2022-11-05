@@ -31,6 +31,18 @@ class _ItemsNotifier extends StateNotifier<List<PlutoLayoutTabItem>> {
         if (item.enabled == flag) item else item.copyWith(enabled: flag),
     ];
   }
+
+  void insert(int index, PlutoLayoutTabItem item) {
+    state.insert(index, item);
+    state = [...state];
+  }
+
+  void remove(PlutoLayoutTabItem item) {
+    state = [
+      for (final e in state)
+        if (item.id != e.id) e,
+    ];
+  }
 }
 
 final _itemsProvider =
