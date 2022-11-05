@@ -12,9 +12,9 @@ import '../events/events.dart';
 class _ItemsNotifier extends StateNotifier<List<PlutoLayoutTabItem>> {
   _ItemsNotifier(List<PlutoLayoutTabItem> items) : super(items);
 
-  void setEnabled(Object id, bool flag, [bool disableOther = false]) {
+  void setEnabled(Object id, bool flag, PlutoLayoutTabMode mode) {
     PlutoLayoutTabItem disableOrNot(PlutoLayoutTabItem item) {
-      if (!disableOther) return item;
+      if (!mode.isShowOneMode) return item;
       return item.copyWith(enabled: false);
     }
 
@@ -24,7 +24,9 @@ class _ItemsNotifier extends StateNotifier<List<PlutoLayoutTabItem>> {
     ];
   }
 
-  void toggleAll(bool flag) {
+  void toggleAll(bool flag, PlutoLayoutTabMode mode) {
+    if (mode.isShowOneMust) return;
+
     state = [
       for (final item in state)
         if (item.enabled == flag) item else item.copyWith(enabled: flag),
@@ -42,11 +44,30 @@ final _itemProvider =
 /// {@macro pluto_layout_example}
 class PlutoLayoutTabs extends ConsumerWidget {
   PlutoLayoutTabs({
-    this.items = const [],
+    List<PlutoLayoutTabItem> items = const [],
     this.mode = PlutoLayoutTabMode.showOne,
     this.tabViewSizeResolver,
     super.key,
-  });
+  }) : items = _updateConstrains(items, mode);
+
+  static List<PlutoLayoutTabItem> _updateConstrains(
+    List<PlutoLayoutTabItem> items,
+    PlutoLayoutTabMode mode,
+  ) {
+    assert(
+      !mode.isShowOneMode || items.where((e) => e.enabled).length < 2,
+      'If the mode is showOne or showOneMust, the enabled item must be absent or one.',
+    );
+
+    if (!mode.isShowOneMust || items.isEmpty) return items;
+
+    if (items.where((e) => e.enabled).length == 1) return items;
+
+    return [
+      items.first.copyWith(enabled: true),
+      ...items.skip(1),
+    ];
+  }
 
   /// Pass a list of [PlutoLayoutTabItem].
   ///
@@ -72,12 +93,7 @@ class PlutoLayoutTabs extends ConsumerWidget {
   /// ```
   final List<PlutoLayoutTabItem> items;
 
-  /// {@template pluto_layout_tab_mode}
-  /// [mode] determines the operation method of the tab menu.
-  ///
-  /// [PlutoLayoutTabMode.showOne] shows only one tab view of the menu selected from multiple menus.
-  /// [PlutoLayoutTabMode.showSelected] shows the tab view of all selected menus in multiple menus.
-  /// {@endtemplate}
+  /// {@macro pluto_layout_tab_mode}
   final PlutoLayoutTabMode mode;
 
   /// Set the size of the tab view.
@@ -241,13 +257,17 @@ class _MenusState extends ConsumerState<_Menus> {
       }
 
       if (enabledIndex == items.length - 1) {
-        toggleTab(ref, items.last, false);
+        toggleTab(
+          ref,
+          widget.mode.isShowOneMust ? items.first : items.last,
+          widget.mode.isShowOneMust ? true : false,
+        );
         return;
       }
 
       toggleTab(ref, items[enabledIndex + 1], true, showOne: true);
     } else if (event is PlutoHideAllTabViewEvent) {
-      ref.read(_itemProvider.notifier).toggleAll(false);
+      ref.read(_itemProvider.notifier).toggleAll(false, widget.mode);
 
       if (event.afterFocusToBody) {
         ref.read(layoutFocusedIdProvider.notifier).state = PlutoLayoutId.body;
@@ -261,7 +281,7 @@ class _MenusState extends ConsumerState<_Menus> {
     bool flag, {
     bool? showOne,
   }) {
-    final isShowOne = showOne ?? widget.mode.isShowOne;
+    if (widget.mode.isShowOneMust) flag = true;
 
     final layoutId = ref.read(layoutIdProvider);
 
@@ -269,7 +289,7 @@ class _MenusState extends ConsumerState<_Menus> {
 
     final layoutData = ref.read(layoutDataProvider);
 
-    ref.read(_itemProvider.notifier).setEnabled(item.id, flag, isShowOne);
+    ref.read(_itemProvider.notifier).setEnabled(item.id, flag, widget.mode);
 
     final items = ref.read(_itemProvider).where((e) => e.enabled);
 
@@ -1185,11 +1205,38 @@ class PlutoLayoutTabItemSizeInitial implements PlutoLayoutTabItemSizeResolver {
   }
 }
 
-/// {@macro pluto_layout_tab_mode}
+/// {@template pluto_layout_tab_mode}
+/// [mode] determines the operation method of the tab menu.
+///
+/// [PlutoLayoutTabMode.showOne]
+/// {@macro pluto_lay_out_tab_mode_showOne}
+///
+/// [PlutoLayoutTabMode.showOneMust]
+/// {@macro pluto_lay_out_tab_mode_showOneMust}
+///
+/// [PlutoLayoutTabMode.showSelected]
+/// {@macro pluto_lay_out_tab_mode_showSelected}
+/// {@endtemplate}
 enum PlutoLayoutTabMode {
+  /// {@template pluto_lay_out_tab_mode_showOne}
+  /// shows only one tab view of the menu selected from multiple menus.
+  /// {@endtemplate}
   showOne,
+
+  /// {@template pluto_lay_out_tab_mode_showOneMust}
+  /// This is a mode in which one item must be activated.
+  /// {@endtemplate}
+  showOneMust,
+
+  /// {@template pluto_lay_out_tab_mode_showSelected}
+  /// shows the tab view of all selected menus in multiple menus.
+  /// {@endtemplate}
   showSelected;
 
+  /// In this mode, only one item should be activated.
+  bool get isShowOneMode => isShowOne || isShowOneMust;
+
   bool get isShowOne => this == PlutoLayoutTabMode.showOne;
+  bool get isShowOneMust => this == PlutoLayoutTabMode.showOneMust;
   bool get isShowSelected => this == PlutoLayoutTabMode.showSelected;
 }
