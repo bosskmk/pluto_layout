@@ -22,6 +22,7 @@ void main() {
     WidgetTester tester, {
     List<PlutoLayoutTabItem>? items,
     PlutoLayoutTabMode mode = PlutoLayoutTabMode.showOne,
+    bool? draggable,
     PlutoLayoutTabViewSizeResolver? tabViewSizeResolver,
     Size? screenSize,
     required PlutoLayoutId layoutId,
@@ -45,6 +46,7 @@ void main() {
             items: items ?? [],
             mode: mode,
             tabViewSizeResolver: tabViewSizeResolver,
+            draggable: draggable,
           ),
         ),
       ),
@@ -564,6 +566,98 @@ void main() {
         },
       );
     });
+  });
+
+  group('draggable', () {
+    const layoutId = PlutoLayoutId.left;
+
+    const direction = PlutoLayoutContainerDirection.left;
+
+    late List<PlutoLayoutTabItem> items;
+
+    setUp(() {
+      items = [
+        PlutoLayoutTabItem(
+          id: 'tab1',
+          title: 'tab1',
+          tabViewBuilder: (e) => const Text('tab1 view'),
+        ),
+        PlutoLayoutTabItem(
+          id: 'tab2',
+          title: 'tab2',
+          tabViewBuilder: (e) => const Text('tab2 view'),
+        ),
+        PlutoLayoutTabItem(
+          id: 'tab3',
+          title: 'tab3',
+          tabViewBuilder: (e) => const Text('tab3 view'),
+        ),
+      ];
+    });
+
+    testWidgets(
+      'draggable 기본값이 false 인 경우 Draggable 위젯이 렌더링 되지 않아야 한다.',
+      (tester) async {
+        await buildWidget(
+          tester,
+          items: items,
+          layoutId: layoutId,
+          direction: direction,
+          mode: PlutoLayoutTabMode.showSelected,
+        );
+
+        expect(find.byKey(const ValueKey('_Draggable_tab1')), findsNothing);
+        expect(find.byKey(const ValueKey('_Draggable_tab2')), findsNothing);
+        expect(find.byKey(const ValueKey('_Draggable_tab3')), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'draggable 이 true 인 경우 Draggable 위젯이 렌더링 되어야 한다.',
+      (tester) async {
+        await buildWidget(
+          tester,
+          items: items,
+          layoutId: layoutId,
+          direction: direction,
+          draggable: true,
+          mode: PlutoLayoutTabMode.showSelected,
+        );
+
+        expect(find.byKey(const ValueKey('_Draggable_tab1')), findsOneWidget);
+        expect(find.byKey(const ValueKey('_Draggable_tab2')), findsOneWidget);
+        expect(find.byKey(const ValueKey('_Draggable_tab3')), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'tab1 을 tab2 로 드래그 하면 위치가 변경 되어야 한다.',
+      (tester) async {
+        await buildWidget(
+          tester,
+          items: items,
+          layoutId: layoutId,
+          direction: direction,
+          draggable: true,
+          mode: PlutoLayoutTabMode.showSelected,
+        );
+
+        {
+          final tab1Pos = tester.getCenter(find.text('tab1'));
+          final tab2Pos = tester.getCenter(find.text('tab2'));
+          expect(tab1Pos.dy, lessThan(tab2Pos.dy));
+
+          await tester.drag(find.text('tab1'), Offset(0, tab2Pos.dy));
+          await tester.pump();
+        }
+
+        {
+          final tab1Pos = tester.getCenter(find.text('tab1'));
+          final tab2Pos = tester.getCenter(find.text('tab2'));
+          expect(tab1Pos.dy, greaterThan(tab2Pos.dy));
+        }
+      },
+    );
   });
 
   group('PlutoLayoutTabViewSizeResolver', () {

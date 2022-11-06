@@ -175,6 +175,7 @@ class _MenusState extends ConsumerState<_Menus> {
       if (!widget.draggable) return button;
 
       return _Draggable(
+        key: ValueKey('_Draggable_${item.id}'),
         layoutId: layoutId,
         item: item,
         items: items,
@@ -219,6 +220,7 @@ class _Draggable extends ConsumerWidget {
     required this.direction,
     required this.quarterTurns,
     required this.child,
+    super.key,
   });
 
   final PlutoLayoutId layoutId;
