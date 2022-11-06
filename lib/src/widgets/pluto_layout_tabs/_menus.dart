@@ -4,12 +4,16 @@ class _Menus extends ConsumerStatefulWidget {
   const _Menus({
     required this.direction,
     required this.mode,
+    bool? draggable,
     required this.menuKey,
-  }) : super(key: const ValueKey('_Menus'));
+  })  : draggable = draggable ?? false,
+        super(key: const ValueKey('_Menus'));
 
   final PlutoLayoutContainerDirection direction;
 
   final PlutoLayoutTabMode mode;
+
+  final bool draggable;
 
   final GlobalKey<_MenusState> menuKey;
 
@@ -111,6 +115,12 @@ class _MenusState extends ConsumerState<_Menus> {
       if (event.afterFocusToBody) {
         ref.read(layoutFocusedIdProvider.notifier).state = PlutoLayoutId.body;
       }
+    } else if (event is PlutoRemoveTabItemEvent) {
+      final layoutId = ref.read(layoutIdProvider);
+
+      if (layoutId != event.layoutId) return;
+
+      ref.read(_itemsProvider.notifier).remove(event.item);
     }
   }
 
@@ -152,31 +162,173 @@ class _MenusState extends ConsumerState<_Menus> {
 
     final items = ref.watch(_itemsProvider);
 
+    final quarterTurns = getMenuRotate(layoutId);
+
+    Widget draggableOrNot(PlutoLayoutTabItem item) {
+      final button = ToggleButton(
+        title: item.title,
+        icon: item.icon,
+        enabled: item.enabled,
+        changed: (flag) => toggleTab(ref, item, flag),
+      );
+
+      if (!widget.draggable) return button;
+
+      return _Draggable(
+        key: ValueKey('_Draggable_${item.id}'),
+        layoutId: layoutId,
+        item: item,
+        items: items,
+        mode: widget.mode,
+        direction: widget.direction,
+        quarterTurns: quarterTurns,
+        child: button,
+      );
+    }
+
+    final children = <Widget>[
+      for (final item in (widget.direction.isLeft ? items.reversed : items))
+        draggableOrNot(item)
+    ];
+
     return Align(
       key: widget.menuKey,
       alignment: widget.direction.isVertical
           ? Alignment.centerLeft
           : Alignment.topCenter,
       child: RotatedBox(
-        quarterTurns: getMenuRotate(layoutId),
+        quarterTurns: quarterTurns,
         child: SingleChildScrollView(
           reverse: widget.direction.isLeft,
           scrollDirection: Axis.horizontal,
           child: Row(
             mainAxisAlignment: getMenuAlignment(layoutId),
-            children: (widget.direction.isLeft ? items.reversed : items)
-                .map(
-                  (e) => ToggleButton(
-                    title: e.title,
-                    icon: e.icon,
-                    enabled: e.enabled,
-                    changed: (flag) => toggleTab(ref, e, flag),
-                  ),
-                )
-                .toList(),
+            children: children,
           ),
         ),
       ),
     );
+  }
+}
+
+class _Draggable extends ConsumerWidget {
+  const _Draggable({
+    required this.layoutId,
+    required this.item,
+    required this.items,
+    required this.mode,
+    required this.direction,
+    required this.quarterTurns,
+    required this.child,
+    super.key,
+  });
+
+  final PlutoLayoutId layoutId;
+
+  final PlutoLayoutTabItem item;
+
+  final List<PlutoLayoutTabItem> items;
+
+  final PlutoLayoutTabMode mode;
+
+  final PlutoLayoutContainerDirection direction;
+
+  final int quarterTurns;
+
+  final Widget child;
+
+  bool _onWillAccept(_DragData? data) {
+    return data != null && data.item.id != item.id;
+  }
+
+  void Function(_DragData) _onAccept(WidgetRef ref) {
+    final itemsNotifier = ref.read(_itemsProvider.notifier);
+
+    return (data) {
+      final index = items.indexOf(item);
+      if (data.layoutId == layoutId) {
+        itemsNotifier.remove(data.item);
+      } else {
+        final events = ref.read(layoutEventsProvider);
+        events.add(PlutoRemoveTabItemEvent(data.layoutId, data.item));
+      }
+      itemsNotifier.insert(index, data.item);
+      if (mode.isShowOneMode &&
+          data.item.enabled &&
+          items.where((e) => e.enabled).isNotEmpty) {
+        itemsNotifier.setEnabled(data.item.id, true, mode);
+      }
+    };
+  }
+
+  Widget _builder(
+    BuildContext context,
+    List<_DragData?> candidateData,
+    List<dynamic> rejectedData,
+  ) {
+    if (candidateData.isNotEmpty || rejectedData.isNotEmpty) {
+      return ColoredBox(
+        color: Theme.of(context).backgroundColor,
+        child: child,
+      );
+    }
+    return child;
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Draggable<_DragData>(
+      data: _DragData(layoutId, item),
+      dragAnchorStrategy: _childDragAnchorStrategy(direction),
+      feedback: Material(
+        child: RotatedBox(quarterTurns: quarterTurns, child: child),
+      ),
+      child: DragTarget<_DragData>(
+        onWillAccept: _onWillAccept,
+        onAccept: _onAccept(ref),
+        builder: _builder,
+      ),
+    );
+  }
+}
+
+class _DragData {
+  const _DragData(this.layoutId, this.item);
+
+  final PlutoLayoutId layoutId;
+
+  final PlutoLayoutTabItem item;
+}
+
+Offset Function(
+  Draggable<Object> draggable,
+  BuildContext context,
+  Offset position,
+) _childDragAnchorStrategy(PlutoLayoutContainerDirection direction) {
+  return (
+    Draggable<Object> draggable,
+    BuildContext context,
+    Offset position,
+  ) {
+    final RenderBox renderObject = context.findRenderObject()! as RenderBox;
+    final local = renderObject.globalToLocal(position);
+    return _directionalPosition(local, renderObject.size, direction);
+  };
+}
+
+Offset _directionalPosition(
+  Offset offset,
+  Size size,
+  PlutoLayoutContainerDirection direction,
+) {
+  switch (direction) {
+    case PlutoLayoutContainerDirection.top:
+      return offset;
+    case PlutoLayoutContainerDirection.left:
+      return Offset(offset.dy, (size.width - offset.dx).abs());
+    case PlutoLayoutContainerDirection.right:
+      return Offset((size.height - offset.dy).abs(), offset.dx);
+    case PlutoLayoutContainerDirection.bottom:
+      return offset;
   }
 }

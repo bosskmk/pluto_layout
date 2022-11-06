@@ -480,7 +480,6 @@ class _TabItemsDelegate extends MultiChildLayoutDelegate {
   }
 
   void _reset(Size size) {
-    if (_previousSize == Size.zero) return;
     if (_previousSize == size) return;
 
     final maxSize = direction.isHorizontal ? size.height : size.width;

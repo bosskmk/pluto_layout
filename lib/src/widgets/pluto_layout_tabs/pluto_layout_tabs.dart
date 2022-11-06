@@ -27,8 +27,10 @@ class PlutoLayoutTabs extends ConsumerWidget {
     List<PlutoLayoutTabItem> items = const [],
     this.mode = PlutoLayoutTabMode.showOne,
     this.tabViewSizeResolver,
+    bool? draggable,
     super.key,
-  }) : items = _updateConstrains(items, mode);
+  })  : items = _updateConstrains(items, mode),
+        draggable = draggable ?? false;
 
   static List<PlutoLayoutTabItem> _updateConstrains(
     List<PlutoLayoutTabItem> items,
@@ -96,6 +98,9 @@ class PlutoLayoutTabs extends ConsumerWidget {
   /// {@macro pluto_layout_tab_view_size_ratio}
   final PlutoLayoutTabViewSizeResolver? tabViewSizeResolver;
 
+  /// If the value is true, drag the item button to move the tab position.
+  final bool draggable;
+
   final GlobalKey<_MenusState> _menuKey = GlobalKey();
 
   @override
@@ -107,7 +112,12 @@ class PlutoLayoutTabs extends ConsumerWidget {
     final containerDirection = ref.read(layoutContainerDirectionProvider);
 
     final List<Widget> children = [
-      _Menus(direction: containerDirection, mode: mode, menuKey: _menuKey),
+      _Menus(
+        direction: containerDirection,
+        mode: mode,
+        draggable: draggable,
+        menuKey: _menuKey,
+      ),
       _TabView(
         direction: containerDirection,
         tabViewSizeResolver: tabViewSizeResolver,
