@@ -114,44 +114,12 @@ class _TabViewState extends ConsumerState<_TabView> {
 
   void handleEvent(PlutoLayoutEvent event) {
     if (event is PlutoRelayoutEvent) {
-      final layoutId = ref.read(layoutIdProvider);
+      return _handleRelayoutEvent();
+    }
 
-      resizeTabView(layoutId, Offset.zero);
-    } else if (event is PlutoLayoutHasInDecreaseTabViewEvent) {
-      // todo : Refactor.
-      final tabSizeEvent = event as PlutoLayoutHasInDecreaseTabViewEvent;
-
-      final containerDirection =
-          tabSizeEvent.containerDirection ?? getFocusedContainerDirection();
-
-      if (containerDirection != direction) return;
-
-      final hasEnabledItem =
-          ref.read(_itemsProvider).firstWhereOrNull(isEnabledItem) != null;
-
-      if (!hasEnabledItem) return;
-
-      final layoutId = ref.read(layoutIdProvider);
-
-      final bool isIncreased = event is PlutoIncreaseTabViewEvent;
-
-      final reverse =
-          !tabSizeEvent.reverseByDirection && !direction.isIncreasedOffset;
-
-      final double size = isIncreased
-          ? reverse
-              ? -tabSizeEvent.size
-              : tabSizeEvent.size
-          : reverse
-              ? tabSizeEvent.size
-              : -tabSizeEvent.size;
-
-      resizeTabView(
-        layoutId,
-        Offset(
-          widget.direction.isHorizontal ? size : 0,
-          widget.direction.isHorizontal ? 0 : size,
-        ),
+    if (event is PlutoLayoutHasInDecreaseTabViewEvent) {
+      return _handleInDecreaseTabViewEvent(
+        event as PlutoLayoutHasInDecreaseTabViewEvent,
       );
     }
   }
@@ -232,6 +200,46 @@ class _TabViewState extends ConsumerState<_TabView> {
     itemResizeNotifier.notifyListeners();
   }
 
+  void _handleRelayoutEvent() {
+    resizeTabView(ref.read(layoutIdProvider), Offset.zero);
+  }
+
+  void _handleInDecreaseTabViewEvent(
+    PlutoLayoutHasInDecreaseTabViewEvent event,
+  ) {
+    final containerDirection =
+        event.containerDirection ?? getFocusedContainerDirection();
+
+    if (containerDirection != direction) return;
+
+    final hasEnabledItem =
+        ref.read(_itemsProvider).firstWhereOrNull(isEnabledItem) != null;
+
+    if (!hasEnabledItem) return;
+
+    final layoutId = ref.read(layoutIdProvider);
+
+    final bool isIncreased = event is PlutoIncreaseTabViewEvent;
+
+    final reverse = !event.reverseByDirection && !direction.isIncreasedOffset;
+
+    final double size = isIncreased
+        ? reverse
+            ? -event.size
+            : event.size
+        : reverse
+            ? event.size
+            : -event.size;
+
+    resizeTabView(
+      layoutId,
+      Offset(
+        widget.direction.isHorizontal ? size : 0,
+        widget.direction.isHorizontal ? 0 : size,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final enabledItems = ref.watch(_itemsProvider).where(isEnabledItem);
@@ -246,13 +254,12 @@ class _TabViewState extends ConsumerState<_TabView> {
 
     final border = BorderSide(color: theme.dividerColor);
 
-    final children = <Widget>[];
+    final int length = enabledItems.length;
 
-    int length = enabledItems.length;
-    for (int i = 0; i < length; i += 1) {
-      final item = enabledItems.elementAt(i);
+    Widget resizeOrNot(int index, PlutoLayoutTabItem item) {
       Widget child = item.tabViewBuilder!(context);
-      if (i < length - 1) {
+
+      if (index < length - 1) {
         child = ResizeIndicator<PlutoLayoutTabItem>(
           item: item,
           onResize: resizeTabItem,
@@ -260,7 +267,8 @@ class _TabViewState extends ConsumerState<_TabView> {
           child: child,
         );
       }
-      children.add(LayoutId(id: item.id, child: child));
+
+      return LayoutId(id: item.id, child: child);
     }
 
     return CustomSingleChildLayout(
@@ -292,7 +300,10 @@ class _TabViewState extends ConsumerState<_TabView> {
               enabledItems,
               itemResizeNotifier,
             ),
-            children: children,
+            children: [
+              for (int i = 0; i < length; i += 1)
+                resizeOrNot(i, enabledItems.elementAt(i)),
+            ],
           ),
         ),
       ),

@@ -71,56 +71,20 @@ class _MenusState extends ConsumerState<_Menus> {
   }
 
   void handleEvent(PlutoLayoutEvent event) {
-    // todo : refactor.
-    if (event is PlutoToggleTabViewEvent &&
-        event.containerDirection == widget.direction) {
-      final item = ref
-          .read(_itemsProvider)
-          .firstWhereOrNull((e) => e.id == event.tabItemId);
+    if (event is PlutoToggleTabViewEvent) {
+      return _handleToggleTabViewEvent(event);
+    }
 
-      if (item == null) return;
+    if (event is PlutoRotateTabViewEvent) {
+      return _handleRotateTabViewEvent(event);
+    }
 
-      toggleTab(ref, item, !item.enabled);
-    } else if (event is PlutoRotateTabViewEvent &&
-        event.containerDirection == widget.direction) {
-      final items = ref.read(_itemsProvider);
+    if (event is PlutoHideAllTabViewEvent) {
+      return _handleHideAllTabViewEvent(event);
+    }
 
-      if (items.isEmpty) return;
-
-      if (items.length == 1) {
-        toggleTab(ref, items.first, !items.first.enabled);
-        return;
-      }
-
-      final enabledIndex = items.indexWhere((e) => e.enabled);
-
-      if (enabledIndex == -1) {
-        toggleTab(ref, items.first, true);
-        return;
-      }
-
-      if (enabledIndex == items.length - 1) {
-        toggleTab(
-          ref,
-          widget.mode.isShowOneMust ? items.first : items.last,
-          widget.mode.isShowOneMust ? true : false,
-        );
-        return;
-      }
-
-      toggleTab(ref, items[enabledIndex + 1], true, forceShowOne: true);
-    } else if (event is PlutoHideAllTabViewEvent) {
-      ref.read(_itemsProvider.notifier).toggleAll(false, widget.mode);
-
-      if (event.afterFocusToBody) {
-        ref.read(layoutFocusedIdProvider.notifier).state = PlutoLayoutId.body;
-      }
-    } else if (event is PlutoRemoveTabItemEvent) {
-      final layoutId = ref.read(layoutIdProvider);
-
-      if (layoutId != event.layoutId) return;
-
-      ref.read(_itemsProvider.notifier).remove(event.item);
+    if (event is PlutoRemoveTabItemEvent) {
+      return _handleRemoveTabItemEvent(event);
     }
   }
 
@@ -156,6 +120,65 @@ class _MenusState extends ConsumerState<_Menus> {
     );
   }
 
+  void _handleToggleTabViewEvent(PlutoToggleTabViewEvent event) {
+    if (event.containerDirection != widget.direction) return;
+
+    final item = ref
+        .read(_itemsProvider)
+        .firstWhereOrNull((e) => e.id == event.tabItemId);
+
+    if (item == null) return;
+
+    toggleTab(ref, item, !item.enabled);
+  }
+
+  void _handleRotateTabViewEvent(PlutoRotateTabViewEvent event) {
+    if (event.containerDirection != widget.direction) return;
+
+    final items = ref.read(_itemsProvider);
+
+    if (items.isEmpty) return;
+
+    if (items.length == 1) {
+      toggleTab(ref, items.first, !items.first.enabled);
+      return;
+    }
+
+    final enabledIndex = items.indexWhere((e) => e.enabled);
+
+    if (enabledIndex == -1) {
+      toggleTab(ref, items.first, true);
+      return;
+    }
+
+    if (enabledIndex == items.length - 1) {
+      toggleTab(
+        ref,
+        widget.mode.isShowOneMust ? items.first : items.last,
+        widget.mode.isShowOneMust ? true : false,
+      );
+      return;
+    }
+
+    toggleTab(ref, items[enabledIndex + 1], true, forceShowOne: true);
+  }
+
+  void _handleHideAllTabViewEvent(PlutoHideAllTabViewEvent event) {
+    ref.read(_itemsProvider.notifier).toggleAll(false, widget.mode);
+
+    if (event.afterFocusToBody) {
+      ref.read(layoutFocusedIdProvider.notifier).state = PlutoLayoutId.body;
+    }
+  }
+
+  void _handleRemoveTabItemEvent(PlutoRemoveTabItemEvent event) {
+    final layoutId = ref.read(layoutIdProvider);
+
+    if (layoutId != event.layoutId) return;
+
+    ref.read(_itemsProvider.notifier).remove(event.item);
+  }
+
   @override
   Widget build(BuildContext context) {
     final layoutId = ref.read(layoutIdProvider);
@@ -166,6 +189,7 @@ class _MenusState extends ConsumerState<_Menus> {
 
     Widget draggableOrNot(PlutoLayoutTabItem item) {
       final button = ToggleButton(
+        key: ValueKey('ToggleButton_${item.id}'),
         title: item.title,
         icon: item.icon,
         enabled: item.enabled,
