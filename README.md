@@ -19,140 +19,120 @@ You can also assign custom shortcut keys to open or close tab views and resize t
 ### Usage
 
 ```dart
-class DemoPage extends StatefulWidget {
-  const DemoPage({super.key});
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:pluto_layout/pluto_layout.dart';
 
-  @override
-  State<DemoPage> createState() => _DemoPageState();
+void main() {
+  runApp(const ExampleApp());
 }
 
-class _DemoPageState extends State<DemoPage>
-    with SingleTickerProviderStateMixin {
-  final List<PlutoMenuItem> menuItems = [];
-
-  @override
-  void initState() {
-    super.initState();
-
-    menuItems.addAll([
-      PlutoMenuItem(
-          title: 'Home',
-          onTap: () {
-            print('Tap home.');
-          }),
-      PlutoMenuItem(
-        title: 'Links',
-        children: [
-          PlutoMenuItem(
-            title: 'Home page',
-            children: [
-              PlutoMenuItem(
-                  title: 'PlutoGrid',
-                  onTap: () =>
-                      launchUrl('https://pluto.weblaze.dev/series/pluto-grid')),
-              PlutoMenuItem(
-                  title: 'PlutoMenuBar',
-                  onTap: () => launchUrl(
-                      'https://pluto.weblaze.dev/series/pluto-menu-bar')),
-            ],
-          ),
-          PlutoMenuItem(
-            title: 'Github',
-            children: [
-              PlutoMenuItem(
-                  title: 'PlutoGrid',
-                  onTap: () =>
-                      launchUrl('https://github.com/bosskmk/pluto_grid')),
-              PlutoMenuItem(
-                  title: 'PlutoMenuBar',
-                  onTap: () =>
-                      launchUrl('https://github.com/bosskmk/pluto_menu_bar')),
-            ],
-          ),
-        ],
-      ),
-    ]);
-  }
+class ExampleApp extends StatelessWidget {
+  const ExampleApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark(useMaterial3: true),
+      home: const ExamplePage(),
+    );
+  }
+}
 
+class ExamplePage extends StatefulWidget {
+  const ExamplePage({super.key});
+
+  @override
+  State<ExamplePage> createState() => _ExamplePageState();
+}
+
+class _ExamplePageState extends State<ExamplePage> {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      body: ScrollConfiguration(
-        behavior: const ScrollBehavior().copyWith(
-          dragDevices: {
-            PointerDeviceKind.touch,
-            PointerDeviceKind.mouse,
-          },
-          scrollbars: true,
+      body: PlutoLayout(
+        shortcuts: {
+          LogicalKeySet(LogicalKeyboardKey.escape):
+          PlutoLayoutActions.hideAllTabView(),
+          LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
+          PlutoLayoutActions.rotateTabView(
+            PlutoLayoutContainerDirection.left,
+          ),
+          LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit2):
+          PlutoLayoutActions.rotateTabView(
+            PlutoLayoutContainerDirection.right,
+          ),
+          LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowUp):
+          PlutoLayoutActions.increaseTabView(),
+          LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowDown):
+          PlutoLayoutActions.decreaseTabView(),
+        },
+        body: const PlutoLayoutContainer(
+          child: Text('Body container'),
         ),
-        child: PlutoLayout(
-          // You can assign custom shortcut keys.
-          shortcuts: {
-            // Pressing the Escape key closes all open tabviews.
-            LogicalKeySet(LogicalKeyboardKey.escape):
-            PlutoLayoutActions.hideAllTabView(),
-            // If you press alt + 1, 
-            // the tab views registered in left are opened and closed sequentially.
-            LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
-            PlutoLayoutActions.rotateTabView(
-              PlutoLayoutContainerDirection.left,
-            ),
-            // If the tab view is open, 
-            // you can resize the tab view with alt + left or right keys.
-            LogicalKeySet(
-                LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowRight):
-            PlutoLayoutActions.increaseTabView(reverseByDirection: true),
-            LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowLeft):
-            PlutoLayoutActions.decreaseTabView(reverseByDirection: true),
-          },
-          body: PlutoLayoutContainer(
-            child: Text('Body container'),
-          ),
-          top: PlutoLayoutContainer(
-            child: PlutoMenuBar(
-              height: 32,
-              mode: PlutoMenuBarMode.hover,
-              menus: menuItems,
-              backgroundColor: theme.dialogBackgroundColor,
-              moreIconColor: theme.toggleableActiveColor,
-              textStyle: TextStyle(
-                color: theme.primaryColorLight,
+        top: PlutoLayoutContainer(
+          child: PlutoLayoutTabs(
+            items: [
+              PlutoLayoutTabItem(
+                id: 'top1',
+                title: 'top1',
+                tabViewBuilder: (e) => const Text('top1'),
               ),
-            ),
+              PlutoLayoutTabItem(
+                id: 'top2',
+                title: 'top2',
+                tabViewBuilder: (e) => const Text('top2'),
+              ),
+            ],
           ),
-          left: PlutoLayoutContainer(
-            child: PlutoLayoutTabs(
-              mode: PlutoLayoutTabMode.showSelected,
-              items: [
-                PlutoLayoutTabItem(
-                  id: 'Project',
-                  title: 'Project',
-                  tabViewBuilder: (c) {
-                    return Text('Project View');
-                  },
-                ),
-                PlutoLayoutTabItem(
-                  id: 'Bookmark',
-                  title: 'Bookmark',
-                  tabViewBuilder: (c) {
-                    return Text('Bookmark View');
-                  },
-                ),
-                PlutoLayoutTabItem(
-                  id: 'Structure',
-                  title: 'Structure',
-                  tabViewBuilder: (c) {
-                    return ListView(
-                      children: List.generate(20, (i) => i)
-                          .map((e) => Text('$e'))
-                          .toList(),
-                    );
-                  },
-                ),
-              ],
-            ),
+        ),
+        left: PlutoLayoutContainer(
+          child: PlutoLayoutTabs(
+            items: [
+              PlutoLayoutTabItem(
+                id: 'left1',
+                title: 'left1',
+                tabViewBuilder: (e) => const Text('left1'),
+              ),
+              PlutoLayoutTabItem(
+                id: 'left2',
+                title: 'left2',
+                tabViewBuilder: (e) => const Text('left2'),
+              ),
+            ],
+          ),
+        ),
+        right: PlutoLayoutContainer(
+          child: PlutoLayoutTabs(
+            items: [
+              PlutoLayoutTabItem(
+                id: 'right1',
+                title: 'right1',
+                tabViewBuilder: (e) => const Text('right1'),
+              ),
+              PlutoLayoutTabItem(
+                id: 'right2',
+                title: 'right2',
+                tabViewBuilder: (e) => const Text('right2'),
+              ),
+            ],
+          ),
+        ),
+        bottom: PlutoLayoutContainer(
+          child: PlutoLayoutTabs(
+            items: [
+              PlutoLayoutTabItem(
+                id: 'bottom1',
+                title: 'bottom1',
+                tabViewBuilder: (e) => const Text('bottom1'),
+              ),
+              PlutoLayoutTabItem(
+                id: 'bottom2',
+                title: 'bottom2',
+                tabViewBuilder: (e) => const Text('bottom2'),
+              ),
+            ],
           ),
         ),
       ),
