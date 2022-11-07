@@ -109,6 +109,8 @@ class PlutoLayoutTabs extends ConsumerWidget {
 
     final theme = Theme.of(context);
 
+    final border = BorderSide(color: theme.dividerColor);
+
     final containerDirection = ref.read(layoutContainerDirectionProvider);
 
     final List<Widget> children = [
@@ -120,6 +122,7 @@ class PlutoLayoutTabs extends ConsumerWidget {
       ),
       _TabView(
         direction: containerDirection,
+        mode: mode,
         tabViewSizeResolver: tabViewSizeResolver,
         menuKey: _menuKey,
       ),
@@ -129,8 +132,16 @@ class PlutoLayoutTabs extends ConsumerWidget {
       overrides: [
         _itemsProvider.overrideWith((ref) => _ItemsNotifier(items)),
       ],
-      child: ColoredBox(
-        color: theme.dialogBackgroundColor,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: theme.dialogBackgroundColor,
+          border: Border(
+            top: containerDirection.isBottom ? border : BorderSide.none,
+            left: containerDirection.isRight ? border : BorderSide.none,
+            right: containerDirection.isLeft ? border : BorderSide.none,
+            bottom: containerDirection.isTop ? border : BorderSide.none,
+          ),
+        ),
         child: containerDirection.isHorizontal
             ? Row(
                 mainAxisSize: MainAxisSize.min,

@@ -363,9 +363,10 @@ class PlutoLayoutData {
 
   double getTabViewConstrains(PlutoLayoutId id) {
     switch (id) {
+      case PlutoLayoutId.body:
+        return size.height - topSize.height - bottomSize.height;
       case PlutoLayoutId.top:
       case PlutoLayoutId.bottom:
-      case PlutoLayoutId.body:
         return size.height;
       case PlutoLayoutId.left:
       case PlutoLayoutId.right:

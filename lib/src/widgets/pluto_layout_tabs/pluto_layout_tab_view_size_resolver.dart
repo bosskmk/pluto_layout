@@ -17,6 +17,8 @@
 abstract class PlutoLayoutTabViewSizeResolver {
   const PlutoLayoutTabViewSizeResolver();
 
+  bool get resizable;
+
   double resolve({
     required double maxSize,
     required double? sizeToSet,
@@ -36,6 +38,9 @@ class PlutoLayoutTabViewSizeFixed extends PlutoLayoutTabViewSizeResolver {
       : assert(_size > 0, 'Size must be greater than 0.');
 
   final double _size;
+
+  @override
+  final bool resizable = false;
 
   @override
   double resolve({
@@ -89,6 +94,9 @@ class PlutoLayoutTabViewSizeConstrains extends PlutoLayoutTabViewSizeResolver {
   final double? _initialSize;
 
   @override
+  final bool resizable = true;
+
+  @override
   double resolve({
     required double maxSize,
     required double? sizeToSet,
@@ -116,6 +124,9 @@ class PlutoLayoutTabViewSizeRatio extends PlutoLayoutTabViewSizeResolver {
         );
 
   final double _ratio;
+
+  @override
+  final bool resizable = false;
 
   @override
   double resolve({
