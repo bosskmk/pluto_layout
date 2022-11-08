@@ -160,6 +160,7 @@ class _DemoPageState extends State<DemoPage>
           left: PlutoLayoutContainer(
             child: PlutoLayoutTabs(
               mode: PlutoLayoutTabMode.showSelected,
+              draggable: true,
               tabViewSizeResolver: PlutoLayoutTabViewSizeConstrains(
                 minSize: 100,
               ),
@@ -226,6 +227,7 @@ class _DemoPageState extends State<DemoPage>
           ),
           right: PlutoLayoutContainer(
             child: PlutoLayoutTabs(
+              draggable: true,
               items: [
                 PlutoLayoutTabItem(
                   id: ExampleText.donateTitle,
