@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pluto_layout/pluto_layout.dart';
 import 'package:pluto_layout/src/helper/resize_helper.dart';
@@ -101,6 +102,28 @@ class PlutoLayoutTabs extends ConsumerWidget {
   /// If the value is true, drag the item button to move the tab position.
   final bool draggable;
 
+  int _getTabsRotate(PlutoLayoutContainerDirection id) {
+    switch (id) {
+      case PlutoLayoutContainerDirection.top:
+      case PlutoLayoutContainerDirection.left:
+        return 0;
+      case PlutoLayoutContainerDirection.bottom:
+      case PlutoLayoutContainerDirection.right:
+        return 90;
+    }
+  }
+
+  int _getTabsChildrenRotate(PlutoLayoutContainerDirection id) {
+    switch (id) {
+      case PlutoLayoutContainerDirection.top:
+      case PlutoLayoutContainerDirection.left:
+        return 0;
+      case PlutoLayoutContainerDirection.bottom:
+      case PlutoLayoutContainerDirection.right:
+        return -90;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (items.isEmpty) return const SizedBox.shrink();
@@ -111,16 +134,32 @@ class PlutoLayoutTabs extends ConsumerWidget {
 
     final containerDirection = ref.read(layoutContainerDirectionProvider);
 
+    final tabsRotate = _getTabsRotate(containerDirection);
+
+    final childrenRotate = _getTabsChildrenRotate(containerDirection);
+
+    Widget rotateOrNot(int rotate, Widget child) {
+      return rotate == 0
+          ? child
+          : RotatedBox(quarterTurns: rotate, child: child);
+    }
+
     final List<Widget> children = [
-      _Menus(
-        direction: containerDirection,
-        mode: mode,
-        draggable: draggable,
+      rotateOrNot(
+        childrenRotate,
+        _Menus(
+          direction: containerDirection,
+          mode: mode,
+          draggable: draggable,
+        ),
       ),
-      _TabView(
-        direction: containerDirection,
-        mode: mode,
-        tabViewSizeResolver: tabViewSizeResolver,
+      rotateOrNot(
+        childrenRotate,
+        _TabView(
+          direction: containerDirection,
+          mode: mode,
+          tabViewSizeResolver: tabViewSizeResolver,
+        ),
       ),
     ];
 
@@ -138,19 +177,18 @@ class PlutoLayoutTabs extends ConsumerWidget {
             bottom: containerDirection.isTop ? border : BorderSide.none,
           ),
         ),
-        child: containerDirection.isHorizontal
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: containerDirection.isLeft
-                    ? children
-                    : children.reversed.toList(growable: false),
-              )
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: containerDirection.isTop
-                    ? children
-                    : children.reversed.toList(growable: false),
-              ),
+        child: rotateOrNot(
+          tabsRotate,
+          containerDirection.isHorizontal
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: children,
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: children,
+                ),
+        ),
       ),
     );
   }

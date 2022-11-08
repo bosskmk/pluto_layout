@@ -315,23 +315,38 @@ class PlutoLayoutEventStreamController {
 
 /// Information needed for the layout of the widget
 class PlutoLayoutData {
-  /// [PlutoLayout] size constraint
+  /// [PlutoLayout] size constraint.
   Size size = Size.zero;
 
-  /// [PlutoLayout.top] size constraint of container
+  /// [PlutoLayout.top] size constraint of container.
   Size topSize = Size.zero;
 
-  /// [PlutoLayout.left] size constraint of container
+  /// [PlutoLayout.left] size constraint of container.
   Size leftSize = Size.zero;
 
-  /// [PlutoLayout.right] size constraint of container
+  /// [PlutoLayout.right] size constraint of container.
   Size rightSize = Size.zero;
 
-  /// [PlutoLayout.bottom] size constraint of container
+  /// [PlutoLayout.bottom] size constraint of container.
   Size bottomSize = Size.zero;
 
-  /// [PlutoLayout.body] size constraint of container
+  /// [PlutoLayout.body] size constraint of container.
   Size bodySize = Size.zero;
+
+  /// Size of menu area when [PlutoLayoutTabs] is set in [PlutoLayout.top].
+  Size topTabMenuSize = Size.zero;
+
+  /// Size of menu area when [PlutoLayoutTabs] is set in [PlutoLayout.left].
+  Size leftTabMenuSize = Size.zero;
+
+  /// Size of menu area if [PlutoLayoutTabs] is set in [PlutoLayout.right].
+  Size rightTabMenuSize = Size.zero;
+
+  /// Size of menu area when [PlutoLayoutTabs] is set in [PlutoLayout.bottom].
+  Size bottomTabMenuSize = Size.zero;
+
+  /// Size of menu area if [PlutoLayoutTabs] is set in [PlutoLayout.body].
+  Size bodyTabMenuSize = Size.zero;
 
   /// Default width of tab view.
   ///
@@ -346,7 +361,8 @@ class PlutoLayoutData {
   /// Minimum size of the tab view.
   static const double minTabSize = 32;
 
-  double getMaxTabItemViewSize(PlutoLayoutId id) {
+  /// Maximum size of tab items of [PlutoLayoutTabs] in [id] direction.
+  double getTabItemViewMaxSize(PlutoLayoutId id) {
     switch (id) {
       case PlutoLayoutId.top:
         return topSize.width;
@@ -361,16 +377,76 @@ class PlutoLayoutData {
     }
   }
 
-  double getTabViewConstrains(PlutoLayoutId id) {
+  /// Minimum size of tab view of [PlutoLayoutTabs] in [id] direction.
+  double getTabViewMinSize(PlutoLayoutId id) {
     switch (id) {
       case PlutoLayoutId.body:
-        return size.height - topSize.height - bottomSize.height;
+        return bodyTabMenuSize.height;
+      case PlutoLayoutId.top:
+        return topTabMenuSize.height;
+      case PlutoLayoutId.bottom:
+        return bottomTabMenuSize.height;
+      case PlutoLayoutId.left:
+        return leftTabMenuSize.width;
+      case PlutoLayoutId.right:
+        return rightTabMenuSize.width;
+    }
+  }
+
+  /// Maximum size of tab view of [PlutoLayoutTabs] in [id] direction.
+  double getTabViewMaxSize(PlutoLayoutId id) {
+    switch (id) {
+      case PlutoLayoutId.body:
+        return size.height -
+            topSize.height -
+            bottomSize.height -
+            bottomTabMenuSize.height;
       case PlutoLayoutId.top:
       case PlutoLayoutId.bottom:
-        return size.height;
+        return size.height - topTabMenuSize.height - bottomTabMenuSize.height;
       case PlutoLayoutId.left:
       case PlutoLayoutId.right:
-        return size.width;
+        return size.width - leftTabMenuSize.width - rightTabMenuSize.width;
+    }
+  }
+
+  /// Size of menu area of [PlutoLayoutTabs] in [id] direction.
+  Size getTabMenuSize(PlutoLayoutId id) {
+    switch (id) {
+      case PlutoLayoutId.top:
+        return topTabMenuSize;
+      case PlutoLayoutId.left:
+        return leftTabMenuSize;
+      case PlutoLayoutId.right:
+        return rightTabMenuSize;
+      case PlutoLayoutId.bottom:
+        return bottomTabMenuSize;
+      case PlutoLayoutId.body:
+        return bodyTabMenuSize;
+    }
+  }
+
+  /// Set the menu area size of [PlutoLayoutTabs] in the [id] direction.
+  ///
+  /// Set in the layout stage in [_RenderMenusWidget] of the [_Menus] widget.
+  /// [_TabView] must be laid out before the widget.
+  void setTabMenuSize(PlutoLayoutId id, Size size) {
+    switch (id) {
+      case PlutoLayoutId.top:
+        topTabMenuSize = size;
+        break;
+      case PlutoLayoutId.left:
+        leftTabMenuSize = size;
+        break;
+      case PlutoLayoutId.right:
+        rightTabMenuSize = size;
+        break;
+      case PlutoLayoutId.bottom:
+        bottomTabMenuSize = size;
+        break;
+      case PlutoLayoutId.body:
+        bodyTabMenuSize = size;
+        break;
     }
   }
 
