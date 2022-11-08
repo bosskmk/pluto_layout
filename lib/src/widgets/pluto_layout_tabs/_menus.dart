@@ -358,6 +358,7 @@ class _Draggable extends ConsumerWidget {
 
     if (dragging) {
       return DecoratedBox(
+        key: ValueKey('_DraggableDragging_${layoutId.name}'),
         position: DecorationPosition.foreground,
         decoration: BoxDecoration(
           color: Theme.of(context).dialogBackgroundColor,
