@@ -101,8 +101,6 @@ class PlutoLayoutTabs extends ConsumerWidget {
   /// If the value is true, drag the item button to move the tab position.
   final bool draggable;
 
-  final GlobalKey<_MenusState> _menuKey = GlobalKey();
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (items.isEmpty) return const SizedBox.shrink();
@@ -118,13 +116,11 @@ class PlutoLayoutTabs extends ConsumerWidget {
         direction: containerDirection,
         mode: mode,
         draggable: draggable,
-        menuKey: _menuKey,
       ),
       _TabView(
         direction: containerDirection,
         mode: mode,
         tabViewSizeResolver: tabViewSizeResolver,
-        menuKey: _menuKey,
       ),
     ];
 

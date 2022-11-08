@@ -5,7 +5,6 @@ class _Menus extends ConsumerStatefulWidget {
     required this.direction,
     required this.mode,
     bool? draggable,
-    required this.menuKey,
   })  : draggable = draggable ?? false,
         super(key: const ValueKey('_Menus'));
 
@@ -14,8 +13,6 @@ class _Menus extends ConsumerStatefulWidget {
   final PlutoLayoutTabMode mode;
 
   final bool draggable;
-
-  final GlobalKey<_MenusState> menuKey;
 
   @override
   ConsumerState<_Menus> createState() => _MenusState();
@@ -216,7 +213,6 @@ class _MenusState extends ConsumerState<_Menus> {
     ];
 
     return Align(
-      key: widget.menuKey,
       alignment: widget.direction.isVertical
           ? Alignment.centerLeft
           : Alignment.topCenter,

@@ -5,7 +5,6 @@ class _TabView extends ConsumerStatefulWidget {
     required this.direction,
     required this.mode,
     required this.tabViewSizeResolver,
-    required this.menuKey,
   }) : super(key: const ValueKey('_TabView'));
 
   final PlutoLayoutContainerDirection direction;
@@ -13,8 +12,6 @@ class _TabView extends ConsumerStatefulWidget {
   final PlutoLayoutTabMode mode;
 
   final PlutoLayoutTabViewSizeResolver? tabViewSizeResolver;
-
-  final GlobalKey<_MenusState> menuKey;
 
   @override
   ConsumerState<_TabView> createState() => _TabViewState();
@@ -27,15 +24,12 @@ class _TabViewState extends ConsumerState<_TabView> {
 
   final ChangeNotifier itemResizeNotifier = ChangeNotifier();
 
-  Size? get menuSize {
-    final c = widget.menuKey.currentContext;
-    if (c == null || widget.menuKey.currentState?.mounted != true) return null;
-    return widget.menuKey.currentContext?.size;
+  Size get menuSize {
+    return const Size(PlutoLayoutData.minTabSize, PlutoLayoutData.minTabSize);
   }
 
   double get menuSizeByDirection {
-    final safeMenuSize = menuSize ??
-        const Size(PlutoLayoutData.minTabSize, PlutoLayoutData.minTabSize);
+    final safeMenuSize = menuSize;
     switch (direction) {
       case PlutoLayoutContainerDirection.top:
       case PlutoLayoutContainerDirection.bottom:
