@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../pluto_layout.dart';
-
-final layoutContainerDirectionProvider =
-    Provider<PlutoLayoutContainerDirection>(
-  (ref) => throw UnimplementedError(),
-);
+import '../pluto_layout_provider.dart';
+import 'pluto_layout_container_provider.dart';
 
 /// Widgets passed as children of properties such as [PlutoLayout.body] or [PlutoLayout.top].
 ///

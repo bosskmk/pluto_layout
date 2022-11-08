@@ -1,36 +1,7 @@
-import 'dart:async';
-import 'dart:math';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pluto_layout/pluto_layout.dart';
-import 'package:rxdart/rxdart.dart';
-
-import 'events/events.dart';
+part of pluto_layout;
 
 /// Shortcut registration type of [PlutoLayout.shortcuts].
 typedef PlutoLayoutShortcuts = Map<LogicalKeySet, PlutoLayoutIntent>;
-
-/// ID according to the location of [PlutoLayoutContainer].
-final layoutIdProvider = Provider<PlutoLayoutId>(
-  (ref) => throw UnimplementedError(),
-);
-
-/// ID of [PlutoLayoutContainer] that currently has focus activated.
-final layoutFocusedIdProvider = StateProvider<PlutoLayoutId>(
-  (ref) => PlutoLayoutId.body,
-);
-
-/// Layout information of [PlutoLayout].
-final layoutDataProvider = Provider((ref) => PlutoLayoutData());
-
-/// Shortcut information defined by the user.
-final layoutShortcutsProvider = Provider<PlutoLayoutShortcuts?>((ref) => null);
-
-/// Event controller for handling shortcut events, etc.
-final layoutEventsProvider = Provider<PlutoLayoutEventStreamController>(
-  (ref) => throw UnimplementedError(),
-);
 
 /// [PlutoLayout] is a UI package that can configure a menu or tab view on each side.
 ///
@@ -285,104 +256,6 @@ class _LayoutIdProviderScope extends StatelessWidget {
       overrides: [layoutIdProvider.overrideWithValue(id)],
       child: child,
     );
-  }
-}
-
-/// Event controller in PlutoLayout
-///
-/// Listen for events to handle keyboard shortcut events, etc.
-/// The received event is handled by listening to the event
-/// in the widget that needs event handling.
-class PlutoLayoutEventStreamController {
-  final PublishSubject<PlutoLayoutEvent> _subject =
-      PublishSubject<PlutoLayoutEvent>();
-
-  /// Register event handlers in widgets that need to handle events.
-  StreamSubscription<PlutoLayoutEvent> listen(
-    void Function(PlutoLayoutEvent) handler,
-  ) {
-    return _subject.listen(handler);
-  }
-
-  void add(PlutoLayoutEvent event) {
-    _subject.add(event);
-  }
-
-  void dispose() {
-    _subject.close();
-  }
-}
-
-/// Information needed for the layout of the widget
-class PlutoLayoutData {
-  /// [PlutoLayout] size constraint
-  Size size = Size.zero;
-
-  /// [PlutoLayout.top] size constraint of container
-  Size topSize = Size.zero;
-
-  /// [PlutoLayout.left] size constraint of container
-  Size leftSize = Size.zero;
-
-  /// [PlutoLayout.right] size constraint of container
-  Size rightSize = Size.zero;
-
-  /// [PlutoLayout.bottom] size constraint of container
-  Size bottomSize = Size.zero;
-
-  /// [PlutoLayout.body] size constraint of container
-  Size bodySize = Size.zero;
-
-  /// Default width of tab view.
-  ///
-  /// Corresponds to left and right tab views.
-  double get defaultTabWidth => size.width / 4;
-
-  /// Default height of the tab view.
-  ///
-  /// Corresponds to top and bottom tab views.
-  double get defaultTabHeight => size.height / 6;
-
-  /// Minimum size of the tab view.
-  static const double minTabSize = 32;
-
-  double getMaxTabItemViewSize(PlutoLayoutId id) {
-    switch (id) {
-      case PlutoLayoutId.top:
-        return topSize.width;
-      case PlutoLayoutId.left:
-        return leftSize.height;
-      case PlutoLayoutId.right:
-        return rightSize.height;
-      case PlutoLayoutId.bottom:
-        return bottomSize.width;
-      case PlutoLayoutId.body:
-        return bodySize.width;
-    }
-  }
-
-  double getTabViewConstrains(PlutoLayoutId id) {
-    switch (id) {
-      case PlutoLayoutId.top:
-      case PlutoLayoutId.bottom:
-      case PlutoLayoutId.body:
-        return size.height;
-      case PlutoLayoutId.left:
-      case PlutoLayoutId.right:
-        return size.width;
-    }
-  }
-
-  @override
-  String toString() {
-    String text = 'PlutoLayoutData\n';
-    text += 'size: $size\n';
-    text += 'topSize: $topSize\n';
-    text += 'leftSize: $leftSize\n';
-    text += 'rightSize: $rightSize\n';
-    text += 'bottomSize: $bottomSize\n';
-    text += 'bodySize: $bodySize';
-    return text;
   }
 }
 

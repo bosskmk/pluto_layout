@@ -5,7 +5,6 @@ class _Menus extends ConsumerStatefulWidget {
     required this.direction,
     required this.mode,
     bool? draggable,
-    required this.menuKey,
   })  : draggable = draggable ?? false,
         super(key: const ValueKey('_Menus'));
 
@@ -14,8 +13,6 @@ class _Menus extends ConsumerStatefulWidget {
   final PlutoLayoutTabMode mode;
 
   final bool draggable;
-
-  final GlobalKey<_MenusState> menuKey;
 
   @override
   ConsumerState<_Menus> createState() => _MenusState();
@@ -111,7 +108,7 @@ class _MenusState extends ConsumerState<_Menus> {
 
     final items = ref.read(_itemsProvider).where((e) => e.enabled);
 
-    final maxSize = layoutData.getMaxTabItemViewSize(layoutId);
+    final maxSize = layoutData.getTabItemViewMaxSize(layoutId);
 
     PlutoLayoutTabItemSizeResolver._update(
       maxSize: maxSize,
@@ -183,6 +180,8 @@ class _MenusState extends ConsumerState<_Menus> {
   Widget build(BuildContext context) {
     final layoutId = ref.read(layoutIdProvider);
 
+    final layoutData = ref.read(layoutDataProvider);
+
     final items = ref.watch(_itemsProvider);
 
     final quarterTurns = getMenuRotate(layoutId);
@@ -210,28 +209,68 @@ class _MenusState extends ConsumerState<_Menus> {
       );
     }
 
-    final children = <Widget>[
-      for (final item in (widget.direction.isLeft ? items.reversed : items))
-        draggableOrNot(item)
-    ];
-
-    return Align(
-      key: widget.menuKey,
-      alignment: widget.direction.isVertical
-          ? Alignment.centerLeft
-          : Alignment.topCenter,
-      child: RotatedBox(
-        quarterTurns: quarterTurns,
-        child: SingleChildScrollView(
-          reverse: widget.direction.isLeft,
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisAlignment: getMenuAlignment(layoutId),
-            children: children,
+    return _RenderMenusWidget(
+      layoutId: layoutId,
+      layoutData: layoutData,
+      child: Align(
+        alignment: widget.direction.isVertical
+            ? Alignment.centerLeft
+            : Alignment.topCenter,
+        child: RotatedBox(
+          quarterTurns: quarterTurns,
+          child: SingleChildScrollView(
+            reverse: widget.direction.isLeft,
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: getMenuAlignment(layoutId),
+              children: [
+                for (final item
+                    in (widget.direction.isLeft ? items.reversed : items))
+                  draggableOrNot(item)
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+}
+
+class _RenderMenusWidget extends SingleChildRenderObjectWidget {
+  const _RenderMenusWidget({
+    required this.layoutId,
+    required this.layoutData,
+    required Widget child,
+  }) : super(child: child);
+
+  final PlutoLayoutId layoutId;
+
+  final PlutoLayoutData layoutData;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) {
+    return _RenderMenusBox(
+      layoutId: layoutId,
+      layoutData: layoutData,
+    );
+  }
+}
+
+class _RenderMenusBox extends RenderProxyBox {
+  _RenderMenusBox({
+    required this.layoutId,
+    required this.layoutData,
+  });
+
+  final PlutoLayoutId layoutId;
+
+  final PlutoLayoutData layoutData;
+
+  @override
+  performLayout() {
+    super.performLayout();
+
+    layoutData.setTabMenuSize(layoutId, size);
   }
 }
 

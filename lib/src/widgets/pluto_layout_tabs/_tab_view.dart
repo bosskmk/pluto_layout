@@ -3,15 +3,15 @@ part of pluto_layout_tabs;
 class _TabView extends ConsumerStatefulWidget {
   const _TabView({
     required this.direction,
+    required this.mode,
     required this.tabViewSizeResolver,
-    required this.menuKey,
   }) : super(key: const ValueKey('_TabView'));
 
   final PlutoLayoutContainerDirection direction;
 
-  final PlutoLayoutTabViewSizeResolver? tabViewSizeResolver;
+  final PlutoLayoutTabMode mode;
 
-  final GlobalKey<_MenusState> menuKey;
+  final PlutoLayoutTabViewSizeResolver? tabViewSizeResolver;
 
   @override
   ConsumerState<_TabView> createState() => _TabViewState();
@@ -23,27 +23,6 @@ class _TabViewState extends ConsumerState<_TabView> {
   final ValueNotifier<double?> tabSize = ValueNotifier(null);
 
   final ChangeNotifier itemResizeNotifier = ChangeNotifier();
-
-  Size? get menuSize {
-    final c = widget.menuKey.currentContext;
-    if (c == null || widget.menuKey.currentState?.mounted != true) return null;
-    return widget.menuKey.currentContext?.size;
-  }
-
-  double get menuSizeByDirection {
-    final safeMenuSize = menuSize ??
-        const Size(PlutoLayoutData.minTabSize, PlutoLayoutData.minTabSize);
-    switch (direction) {
-      case PlutoLayoutContainerDirection.top:
-      case PlutoLayoutContainerDirection.bottom:
-        return safeMenuSize.height;
-      case PlutoLayoutContainerDirection.left:
-      case PlutoLayoutContainerDirection.right:
-        return safeMenuSize.width;
-    }
-  }
-
-  Size get maxSize => MediaQuery.of(context).size;
 
   PlutoLayoutContainerDirection get direction => widget.direction;
 
@@ -126,9 +105,9 @@ class _TabViewState extends ConsumerState<_TabView> {
 
   void resizeTabView(PlutoLayoutId id, Offset offset) {
     ref.read(layoutFocusedIdProvider.notifier).state = id;
-    final menuSize = menuSizeByDirection;
     final layoutData = ref.read(layoutDataProvider);
-    final maximumSize = layoutData.getTabViewConstrains(id) - (menuSize * 2);
+    final minimumSize = layoutData.getTabViewMinSize(id);
+    final maximumSize = layoutData.getTabViewMaxSize(id);
 
     final constrains = ref.read(layoutDataProvider);
     final defaultSize = direction.isHorizontal
@@ -160,23 +139,22 @@ class _TabViewState extends ConsumerState<_TabView> {
       );
     }
 
-    if (size <= menuSize) return;
+    if (size < minimumSize) return;
 
-    if (size >= maximumSize) {
-      size = maximumSize;
-    }
+    if (size > maximumSize) size = maximumSize;
 
     tabSize.value = size;
   }
 
   void resizeTabItem(PlutoLayoutTabItem item, Offset offset) {
+    final layoutId = ref.read(layoutIdProvider);
+
     final layoutData = ref.read(layoutDataProvider);
 
-    final items = ref.read(_itemsProvider).where(isEnabledItem).toList();
+    final items =
+        ref.read(_itemsProvider).where(isEnabledItem).toList(growable: false);
 
-    final maxSize = direction.isHorizontal
-        ? layoutData.leftSize.height
-        : layoutData.topSize.width;
+    final maxSize = layoutData.getTabItemViewMaxSize(layoutId);
 
     final defaultSize = maxSize / items.length;
 
@@ -256,10 +234,10 @@ class _TabViewState extends ConsumerState<_TabView> {
 
     final int length = enabledItems.length;
 
-    Widget resizeOrNot(int index, PlutoLayoutTabItem item) {
+    Widget resizeTabItemOrNot(int index, PlutoLayoutTabItem item) {
       Widget child = item.tabViewBuilder!(context);
 
-      if (index < length - 1) {
+      if (!widget.mode.isShowOneMode && index < length - 1) {
         child = ResizeIndicator<PlutoLayoutTabItem>(
           item: item,
           onResize: resizeTabItem,
@@ -271,42 +249,46 @@ class _TabViewState extends ConsumerState<_TabView> {
       return LayoutId(id: item.id, child: child);
     }
 
+    final child = DecoratedBox(
+      position: DecorationPosition.foreground,
+      decoration: BoxDecoration(
+        border: Border(
+          top: direction.isTop ? border : BorderSide.none,
+          left: direction.isLeft ? border : BorderSide.none,
+          right: direction.isRight ? border : BorderSide.none,
+          bottom: direction.isBottom ? border : BorderSide.none,
+        ),
+      ),
+      child: CustomMultiChildLayout(
+        delegate: _TabItemsDelegate(
+          direction,
+          layoutData,
+          enabledItems,
+          itemResizeNotifier,
+        ),
+        children: [
+          for (int i = 0; i < length; i += 1)
+            resizeTabItemOrNot(i, enabledItems.elementAt(i)),
+        ],
+      ),
+    );
+
     return CustomSingleChildLayout(
       delegate: _TabViewDelegate(
         layoutId,
         direction,
         tabSize,
-        menuSizeByDirection,
         widget.tabViewSizeResolver,
         layoutData,
       ),
-      child: ResizeIndicator<PlutoLayoutId>(
-        item: layoutId,
-        position: tabViewResizePosition,
-        onResize: resizeTabView,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border(
-              top: direction.isTop ? border : BorderSide.none,
-              left: direction.isLeft ? border : BorderSide.none,
-              right: direction.isRight ? border : BorderSide.none,
-              bottom: direction.isBottom ? border : BorderSide.none,
+      child: widget.tabViewSizeResolver?.resizable == false
+          ? child
+          : ResizeIndicator<PlutoLayoutId>(
+              item: layoutId,
+              position: tabViewResizePosition,
+              onResize: resizeTabView,
+              child: child,
             ),
-          ),
-          child: CustomMultiChildLayout(
-            delegate: _TabItemsDelegate(
-              direction,
-              layoutData,
-              enabledItems,
-              itemResizeNotifier,
-            ),
-            children: [
-              for (int i = 0; i < length; i += 1)
-                resizeOrNot(i, enabledItems.elementAt(i)),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
@@ -316,7 +298,6 @@ class _TabViewDelegate extends SingleChildLayoutDelegate {
     this.layoutId,
     this.direction,
     this.tabSize,
-    this.menuSize,
     this.tabViewSizeResolver,
     this.layoutData,
   ) : super(relayout: tabSize);
@@ -327,60 +308,16 @@ class _TabViewDelegate extends SingleChildLayoutDelegate {
 
   final ValueNotifier<double?> tabSize;
 
-  final double menuSize;
-
   final PlutoLayoutTabViewSizeResolver? tabViewSizeResolver;
 
   final PlutoLayoutData layoutData;
 
-  double get defaultHeight => layoutData.defaultTabHeight;
-
-  double get defaultWidth => layoutData.defaultTabWidth;
-
   double get safeHeight {
-    final maxSize = layoutData.getTabViewConstrains(layoutId) - (menuSize * 2);
-
-    if (tabSize.value == null) {
-      if (tabViewSizeResolver == null) return defaultHeight;
-
-      return tabViewSizeResolver!.resolve(
-        maxSize: maxSize,
-        sizeToSet: null,
-        defaultSize: defaultHeight,
-      );
-    }
-
-    if (tabSize.value! >= maxSize) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        tabSize.value = maxSize;
-      });
-      return maxSize;
-    }
-
-    return tabSize.value!;
+    return _getSafeSize(layoutData.defaultTabHeight);
   }
 
   double get safeWidth {
-    final maxSize = layoutData.getTabViewConstrains(layoutId) - (menuSize * 2);
-
-    if (tabSize.value == null) {
-      if (tabViewSizeResolver == null) return defaultWidth;
-
-      return tabViewSizeResolver!.resolve(
-        maxSize: maxSize,
-        sizeToSet: null,
-        defaultSize: defaultWidth,
-      );
-    }
-
-    if (tabSize.value! >= maxSize) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        tabSize.value = maxSize;
-      });
-      return maxSize;
-    }
-
-    return tabSize.value!;
+    return _getSafeSize(layoutData.defaultTabWidth);
   }
 
   @override
@@ -421,6 +358,29 @@ class _TabViewDelegate extends SingleChildLayoutDelegate {
   @override
   bool shouldRelayout(covariant SingleChildLayoutDelegate oldDelegate) {
     return true;
+  }
+
+  double _getSafeSize(double defaultSize) {
+    final maxSize = layoutData.getTabViewMaxSize(layoutId);
+
+    if (tabSize.value == null) {
+      if (tabViewSizeResolver == null) return defaultSize;
+
+      return tabViewSizeResolver!.resolve(
+        maxSize: maxSize,
+        sizeToSet: null,
+        defaultSize: defaultSize,
+      );
+    }
+
+    if (tabSize.value! > maxSize) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        tabSize.value = maxSize;
+      });
+      return maxSize;
+    }
+
+    return tabSize.value!;
   }
 }
 
