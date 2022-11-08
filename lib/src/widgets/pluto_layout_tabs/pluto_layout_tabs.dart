@@ -131,8 +131,6 @@ class PlutoLayoutTabs extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (items.isEmpty) return const SizedBox.shrink();
-
     final theme = Theme.of(context);
 
     final border = BorderSide(color: theme.dividerColor);

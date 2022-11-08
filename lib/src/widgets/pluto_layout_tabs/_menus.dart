@@ -1,5 +1,7 @@
 part of pluto_layout_tabs;
 
+final _draggingTabMenu = StateProvider<_DragData?>((ref) => null);
+
 class _Menus extends ConsumerStatefulWidget {
   const _Menus({
     required this.direction,
@@ -184,10 +186,18 @@ class _MenusState extends ConsumerState<_Menus> {
 
     final items = ref.watch(_itemsProvider);
 
+    final effectiveItems = widget.direction.isLeft ? items.reversed : items;
+
     final quarterTurns = getMenuRotate(layoutId);
 
-    Widget draggableOrNot(PlutoLayoutTabItem item) {
-      final button = ToggleButton(
+    final draggingTabMenu =
+        widget.draggable ? ref.watch(_draggingTabMenu) : null;
+
+    final bool showDraggingTabMenu =
+        draggingTabMenu != null && draggingTabMenu.layoutId != layoutId;
+
+    Widget draggableOrNot(PlutoLayoutTabItem item, {bool dragging = false}) {
+      Widget button = ToggleButton(
         key: ValueKey('ToggleButton_${item.id}'),
         title: item.title,
         icon: item.icon,
@@ -205,6 +215,7 @@ class _MenusState extends ConsumerState<_Menus> {
         mode: widget.mode,
         direction: widget.direction,
         quarterTurns: quarterTurns,
+        dragging: dragging,
         child: button,
       );
     }
@@ -224,9 +235,11 @@ class _MenusState extends ConsumerState<_Menus> {
             child: Row(
               mainAxisAlignment: getMenuAlignment(layoutId),
               children: [
-                for (final item
-                    in (widget.direction.isLeft ? items.reversed : items))
-                  draggableOrNot(item)
+                if (showDraggingTabMenu && widget.direction.isLeft)
+                  draggableOrNot(draggingTabMenu.item, dragging: true),
+                for (final item in effectiveItems) draggableOrNot(item),
+                if (showDraggingTabMenu && !widget.direction.isLeft)
+                  draggableOrNot(draggingTabMenu.item, dragging: true),
               ],
             ),
           ),
@@ -282,6 +295,7 @@ class _Draggable extends ConsumerWidget {
     required this.mode,
     required this.direction,
     required this.quarterTurns,
+    required this.dragging,
     required this.child,
     super.key,
   });
@@ -298,24 +312,30 @@ class _Draggable extends ConsumerWidget {
 
   final int quarterTurns;
 
+  final bool dragging;
+
   final Widget child;
 
   bool _onWillAccept(_DragData? data) {
-    return data != null && data.item.id != item.id;
+    return data != null && (data.item.id != item.id || dragging);
   }
 
   void Function(_DragData) _onAccept(WidgetRef ref) {
     final itemsNotifier = ref.read(_itemsProvider.notifier);
 
     return (data) {
-      final index = items.indexOf(item);
+      final index = dragging ? items.length : items.indexOf(item);
+
       if (data.layoutId == layoutId) {
         itemsNotifier.remove(data.item);
       } else {
         final events = ref.read(layoutEventsProvider);
+
         events.add(PlutoRemoveTabItemEvent(data.layoutId, data.item));
       }
+
       itemsNotifier.insert(index, data.item);
+
       if (mode.isShowOneMode &&
           data.item.enabled &&
           items.where((e) => e.enabled).isNotEmpty) {
@@ -335,14 +355,30 @@ class _Draggable extends ConsumerWidget {
         child: child,
       );
     }
+
+    if (dragging) {
+      return DecoratedBox(
+        key: ValueKey('_DraggableDragging_${layoutId.name}'),
+        position: DecorationPosition.foreground,
+        decoration: BoxDecoration(
+          color: Theme.of(context).dialogBackgroundColor,
+        ),
+        child: child,
+      );
+    }
+
     return child;
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final data = _DragData(layoutId, item);
+
     return Draggable<_DragData>(
-      data: _DragData(layoutId, item),
+      data: data,
       dragAnchorStrategy: _childDragAnchorStrategy(direction),
+      onDragStarted: () => ref.read(_draggingTabMenu.notifier).state = data,
+      onDragEnd: (_) => ref.read(_draggingTabMenu.notifier).state = null,
       feedback: Material(
         child: RotatedBox(quarterTurns: quarterTurns, child: child),
       ),
