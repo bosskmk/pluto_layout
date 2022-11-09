@@ -179,7 +179,7 @@ class _MenusState extends ConsumerState<_Menus> {
 
     if (event.layoutId != layoutId) return;
 
-    ref.read(_itemsProvider.notifier).remove(event.item);
+    ref.read(_itemsProvider.notifier).remove(event.itemId);
   }
 
   @override
@@ -331,11 +331,11 @@ class _Draggable extends ConsumerWidget {
       final index = dragging ? items.length : items.indexOf(item);
 
       if (data.layoutId == layoutId) {
-        itemsNotifier.remove(data.item);
+        itemsNotifier.remove(data.item.id);
       } else {
         final events = ref.read(layoutEventsProvider);
 
-        events.add(PlutoRemoveTabItemEvent(data.layoutId, data.item));
+        events.add(PlutoRemoveTabItemEvent(data.layoutId, data.item.id));
       }
 
       itemsNotifier.insert(index, data.item);

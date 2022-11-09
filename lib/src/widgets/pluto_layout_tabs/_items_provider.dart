@@ -37,10 +37,10 @@ class _ItemsNotifier extends StateNotifier<List<PlutoLayoutTabItem>> {
     state = [...state];
   }
 
-  void remove(PlutoLayoutTabItem item) {
+  void remove(Object id) {
     state = [
       for (final e in state)
-        if (item.id != e.id) e,
+        if (id != e.id) e,
     ];
   }
 }

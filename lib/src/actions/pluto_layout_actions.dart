@@ -62,6 +62,14 @@ abstract class PlutoLayoutActions {
       reverseByDirection: reverseByDirection,
     );
   }
+
+  /// {@macro pluto_layout_action_remove_tab_item_intent}
+  static PlutoLayoutActionRemoveTabItemIntent removeTabItem(
+    PlutoLayoutId layoutId,
+    Object tabItemId,
+  ) {
+    return PlutoLayoutActionRemoveTabItemIntent(layoutId, tabItemId);
+  }
 }
 
 abstract class PlutoLayoutIntent extends Intent {
