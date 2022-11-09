@@ -5,6 +5,7 @@ class ToggleButton extends StatelessWidget {
     required this.title,
     required this.enabled,
     this.icon,
+    this.trailing,
     this.changed,
     super.key,
   });
@@ -14,6 +15,8 @@ class ToggleButton extends StatelessWidget {
   final bool enabled;
 
   final Widget? icon;
+
+  final Widget? trailing;
 
   final void Function(bool)? changed;
 
@@ -33,7 +36,11 @@ class ToggleButton extends StatelessWidget {
       ),
     );
 
-    final label = Text(title);
+    Widget label = Text(title);
+
+    if (trailing != null) {
+      label = Row(children: [label, trailing!]);
+    }
 
     return icon != null
         ? TextButton.icon(

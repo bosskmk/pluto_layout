@@ -9,7 +9,7 @@ class LeftTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PlutoLayoutTabs(
-      mode: PlutoLayoutTabMode.showSelected,
+      mode: PlutoLayoutTabMode.showOneMust,
       draggable: true,
       tabViewSizeResolver: const PlutoLayoutTabViewSizeConstrains(
         minSize: 100,
@@ -18,6 +18,7 @@ class LeftTab extends StatelessWidget {
         PlutoLayoutTabItem(
           id: ExampleText.aboutTitle,
           title: ExampleText.aboutTitle,
+          showRemoveButton: true,
           sizeResolver: const PlutoLayoutTabItemSizeInitial(300),
           tabViewBuilder: (c) {
             return Padding(
@@ -37,6 +38,7 @@ class LeftTab extends StatelessWidget {
         PlutoLayoutTabItem(
           id: ExampleText.aboutLayoutTitle,
           title: ExampleText.aboutLayoutTitle,
+          showRemoveButton: true,
           sizeResolver: const PlutoLayoutTabItemSizeFlexible(0.7),
           tabViewBuilder: (c) {
             return Padding(
@@ -56,6 +58,7 @@ class LeftTab extends StatelessWidget {
         PlutoLayoutTabItem(
           id: ExampleText.nestedTabsTitle,
           title: ExampleText.nestedTabsTitle,
+          showRemoveButton: true,
           sizeResolver: const PlutoLayoutTabItemSizeFlexible(0.3),
           tabViewBuilder: (c) {
             return Padding(

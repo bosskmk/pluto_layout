@@ -179,16 +179,35 @@ class _MenusState extends ConsumerState<_Menus> {
 
     if (event.layoutId != layoutId) return;
 
+    final removeIdx =
+        ref.read(_itemsProvider).indexWhere((e) => e.id == event.itemId);
+
+    if (removeIdx == -1) return;
+
     ref.read(_itemsProvider.notifier).remove(event.itemId);
+
+    if (!widget.mode.isShowOneMust) return;
+
+    final items = ref.read(_itemsProvider);
+
+    if (items.isEmpty || items.where((e) => e.enabled).isNotEmpty) return;
+
+    final idx = removeIdx >= items.length ? items.length - 1 : removeIdx;
+
+    toggleTab(ref, items[idx], true);
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     final layoutId = ref.read(layoutIdProvider);
 
     final layoutData = ref.read(layoutDataProvider);
 
     final items = ref.watch(_itemsProvider);
+
+    final events = ref.read(layoutEventsProvider);
 
     final effectiveItems = widget.direction.isLeft ? items.reversed : items;
 
@@ -205,6 +224,17 @@ class _MenusState extends ConsumerState<_Menus> {
         key: ValueKey('ToggleButton_${item.id}'),
         title: item.title,
         icon: item.icon,
+        trailing: item.showRemoveButton
+            ? IconButton(
+                iconSize: 14,
+                color: theme.disabledColor,
+                onPressed: () => events.add(PlutoRemoveTabItemEvent(
+                  layoutId,
+                  item.id,
+                )),
+                icon: const Icon(Icons.close),
+              )
+            : null,
         enabled: item.enabled,
         changed: (flag) => toggleTab(ref, item, flag),
       );
@@ -340,9 +370,10 @@ class _Draggable extends ConsumerWidget {
 
       itemsNotifier.insert(index, data.item);
 
-      if (mode.isShowOneMode &&
-          data.item.enabled &&
-          items.where((e) => e.enabled).isNotEmpty) {
+      if (!mode.isShowOneMode) return;
+
+      if (data.item.enabled ||
+          (mode.isShowOneMust && items.where((e) => e.enabled).isEmpty)) {
         itemsNotifier.setEnabled(data.item.id, true, mode);
       }
     };
@@ -361,11 +392,18 @@ class _Draggable extends ConsumerWidget {
     }
 
     if (dragging) {
+      final theme = Theme.of(context);
+
       return DecoratedBox(
         key: ValueKey('_DraggableDragging_${layoutId.name}'),
         position: DecorationPosition.foreground,
         decoration: BoxDecoration(
           color: Theme.of(context).dialogBackgroundColor,
+          border: Border(
+            bottom: items.where((i) => i.enabled).isEmpty
+                ? BorderSide(color: theme.dividerColor)
+                : BorderSide.none,
+          ),
         ),
         child: child,
       );
