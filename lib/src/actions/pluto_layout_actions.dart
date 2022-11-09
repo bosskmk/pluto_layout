@@ -20,29 +20,29 @@ abstract class PlutoLayoutActions {
 
   /// {@macro pluto_layout_action_toggle_tab_view_intent}
   static PlutoLayoutActionToggleTabViewIntent toggleTabView(
-    PlutoLayoutContainerDirection containerDirection,
+    PlutoLayoutId layoutId,
     Object tabItemId,
   ) {
-    return PlutoLayoutActionToggleTabViewIntent(containerDirection, tabItemId);
+    return PlutoLayoutActionToggleTabViewIntent(layoutId, tabItemId);
   }
 
   /// {@macro pluto_layout_action_rotate_tab_view_intent}
   static PlutoLayoutActionRotateTabViewIntent rotateTabView(
-    PlutoLayoutContainerDirection containerDirection,
+    PlutoLayoutId layoutId,
   ) {
-    return PlutoLayoutActionRotateTabViewIntent(containerDirection);
+    return PlutoLayoutActionRotateTabViewIntent(layoutId);
   }
 
   /// {@macro pluto_layout_action_increase_tab_view_intent}
   static PlutoLayoutActionIncreaseTabViewIntent increaseTabView({
-    PlutoLayoutContainerDirection? containerDirection,
+    PlutoLayoutId? layoutId,
     double size = PlutoLayoutHasInDecreaseTabViewEvent.defaultSize,
     bool reverseByDirection = false,
   }) {
     assert(size > 0);
 
     return PlutoLayoutActionIncreaseTabViewIntent(
-      containerDirection,
+      layoutId,
       size: size,
       reverseByDirection: reverseByDirection,
     );
@@ -50,14 +50,14 @@ abstract class PlutoLayoutActions {
 
   /// {@macro pluto_layout_action_decrease_tab_view_intent}
   static PlutoLayoutActionDecreaseTabViewIntent decreaseTabView({
-    PlutoLayoutContainerDirection? containerDirection,
+    PlutoLayoutId? layoutId,
     double size = PlutoLayoutHasInDecreaseTabViewEvent.defaultSize,
     bool reverseByDirection = false,
   }) {
     assert(size > 0);
 
     return PlutoLayoutActionDecreaseTabViewIntent(
-      containerDirection,
+      layoutId,
       size: size,
       reverseByDirection: reverseByDirection,
     );

@@ -12,7 +12,7 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.rotateTabView(
-          PlutoLayoutContainerDirection.left,
+          PlutoLayoutId.left,
         ),
       },
       body: const PlutoLayoutContainer(child: Text('body container')),
@@ -72,7 +72,7 @@ void main() {
         shortcuts: {
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
               PlutoLayoutActions.rotateTabView(
-            PlutoLayoutContainerDirection.left,
+            PlutoLayoutId.left,
           ),
         },
         body: const PlutoLayoutContainer(child: Text('body container')),

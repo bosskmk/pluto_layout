@@ -120,7 +120,9 @@ class _MenusState extends ConsumerState<_Menus> {
   }
 
   void _handleToggleTabViewEvent(PlutoToggleTabViewEvent event) {
-    if (event.containerDirection != widget.direction) return;
+    final layoutId = ref.read(layoutIdProvider);
+
+    if (event.layoutId != layoutId) return;
 
     final item = ref
         .read(_itemsProvider)
@@ -132,7 +134,9 @@ class _MenusState extends ConsumerState<_Menus> {
   }
 
   void _handleRotateTabViewEvent(PlutoRotateTabViewEvent event) {
-    if (event.containerDirection != widget.direction) return;
+    final layoutId = ref.read(layoutIdProvider);
+
+    if (event.layoutId != layoutId) return;
 
     final items = ref.read(_itemsProvider);
 
@@ -173,7 +177,7 @@ class _MenusState extends ConsumerState<_Menus> {
   void _handleRemoveTabItemEvent(PlutoRemoveTabItemEvent event) {
     final layoutId = ref.read(layoutIdProvider);
 
-    if (layoutId != event.layoutId) return;
+    if (event.layoutId != layoutId) return;
 
     ref.read(_itemsProvider.notifier).remove(event.item);
   }

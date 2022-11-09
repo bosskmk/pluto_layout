@@ -4,14 +4,14 @@ import '../events/events.dart';
 
 /// {@template pluto_layout_action_rotate_tab_view_intent}
 /// Opens and closes all items in the tab view
-/// corresponding to the [containerDirection] position in order.
+/// corresponding to the [layoutId] position in order.
 /// {@endtemplate}
 class PlutoLayoutActionRotateTabViewIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionRotateTabViewIntent(
-    this.containerDirection,
+    this.layoutId,
   );
 
-  final PlutoLayoutContainerDirection containerDirection;
+  final PlutoLayoutId layoutId;
 }
 
 class PlutoLayoutActionRotateTabViewAction
@@ -21,7 +21,7 @@ class PlutoLayoutActionRotateTabViewAction
   @override
   void invoke(PlutoLayoutActionRotateTabViewIntent intent) {
     events.add(PlutoRotateTabViewEvent(
-      intent.containerDirection,
+      intent.layoutId,
     ));
   }
 }
