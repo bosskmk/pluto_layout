@@ -75,7 +75,7 @@ class _TabViewState extends ConsumerState<_TabView> {
   bool isEnabledItem(e) => e.enabled && e.tabViewBuilder != null;
 
   PlutoLayoutId? getFocusedLayoutId() {
-    return ref.read(layoutFocusedIdProvider);
+    return ref.read(focusedLayoutIdProvider);
   }
 
   void handleEvent(PlutoLayoutEvent event) {
@@ -91,7 +91,7 @@ class _TabViewState extends ConsumerState<_TabView> {
   }
 
   void resizeTabView(PlutoLayoutId id, Offset offset) {
-    ref.read(layoutFocusedIdProvider.notifier).state = id;
+    ref.read(focusedLayoutIdProvider.notifier).state = id;
     final layoutData = ref.read(layoutDataProvider);
     final minimumSize = layoutData.getTabViewMinSize(id);
     final maximumSize = layoutData.getTabViewMaxSize(id);

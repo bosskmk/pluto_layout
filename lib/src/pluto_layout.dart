@@ -94,7 +94,7 @@ class _PlutoLayoutState extends State<PlutoLayout> {
         builder: (c, r, w) {
           final layoutData = r.read(layoutDataProvider);
 
-          final frontId = r.watch(layoutFocusedIdProvider);
+          final frontId = r.watch(focusedLayoutIdProvider);
 
           return CustomMultiChildLayout(
             delegate: _PlutoLayoutDelegate(layoutData, _eventStreamController),

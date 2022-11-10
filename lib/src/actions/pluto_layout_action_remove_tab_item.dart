@@ -2,17 +2,20 @@ import 'package:pluto_layout/pluto_layout.dart';
 import 'package:pluto_layout/src/events/events.dart';
 
 /// {@template pluto_layout_action_remove_tab_item_intent}
-/// Remove [tabItemId] located in [layoutId].
+/// Remove [itemId] located in [layoutId].
+///
+/// If [layoutId] and [itemId] are null,
+/// the focused tab is removed if there is a focused tab.
 /// {@endtemplate}
 class PlutoLayoutActionRemoveTabItemIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionRemoveTabItemIntent(
     this.layoutId,
-    this.tabItemId,
+    this.itemId,
   );
 
-  final PlutoLayoutId layoutId;
+  final PlutoLayoutId? layoutId;
 
-  final Object tabItemId;
+  final Object? itemId;
 }
 
 class PlutoLayoutActionRemoveTabItemAction
@@ -23,7 +26,7 @@ class PlutoLayoutActionRemoveTabItemAction
   void invoke(PlutoLayoutActionRemoveTabItemIntent intent) {
     events.add(PlutoRemoveTabItemEvent(
       intent.layoutId,
-      intent.tabItemId,
+      intent.itemId,
     ));
   }
 }

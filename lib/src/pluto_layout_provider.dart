@@ -10,7 +10,7 @@ final layoutIdProvider = Provider<PlutoLayoutId>(
 );
 
 /// ID of [PlutoLayoutContainer] that currently has focus activated.
-final layoutFocusedIdProvider = StateProvider<PlutoLayoutId>(
+final focusedLayoutIdProvider = StateProvider<PlutoLayoutId>(
   (ref) => PlutoLayoutId.body,
 );
 

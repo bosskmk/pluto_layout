@@ -25,7 +25,7 @@ part '_tab_view.dart';
 part 'pluto_layout_tab_item.dart';
 part 'pluto_layout_tab_item_size_resolver.dart';
 
-final _focusedTabItemIdViewProvider = StateProvider<Object?>((ref) => null);
+final _focusedItemIdViewProvider = StateProvider<Object?>((ref) => null);
 
 /// You can configure the tab view by passing it as a child of [PlutoLayoutContainer].
 ///
@@ -200,17 +200,17 @@ class PlutoLayoutTabs extends ConsumerWidget {
 }
 
 class _TabItemFocusHelper {
-  static Object? getFocusedTabItemId(WidgetRef ref) =>
-      ref.read(_focusedTabItemIdViewProvider);
+  static Object? getFocusedItemId(WidgetRef ref) =>
+      ref.read(_focusedItemIdViewProvider);
 
   static void setFocus({
     required WidgetRef ref,
     required PlutoLayoutId? layoutId,
     required Object? itemId,
   }) {
-    ref.read(layoutFocusedIdProvider.notifier).state =
+    ref.read(focusedLayoutIdProvider.notifier).state =
         layoutId ?? PlutoLayoutId.body;
-    ref.read(_focusedTabItemIdViewProvider.notifier).state = itemId;
+    ref.read(_focusedItemIdViewProvider.notifier).state = itemId;
   }
 
   static bool watchIsFocused({
@@ -218,11 +218,11 @@ class _TabItemFocusHelper {
     required Object layoutId,
     required Object itemId,
   }) {
-    final focusedLayoutId = ref.watch(layoutFocusedIdProvider);
+    final focusedLayoutId = ref.watch(focusedLayoutIdProvider);
 
-    final focusedTabItemId = ref.watch(_focusedTabItemIdViewProvider);
+    final focusedItemId = ref.watch(_focusedItemIdViewProvider);
 
-    return layoutId == focusedLayoutId && focusedTabItemId == itemId;
+    return layoutId == focusedLayoutId && focusedItemId == itemId;
   }
 }
 

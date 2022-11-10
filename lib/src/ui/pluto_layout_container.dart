@@ -61,7 +61,7 @@ class _PlutoLayoutContainerState extends ConsumerState<PlutoLayoutContainer> {
 
     gestureOnTap() {
       focusNode.requestFocus();
-      ref.read(layoutFocusedIdProvider.notifier).state = layoutId;
+      ref.read(focusedLayoutIdProvider.notifier).state = layoutId;
     }
 
     Widget containerWidget = Focus(
@@ -118,7 +118,7 @@ class _FocusedContainer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    final layoutFocusedId = ref.watch(layoutFocusedIdProvider);
+    final layoutFocusedId = ref.watch(focusedLayoutIdProvider);
 
     final bool focused = layoutFocusedId == layoutId;
 

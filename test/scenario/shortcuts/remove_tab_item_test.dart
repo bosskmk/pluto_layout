@@ -12,7 +12,10 @@ void main() {
       tester,
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.delete):
-            PlutoLayoutActions.removeTabItem(PlutoLayoutId.left, 'tab1'),
+            PlutoLayoutActions.removeTabItem(
+          layoutId: PlutoLayoutId.left,
+          itemId: 'tab1',
+        ),
       },
       body: const PlutoLayoutContainer(child: Text('body container')),
       left: PlutoLayoutContainer(

@@ -21,9 +21,9 @@ abstract class PlutoLayoutActions {
   /// {@macro pluto_layout_action_toggle_tab_view_intent}
   static PlutoLayoutActionToggleTabViewIntent toggleTabView(
     PlutoLayoutId layoutId,
-    Object tabItemId,
+    Object itemId,
   ) {
-    return PlutoLayoutActionToggleTabViewIntent(layoutId, tabItemId);
+    return PlutoLayoutActionToggleTabViewIntent(layoutId, itemId);
   }
 
   /// {@macro pluto_layout_action_rotate_tab_view_intent}
@@ -64,11 +64,11 @@ abstract class PlutoLayoutActions {
   }
 
   /// {@macro pluto_layout_action_remove_tab_item_intent}
-  static PlutoLayoutActionRemoveTabItemIntent removeTabItem(
-    PlutoLayoutId layoutId,
-    Object tabItemId,
-  ) {
-    return PlutoLayoutActionRemoveTabItemIntent(layoutId, tabItemId);
+  static PlutoLayoutActionRemoveTabItemIntent removeTabItem({
+    PlutoLayoutId? layoutId,
+    Object? itemId,
+  }) {
+    return PlutoLayoutActionRemoveTabItemIntent(layoutId, itemId);
   }
 
   static Map<Type, Action<Intent>> getActionsByShortcuts(

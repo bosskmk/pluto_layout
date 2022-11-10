@@ -117,7 +117,7 @@ class _MenusState extends ConsumerState<_Menus> {
           layoutId: layoutId,
           itemId: item.id,
         );
-      } else if (_TabItemFocusHelper.getFocusedTabItemId(ref) == item.id) {
+      } else if (_TabItemFocusHelper.getFocusedItemId(ref) == item.id) {
         _TabItemFocusHelper.setFocus(
           ref: ref,
           layoutId: items.isEmpty ? null : layoutId,
@@ -138,9 +138,8 @@ class _MenusState extends ConsumerState<_Menus> {
 
     if (event.layoutId != layoutId) return;
 
-    final item = ref
-        .read(_itemsProvider)
-        .firstWhereOrNull((e) => e.id == event.tabItemId);
+    final item =
+        ref.read(_itemsProvider).firstWhereOrNull((e) => e.id == event.itemId);
 
     if (item == null) return;
 
@@ -183,21 +182,26 @@ class _MenusState extends ConsumerState<_Menus> {
     ref.read(_itemsProvider.notifier).toggleAll(false, widget.mode);
 
     if (event.afterFocusToBody) {
-      ref.read(layoutFocusedIdProvider.notifier).state = PlutoLayoutId.body;
+      ref.read(focusedLayoutIdProvider.notifier).state = PlutoLayoutId.body;
     }
   }
 
   void _handleRemoveTabItemEvent(PlutoRemoveTabItemEvent event) {
     final layoutId = ref.read(layoutIdProvider);
 
-    if (event.layoutId != layoutId) return;
+    final eventLayoutId = event.layoutId ?? ref.read(focusedLayoutIdProvider);
+
+    final eventItemId =
+        event.itemId ?? _TabItemFocusHelper.getFocusedItemId(ref);
+
+    if (eventLayoutId != layoutId || eventItemId == null) return;
 
     final removeIdx =
-        ref.read(_itemsProvider).indexWhere((e) => e.id == event.itemId);
+        ref.read(_itemsProvider).indexWhere((e) => e.id == eventItemId);
 
     if (removeIdx == -1) return;
 
-    ref.read(_itemsProvider.notifier).remove(event.itemId);
+    ref.read(_itemsProvider.notifier).remove(eventItemId);
 
     if (!widget.mode.isShowOneMust) return;
 
