@@ -85,18 +85,10 @@ class _PlutoLayoutContainerState extends ConsumerState<PlutoLayoutContainer> {
       final layoutEvents = ref.read(layoutEventsProvider);
 
       containerWidget = Actions(
-        actions: {
-          PlutoLayoutActionHideAllTabViewIntent:
-              PlutoLayoutActionHideAllTabViewAction(layoutEvents),
-          PlutoLayoutActionToggleTabViewIntent:
-              PlutoLayoutActionToggleTabViewAction(layoutEvents),
-          PlutoLayoutActionRotateTabViewIntent:
-              PlutoLayoutActionRotateTabViewAction(layoutEvents),
-          PlutoLayoutActionIncreaseTabViewIntent:
-              PlutoLayoutActionIncreaseTabViewAction(layoutEvents),
-          PlutoLayoutActionDecreaseTabViewIntent:
-              PlutoLayoutActionDecreaseTabViewAction(layoutEvents),
-        },
+        actions: PlutoLayoutActions.getActionsByShortcuts(
+          layoutShortcuts,
+          layoutEvents,
+        ),
         child: containerWidget,
       );
     }

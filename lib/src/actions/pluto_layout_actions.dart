@@ -70,6 +70,44 @@ abstract class PlutoLayoutActions {
   ) {
     return PlutoLayoutActionRemoveTabItemIntent(layoutId, tabItemId);
   }
+
+  static Map<Type, Action<Intent>> getActionsByShortcuts(
+    Map<LogicalKeySet, PlutoLayoutIntent> shortcuts,
+    PlutoLayoutEventStreamController layoutEvents,
+  ) {
+    final actions = <Type, Action<Intent>>{};
+
+    for (final shortcut in shortcuts.entries) {
+      switch (shortcut.value.runtimeType) {
+        case PlutoLayoutActionHideAllTabViewIntent:
+          actions[PlutoLayoutActionHideAllTabViewIntent] =
+              PlutoLayoutActionHideAllTabViewAction(layoutEvents);
+          break;
+        case PlutoLayoutActionToggleTabViewIntent:
+          actions[PlutoLayoutActionToggleTabViewIntent] =
+              PlutoLayoutActionToggleTabViewAction(layoutEvents);
+          break;
+        case PlutoLayoutActionRotateTabViewIntent:
+          actions[PlutoLayoutActionRotateTabViewIntent] =
+              PlutoLayoutActionRotateTabViewAction(layoutEvents);
+          break;
+        case PlutoLayoutActionIncreaseTabViewIntent:
+          actions[PlutoLayoutActionIncreaseTabViewIntent] =
+              PlutoLayoutActionIncreaseTabViewAction(layoutEvents);
+          break;
+        case PlutoLayoutActionDecreaseTabViewIntent:
+          actions[PlutoLayoutActionDecreaseTabViewIntent] =
+              PlutoLayoutActionDecreaseTabViewAction(layoutEvents);
+          break;
+        case PlutoLayoutActionRemoveTabItemIntent:
+          actions[PlutoLayoutActionRemoveTabItemIntent] =
+              PlutoLayoutActionRemoveTabItemAction(layoutEvents);
+          break;
+      }
+    }
+
+    return actions;
+  }
 }
 
 abstract class PlutoLayoutIntent extends Intent {
