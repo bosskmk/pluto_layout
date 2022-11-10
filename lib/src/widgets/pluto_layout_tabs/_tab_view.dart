@@ -221,7 +221,7 @@ class _TabViewState extends ConsumerState<_TabView> {
     final int length = enabledItems.length;
 
     Widget resizeTabItemOrNot(int index, PlutoLayoutTabItem item) {
-      Widget child = item.tabViewBuilder!(context);
+      Widget child = _TabItemViewContainer(layoutId: layoutId, item: item);
 
       if (!widget.mode.isShowOneMode && index < length - 1) {
         child = ResizeIndicator<PlutoLayoutTabItem>(
@@ -451,5 +451,30 @@ class _TabItemsDelegate extends MultiChildLayoutDelegate {
   @override
   bool shouldRelayout(covariant MultiChildLayoutDelegate oldDelegate) {
     return true;
+  }
+}
+
+class _TabItemViewContainer extends ConsumerWidget {
+  const _TabItemViewContainer({
+    required this.layoutId,
+    required this.item,
+  });
+
+  final PlutoLayoutId layoutId;
+
+  final PlutoLayoutTabItem item;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return GestureDetector(
+      onTap: () {
+        _TabItemFocusHelper.setFocus(
+          ref: ref,
+          layoutId: layoutId,
+          itemId: item.id,
+        );
+      },
+      child: item.tabViewBuilder!(context),
+    );
   }
 }
