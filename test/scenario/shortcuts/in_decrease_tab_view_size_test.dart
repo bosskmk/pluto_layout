@@ -63,7 +63,7 @@ void main() {
 
     expect(
       beforeSize.width - afterSize.width,
-      PlutoLayoutHasInDecreaseTabViewEvent.defaultSize * 2,
+      PlutoLayoutInDecreaseTabViewEvent.defaultSize * 2,
     );
   });
 
@@ -126,7 +126,7 @@ void main() {
 
       expect(
         beforeSize.width - afterSize.width,
-        PlutoLayoutHasInDecreaseTabViewEvent.defaultSize * 2,
+        PlutoLayoutInDecreaseTabViewEvent.defaultSize * 2,
       );
     },
   );
@@ -251,7 +251,7 @@ void main() {
 
     expect(
       afterSize.width - beforeSize.width,
-      PlutoLayoutHasInDecreaseTabViewEvent.defaultSize * 2,
+      PlutoLayoutInDecreaseTabViewEvent.defaultSize * 2,
     );
   });
 
@@ -314,7 +314,7 @@ void main() {
 
       expect(
         afterSize.width - beforeSize.width,
-        PlutoLayoutHasInDecreaseTabViewEvent.defaultSize * 2,
+        PlutoLayoutInDecreaseTabViewEvent.defaultSize * 2,
       );
     },
   );
@@ -439,7 +439,7 @@ void main() {
 
     expect(
       afterSize.width - beforeSize.width,
-      PlutoLayoutHasInDecreaseTabViewEvent.defaultSize * 2,
+      PlutoLayoutInDecreaseTabViewEvent.defaultSize * 2,
     );
   });
 
@@ -502,7 +502,7 @@ void main() {
 
       expect(
         afterSize.width - beforeSize.width,
-        PlutoLayoutHasInDecreaseTabViewEvent.defaultSize * 2,
+        PlutoLayoutInDecreaseTabViewEvent.defaultSize * 2,
       );
     },
   );
@@ -566,7 +566,7 @@ void main() {
 
       expect(
         beforeSize.width - afterSize.width,
-        PlutoLayoutHasInDecreaseTabViewEvent.defaultSize * 2,
+        PlutoLayoutInDecreaseTabViewEvent.defaultSize * 2,
       );
     },
   );
@@ -626,7 +626,7 @@ void main() {
 
     expect(
       beforeSize.height - afterSize.height,
-      PlutoLayoutHasInDecreaseTabViewEvent.defaultSize * 2,
+      PlutoLayoutInDecreaseTabViewEvent.defaultSize * 2,
     );
   });
 
@@ -688,7 +688,7 @@ void main() {
 
     expect(
       beforeSize.height - afterSize.height,
-      PlutoLayoutHasInDecreaseTabViewEvent.defaultSize * 2,
+      PlutoLayoutInDecreaseTabViewEvent.defaultSize * 2,
     );
   });
 
@@ -748,7 +748,7 @@ void main() {
 
     expect(
       afterSize.height - beforeSize.height,
-      PlutoLayoutHasInDecreaseTabViewEvent.defaultSize * 2,
+      PlutoLayoutInDecreaseTabViewEvent.defaultSize * 2,
     );
   });
 
@@ -810,7 +810,7 @@ void main() {
 
     expect(
       afterSize.height - beforeSize.height,
-      PlutoLayoutHasInDecreaseTabViewEvent.defaultSize * 2,
+      PlutoLayoutInDecreaseTabViewEvent.defaultSize * 2,
     );
   });
 
@@ -870,7 +870,7 @@ void main() {
 
     expect(
       beforeSize.height - afterSize.height,
-      PlutoLayoutHasInDecreaseTabViewEvent.defaultSize * 2,
+      PlutoLayoutInDecreaseTabViewEvent.defaultSize * 2,
     );
   });
 
@@ -933,7 +933,7 @@ void main() {
 
     expect(
       afterSize.height - beforeSize.height,
-      PlutoLayoutHasInDecreaseTabViewEvent.defaultSize * 2,
+      PlutoLayoutInDecreaseTabViewEvent.defaultSize * 2,
     );
   });
 
@@ -993,7 +993,7 @@ void main() {
 
     expect(
       afterSize.height - beforeSize.height,
-      PlutoLayoutHasInDecreaseTabViewEvent.defaultSize * 2,
+      PlutoLayoutInDecreaseTabViewEvent.defaultSize * 2,
     );
   });
 
@@ -1056,7 +1056,7 @@ void main() {
 
     expect(
       beforeSize.height - afterSize.height,
-      PlutoLayoutHasInDecreaseTabViewEvent.defaultSize * 2,
+      PlutoLayoutInDecreaseTabViewEvent.defaultSize * 2,
     );
   });
 }

@@ -80,12 +80,14 @@ class _TabViewState extends ConsumerState<_TabView> {
 
   void handleEvent(PlutoLayoutEvent event) {
     if (event is PlutoRelayoutEvent) {
-      return _handleRelayoutEvent();
-    }
-
-    if (event is PlutoLayoutHasInDecreaseTabViewEvent) {
-      return _handleInDecreaseTabViewEvent(
-        event as PlutoLayoutHasInDecreaseTabViewEvent,
+      _handleRelayoutEvent();
+    } else if (event is PlutoLayoutInDecreaseTabViewEvent) {
+      _handleInDecreaseTabViewEvent(
+        event as PlutoLayoutInDecreaseTabViewEvent,
+      );
+    } else if (event is PlutoLayoutInDecreaseTabItemViewEvent) {
+      _handleInDecreaseTabItemViewEvent(
+        event as PlutoLayoutInDecreaseTabItemViewEvent,
       );
     }
   }
@@ -170,7 +172,7 @@ class _TabViewState extends ConsumerState<_TabView> {
   }
 
   void _handleInDecreaseTabViewEvent(
-    PlutoLayoutHasInDecreaseTabViewEvent event,
+    PlutoLayoutInDecreaseTabViewEvent event,
   ) {
     final eventLayoutId = event.layoutId ?? getFocusedLayoutId();
 
@@ -183,17 +185,11 @@ class _TabViewState extends ConsumerState<_TabView> {
 
     if (!hasEnabledItem) return;
 
-    final bool isIncreased = event is PlutoIncreaseTabViewEvent;
-
-    final reverse = !event.reverseByDirection && !direction.isIncreasedOffset;
-
-    final double size = isIncreased
-        ? reverse
-            ? -event.size
-            : event.size
-        : reverse
-            ? event.size
-            : -event.size;
+    final double size = _getSizeByInDecrease(
+      event.size,
+      event is PlutoIncreaseTabViewEvent,
+      event.reverseByDirection,
+    );
 
     resizeTabView(
       layoutId,
@@ -202,6 +198,51 @@ class _TabViewState extends ConsumerState<_TabView> {
         widget.direction.isHorizontal ? 0 : size,
       ),
     );
+  }
+
+  void _handleInDecreaseTabItemViewEvent(
+    PlutoLayoutInDecreaseTabItemViewEvent event,
+  ) {
+    final eventLayoutId = event.layoutId ?? getFocusedLayoutId();
+
+    final eventItemId =
+        event.itemId ?? _TabItemFocusHelper.getFocusedItemId(ref);
+
+    if (eventLayoutId == null || eventItemId == null) return;
+
+    if (eventLayoutId != ref.read(layoutIdProvider)) return;
+
+    final item = ref.read(_itemsProvider).firstWhereOrNull(
+          (e) => e.id == eventItemId,
+        );
+
+    if (item == null) return;
+
+    final double size = _getSizeByInDecrease(
+      event.size,
+      event is PlutoIncreaseTabItemViewEvent,
+      event.reverseByDirection,
+    );
+
+    resizeTabItem(
+      item,
+      Offset(
+        widget.direction.isHorizontal ? 0 : size,
+        widget.direction.isHorizontal ? size : 0,
+      ),
+    );
+  }
+
+  double _getSizeByInDecrease(double size, bool increase, bool reverse) {
+    final reverseByDirection = !reverse && !direction.isIncreasedOffset;
+
+    return increase
+        ? reverseByDirection
+            ? -size
+            : size
+        : reverseByDirection
+            ? size
+            : -size;
   }
 
   @override

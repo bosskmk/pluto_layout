@@ -21,7 +21,7 @@ import '../events/events.dart';
 class PlutoLayoutActionIncreaseTabViewIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionIncreaseTabViewIntent(
     this.layoutId, {
-    this.size = PlutoLayoutHasInDecreaseTabViewEvent.defaultSize,
+    this.size = PlutoLayoutInDecreaseTabViewEvent.defaultSize,
     this.reverseByDirection = false,
   }) : assert(size > 0);
 

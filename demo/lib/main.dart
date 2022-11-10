@@ -79,6 +79,12 @@ class _DemoPageState extends State<DemoPage>
                 PlutoLayoutActions.increaseTabView(),
             LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowDown):
                 PlutoLayoutActions.decreaseTabView(),
+            LogicalKeySet(
+                    LogicalKeyboardKey.control, LogicalKeyboardKey.arrowUp):
+                PlutoLayoutActions.increaseTabItemView(),
+            LogicalKeySet(
+                    LogicalKeyboardKey.control, LogicalKeyboardKey.arrowDown):
+                PlutoLayoutActions.decreaseTabItemView(),
           },
           body: PlutoLayoutContainer(
             child: TabBarView(

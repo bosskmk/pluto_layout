@@ -36,7 +36,7 @@ abstract class PlutoLayoutActions {
   /// {@macro pluto_layout_action_increase_tab_view_intent}
   static PlutoLayoutActionIncreaseTabViewIntent increaseTabView({
     PlutoLayoutId? layoutId,
-    double size = PlutoLayoutHasInDecreaseTabViewEvent.defaultSize,
+    double size = PlutoLayoutInDecreaseTabViewEvent.defaultSize,
     bool reverseByDirection = false,
   }) {
     assert(size > 0);
@@ -51,13 +51,47 @@ abstract class PlutoLayoutActions {
   /// {@macro pluto_layout_action_decrease_tab_view_intent}
   static PlutoLayoutActionDecreaseTabViewIntent decreaseTabView({
     PlutoLayoutId? layoutId,
-    double size = PlutoLayoutHasInDecreaseTabViewEvent.defaultSize,
+    double size = PlutoLayoutInDecreaseTabViewEvent.defaultSize,
     bool reverseByDirection = false,
   }) {
     assert(size > 0);
 
     return PlutoLayoutActionDecreaseTabViewIntent(
       layoutId,
+      size: size,
+      reverseByDirection: reverseByDirection,
+    );
+  }
+
+  /// {@macro pluto_layout_action_increase_tab_item_view_intent}
+  static PlutoLayoutActionIncreaseTabItemViewIntent increaseTabItemView({
+    PlutoLayoutId? layoutId,
+    Object? itemId,
+    double size = PlutoLayoutInDecreaseTabItemViewEvent.defaultSize,
+    bool reverseByDirection = false,
+  }) {
+    assert(size > 0);
+
+    return PlutoLayoutActionIncreaseTabItemViewIntent(
+      layoutId: layoutId,
+      itemId: itemId,
+      size: size,
+      reverseByDirection: reverseByDirection,
+    );
+  }
+
+  /// {@macro pluto_layout_action_decrease_tab_item_view_intent}
+  static PlutoLayoutActionDecreaseTabItemViewIntent decreaseTabItemView({
+    PlutoLayoutId? layoutId,
+    Object? itemId,
+    double size = PlutoLayoutInDecreaseTabItemViewEvent.defaultSize,
+    bool reverseByDirection = false,
+  }) {
+    assert(size > 0);
+
+    return PlutoLayoutActionDecreaseTabItemViewIntent(
+      layoutId: layoutId,
+      itemId: itemId,
       size: size,
       reverseByDirection: reverseByDirection,
     );
@@ -98,6 +132,14 @@ abstract class PlutoLayoutActions {
         case PlutoLayoutActionDecreaseTabViewIntent:
           actions[PlutoLayoutActionDecreaseTabViewIntent] =
               PlutoLayoutActionDecreaseTabViewAction(layoutEvents);
+          break;
+        case PlutoLayoutActionIncreaseTabItemViewIntent:
+          actions[PlutoLayoutActionIncreaseTabItemViewIntent] =
+              PlutoLayoutActionIncreaseTabItemViewAction(layoutEvents);
+          break;
+        case PlutoLayoutActionDecreaseTabItemViewIntent:
+          actions[PlutoLayoutActionDecreaseTabItemViewIntent] =
+              PlutoLayoutActionDecreaseTabItemViewAction(layoutEvents);
           break;
         case PlutoLayoutActionRemoveTabItemIntent:
           actions[PlutoLayoutActionRemoveTabItemIntent] =

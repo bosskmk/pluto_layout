@@ -7,7 +7,7 @@ import '../events/events.dart';
 /// corresponding to the [layoutId] position by a specific pixel.
 ///
 /// If [layoutId] is null,
-/// adjust the position of the currently focused container.
+/// Adjust the size of the currently focused container.
 /// If no tab views are open, no action is taken.
 ///
 /// [size] is the size to change in one call.
@@ -21,7 +21,7 @@ import '../events/events.dart';
 class PlutoLayoutActionDecreaseTabViewIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionDecreaseTabViewIntent(
     this.layoutId, {
-    this.size = PlutoLayoutHasInDecreaseTabViewEvent.defaultSize,
+    this.size = PlutoLayoutInDecreaseTabViewEvent.defaultSize,
     this.reverseByDirection = false,
   }) : assert(size > 0);
 

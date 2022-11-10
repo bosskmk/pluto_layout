@@ -71,19 +71,13 @@ class _MenusState extends ConsumerState<_Menus> {
 
   void handleEvent(PlutoLayoutEvent event) {
     if (event is PlutoToggleTabViewEvent) {
-      return _handleToggleTabViewEvent(event);
-    }
-
-    if (event is PlutoRotateTabViewEvent) {
-      return _handleRotateTabViewEvent(event);
-    }
-
-    if (event is PlutoHideAllTabViewEvent) {
-      return _handleHideAllTabViewEvent(event);
-    }
-
-    if (event is PlutoRemoveTabItemEvent) {
-      return _handleRemoveTabItemEvent(event);
+      _handleToggleTabViewEvent(event);
+    } else if (event is PlutoRotateTabViewEvent) {
+      _handleRotateTabViewEvent(event);
+    } else if (event is PlutoHideAllTabViewEvent) {
+      _handleHideAllTabViewEvent(event);
+    } else if (event is PlutoRemoveTabItemEvent) {
+      _handleRemoveTabItemEvent(event);
     }
   }
 

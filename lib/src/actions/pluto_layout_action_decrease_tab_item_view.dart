@@ -1,0 +1,53 @@
+import 'package:pluto_layout/pluto_layout.dart';
+
+import '../events/events.dart';
+
+/// {@template pluto_layout_action_decrease_tab_item_view_intent}
+/// Decrease the size of the tab item view of [itemId] located at [layoutId].
+///
+/// If [layoutId] is null,
+/// Adjust the size of the currently focused container.
+/// If no tab views are open, no action is taken.
+///
+/// If [itemId] is null,
+/// Adjust the size of the currently focused tab item.
+///
+/// [size] is the size to change in one call.
+///
+/// [reverseByDirection] converts the decrease
+/// to a negative number depending on the direction.
+/// In the state where [layoutId] is not specified,
+/// use left, right or top, bottom with one arrow key
+/// to decrease the size according to the direction.
+/// {@endtemplate}
+class PlutoLayoutActionDecreaseTabItemViewIntent extends PlutoLayoutIntent {
+  const PlutoLayoutActionDecreaseTabItemViewIntent({
+    this.layoutId,
+    this.itemId,
+    this.size = PlutoLayoutInDecreaseTabItemViewEvent.defaultSize,
+    this.reverseByDirection = false,
+  }) : assert(size > 0);
+
+  final PlutoLayoutId? layoutId;
+
+  final Object? itemId;
+
+  final double size;
+
+  final bool reverseByDirection;
+}
+
+class PlutoLayoutActionDecreaseTabItemViewAction
+    extends PlutoLayoutAction<PlutoLayoutActionDecreaseTabItemViewIntent> {
+  PlutoLayoutActionDecreaseTabItemViewAction(super.events);
+
+  @override
+  void invoke(PlutoLayoutActionDecreaseTabItemViewIntent intent) {
+    events.add(PlutoDecreaseTabItemViewEvent(
+      layoutId: intent.layoutId,
+      itemId: intent.itemId,
+      size: intent.size,
+      reverseByDirection: intent.reverseByDirection,
+    ));
+  }
+}
