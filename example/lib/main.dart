@@ -36,11 +36,11 @@ class _ExamplePageState extends State<ExamplePage> {
               PlutoLayoutActions.hideAllTabView(),
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
               PlutoLayoutActions.rotateTabView(
-            PlutoLayoutContainerDirection.left,
+            PlutoLayoutId.left,
           ),
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit2):
               PlutoLayoutActions.rotateTabView(
-            PlutoLayoutContainerDirection.right,
+            PlutoLayoutId.right,
           ),
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowUp):
               PlutoLayoutActions.increaseTabView(),

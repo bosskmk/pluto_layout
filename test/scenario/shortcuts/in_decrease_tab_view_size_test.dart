@@ -14,12 +14,12 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutContainerDirection.left,
+          PlutoLayoutId.left,
           'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowLeft):
             PlutoLayoutActions.decreaseTabView(
-          containerDirection: PlutoLayoutContainerDirection.left,
+          layoutId: PlutoLayoutId.left,
         ),
       },
       body: const PlutoLayoutContainer(child: Text('body container')),
@@ -76,12 +76,12 @@ void main() {
         shortcuts: {
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
               PlutoLayoutActions.toggleTabView(
-            PlutoLayoutContainerDirection.left,
+            PlutoLayoutId.left,
             'tab1',
           ),
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowLeft):
               PlutoLayoutActions.decreaseTabView(
-            containerDirection: PlutoLayoutContainerDirection.left,
+            layoutId: PlutoLayoutId.left,
             reverseByDirection: true,
           ),
         },
@@ -140,12 +140,12 @@ void main() {
         shortcuts: {
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
               PlutoLayoutActions.toggleTabView(
-            PlutoLayoutContainerDirection.left,
+            PlutoLayoutId.left,
             'tab1',
           ),
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowLeft):
               PlutoLayoutActions.decreaseTabView(
-            containerDirection: PlutoLayoutContainerDirection.left,
+            layoutId: PlutoLayoutId.left,
             size: 20,
           ),
         },
@@ -202,12 +202,12 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutContainerDirection.left,
+          PlutoLayoutId.left,
           'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowRight):
             PlutoLayoutActions.increaseTabView(
-          containerDirection: PlutoLayoutContainerDirection.left,
+          layoutId: PlutoLayoutId.left,
         ),
       },
       body: const PlutoLayoutContainer(child: Text('body container')),
@@ -264,12 +264,12 @@ void main() {
         shortcuts: {
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
               PlutoLayoutActions.toggleTabView(
-            PlutoLayoutContainerDirection.left,
+            PlutoLayoutId.left,
             'tab1',
           ),
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowRight):
               PlutoLayoutActions.increaseTabView(
-            containerDirection: PlutoLayoutContainerDirection.left,
+            layoutId: PlutoLayoutId.left,
             reverseByDirection: true,
           ),
         },
@@ -328,12 +328,12 @@ void main() {
         shortcuts: {
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
               PlutoLayoutActions.toggleTabView(
-            PlutoLayoutContainerDirection.left,
+            PlutoLayoutId.left,
             'tab1',
           ),
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowRight):
               PlutoLayoutActions.increaseTabView(
-            containerDirection: PlutoLayoutContainerDirection.left,
+            layoutId: PlutoLayoutId.left,
             size: 3,
           ),
         },
@@ -390,12 +390,12 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutContainerDirection.right,
+          PlutoLayoutId.right,
           'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowLeft):
             PlutoLayoutActions.increaseTabView(
-          containerDirection: PlutoLayoutContainerDirection.right,
+          layoutId: PlutoLayoutId.right,
         ),
       },
       body: const PlutoLayoutContainer(child: Text('body container')),
@@ -452,12 +452,12 @@ void main() {
         shortcuts: {
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
               PlutoLayoutActions.toggleTabView(
-            PlutoLayoutContainerDirection.right,
+            PlutoLayoutId.right,
             'tab1',
           ),
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowLeft):
               PlutoLayoutActions.decreaseTabView(
-            containerDirection: PlutoLayoutContainerDirection.right,
+            layoutId: PlutoLayoutId.right,
             reverseByDirection: true,
           ),
         },
@@ -516,12 +516,12 @@ void main() {
         shortcuts: {
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
               PlutoLayoutActions.toggleTabView(
-            PlutoLayoutContainerDirection.right,
+            PlutoLayoutId.right,
             'tab1',
           ),
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowRight):
               PlutoLayoutActions.increaseTabView(
-            containerDirection: PlutoLayoutContainerDirection.right,
+            layoutId: PlutoLayoutId.right,
             reverseByDirection: true,
           ),
         },
@@ -577,12 +577,12 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutContainerDirection.top,
+          PlutoLayoutId.top,
           'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowUp):
             PlutoLayoutActions.decreaseTabView(
-          containerDirection: PlutoLayoutContainerDirection.top,
+          layoutId: PlutoLayoutId.top,
         ),
       },
       body: const PlutoLayoutContainer(child: Text('body container')),
@@ -638,12 +638,12 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutContainerDirection.top,
+          PlutoLayoutId.top,
           'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowUp):
             PlutoLayoutActions.decreaseTabView(
-          containerDirection: PlutoLayoutContainerDirection.top,
+          layoutId: PlutoLayoutId.top,
           reverseByDirection: true,
         ),
       },
@@ -699,12 +699,12 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutContainerDirection.top,
+          PlutoLayoutId.top,
           'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowDown):
             PlutoLayoutActions.increaseTabView(
-          containerDirection: PlutoLayoutContainerDirection.top,
+          layoutId: PlutoLayoutId.top,
         ),
       },
       body: const PlutoLayoutContainer(child: Text('body container')),
@@ -760,12 +760,12 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutContainerDirection.top,
+          PlutoLayoutId.top,
           'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowDown):
             PlutoLayoutActions.increaseTabView(
-          containerDirection: PlutoLayoutContainerDirection.top,
+          layoutId: PlutoLayoutId.top,
           reverseByDirection: true,
         ),
       },
@@ -821,12 +821,12 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutContainerDirection.bottom,
+          PlutoLayoutId.bottom,
           'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowDown):
             PlutoLayoutActions.decreaseTabView(
-          containerDirection: PlutoLayoutContainerDirection.bottom,
+          layoutId: PlutoLayoutId.bottom,
         ),
       },
       body: const PlutoLayoutContainer(child: Text('body container')),
@@ -883,12 +883,12 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutContainerDirection.bottom,
+          PlutoLayoutId.bottom,
           'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowUp):
             PlutoLayoutActions.decreaseTabView(
-          containerDirection: PlutoLayoutContainerDirection.bottom,
+          layoutId: PlutoLayoutId.bottom,
           reverseByDirection: true,
         ),
       },
@@ -944,12 +944,12 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutContainerDirection.bottom,
+          PlutoLayoutId.bottom,
           'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowUp):
             PlutoLayoutActions.increaseTabView(
-          containerDirection: PlutoLayoutContainerDirection.bottom,
+          layoutId: PlutoLayoutId.bottom,
         ),
       },
       body: const PlutoLayoutContainer(child: Text('body container')),
@@ -1006,12 +1006,12 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutContainerDirection.bottom,
+          PlutoLayoutId.bottom,
           'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowDown):
             PlutoLayoutActions.increaseTabView(
-          containerDirection: PlutoLayoutContainerDirection.bottom,
+          layoutId: PlutoLayoutId.bottom,
           reverseByDirection: true,
         ),
       },

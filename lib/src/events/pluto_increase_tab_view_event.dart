@@ -3,7 +3,7 @@ import 'package:pluto_layout/pluto_layout.dart';
 import 'events.dart';
 
 /// An event that increases the size
-/// of the tab view in the [containerDirection] direction by [size].
+/// of the tab view in the [layoutId] direction by [size].
 ///
 /// The [reverseByDirection] property is a property to operate the size
 /// of the right and left or top and bottom tab views
@@ -14,13 +14,13 @@ import 'events.dart';
 class PlutoIncreaseTabViewEvent extends PlutoLayoutEvent
     implements PlutoLayoutHasInDecreaseTabViewEvent {
   const PlutoIncreaseTabViewEvent(
-    this.containerDirection, {
+    this.layoutId, {
     this.size = PlutoLayoutHasInDecreaseTabViewEvent.defaultSize,
     this.reverseByDirection = false,
   });
 
   @override
-  final PlutoLayoutContainerDirection? containerDirection;
+  final PlutoLayoutId? layoutId;
 
   @override
   final double size;

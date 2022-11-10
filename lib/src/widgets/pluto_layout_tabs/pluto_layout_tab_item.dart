@@ -21,6 +21,11 @@ part of pluto_layout_tabs;
 /// that will be displayed when the menu is tapped.
 /// Just pass a function that returns [Widget].
 ///
+/// {@template pluto_layout_tab_item_showRemoveButton}
+/// [showRemoveButton] displays an X button to remove a tab
+/// at the right end of the menu when the value is true.
+/// {@endtemplate}
+///
 /// ```dart
 /// tabViewBuilder: (c) {
 ///   return Padding(
@@ -45,6 +50,7 @@ class PlutoLayoutTabItem {
     this.icon,
     this.tabViewBuilder,
     this.sizeResolver = const PlutoLayoutTabItemSizeFlexible(),
+    this.showRemoveButton = false,
     this.enabled = false,
   });
 
@@ -54,6 +60,7 @@ class PlutoLayoutTabItem {
     this.icon,
     this.tabViewBuilder,
     this.sizeResolver = const PlutoLayoutTabItemSizeFlexible(),
+    this.showRemoveButton = false,
     this.enabled = false,
     double? size,
   }) : _size = size ?? 0;
@@ -73,6 +80,9 @@ class PlutoLayoutTabItem {
   /// {@macro pluto_layout_tab_view_size_resolver}
   final PlutoLayoutTabItemSizeResolver sizeResolver;
 
+  /// {@macro pluto_layout_tab_item_showRemoveButton}
+  final bool showRemoveButton;
+
   /// The open and closed state of the tab view.
   final bool enabled;
 
@@ -84,6 +94,7 @@ class PlutoLayoutTabItem {
     Widget? icon,
     Widget Function(BuildContext context)? tabViewBuilder,
     PlutoLayoutTabItemSizeResolver? sizeResolver,
+    bool? showRemoveButton,
     bool? enabled,
     double? size,
   }) {
@@ -93,6 +104,7 @@ class PlutoLayoutTabItem {
       icon: icon ?? this.icon,
       tabViewBuilder: tabViewBuilder ?? this.tabViewBuilder,
       sizeResolver: sizeResolver ?? this.sizeResolver,
+      showRemoveButton: showRemoveButton ?? this.showRemoveButton,
       enabled: enabled ?? this.enabled,
       size: size ?? _size,
     );

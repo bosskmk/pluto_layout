@@ -5,7 +5,7 @@ abstract class PlutoLayoutEvent {
 }
 
 abstract class PlutoLayoutHasInDecreaseTabViewEvent {
-  PlutoLayoutContainerDirection? get containerDirection;
+  PlutoLayoutId? get layoutId;
 
   double get size;
 

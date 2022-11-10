@@ -28,10 +28,6 @@ class ExampleText {
   static const String bodyPlutoMenuBarDesc1 =
       'PlutoMenuBar is a widget that allows you to compose nested submenus and opens menus with hover or tap';
 
-  static const String bodyCodeFieldTitle = 'Code Field';
-  static const String bodyCodeFieldDesc1 =
-      'You can use packages such as CodeField to construct an IDE-like UI.';
-
   static const String donateTitle = 'Donate';
   static const String donateDesc1 =
       'If you want to use the Pluto Series and want to say thank you, you can send a donation to Github or Buy Me A Coffee.';

@@ -2,11 +2,11 @@ import 'package:pluto_layout/pluto_layout.dart';
 
 import 'events.dart';
 
-/// Event to toggle the tab view of [tabItemId] in [containerDirection].
+/// Event to toggle the tab view of [tabItemId] in [layoutId].
 class PlutoToggleTabViewEvent extends PlutoLayoutEvent {
-  const PlutoToggleTabViewEvent(this.containerDirection, this.tabItemId);
+  const PlutoToggleTabViewEvent(this.layoutId, this.tabItemId);
 
-  final PlutoLayoutContainerDirection containerDirection;
+  final PlutoLayoutId layoutId;
 
   final Object tabItemId;
 }

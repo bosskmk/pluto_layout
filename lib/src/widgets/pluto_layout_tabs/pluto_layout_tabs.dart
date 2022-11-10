@@ -25,6 +25,8 @@ part '_tab_view.dart';
 part 'pluto_layout_tab_item.dart';
 part 'pluto_layout_tab_item_size_resolver.dart';
 
+final _focusedTabItemIdViewProvider = StateProvider<Object?>((ref) => null);
+
 /// You can configure the tab view by passing it as a child of [PlutoLayoutContainer].
 ///
 /// {@macro pluto_layout_example}
@@ -194,6 +196,33 @@ class PlutoLayoutTabs extends ConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+class _TabItemFocusHelper {
+  static Object? getFocusedTabItemId(WidgetRef ref) =>
+      ref.read(_focusedTabItemIdViewProvider);
+
+  static void setFocus({
+    required WidgetRef ref,
+    required PlutoLayoutId? layoutId,
+    required Object? itemId,
+  }) {
+    ref.read(layoutFocusedIdProvider.notifier).state =
+        layoutId ?? PlutoLayoutId.body;
+    ref.read(_focusedTabItemIdViewProvider.notifier).state = itemId;
+  }
+
+  static bool watchIsFocused({
+    required WidgetRef ref,
+    required Object layoutId,
+    required Object itemId,
+  }) {
+    final focusedLayoutId = ref.watch(layoutFocusedIdProvider);
+
+    final focusedTabItemId = ref.watch(_focusedTabItemIdViewProvider);
+
+    return layoutId == focusedLayoutId && focusedTabItemId == itemId;
   }
 }
 

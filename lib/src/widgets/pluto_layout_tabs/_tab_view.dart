@@ -74,21 +74,8 @@ class _TabViewState extends ConsumerState<_TabView> {
 
   bool isEnabledItem(e) => e.enabled && e.tabViewBuilder != null;
 
-  PlutoLayoutContainerDirection? getFocusedContainerDirection() {
-    final focusedId = ref.read(layoutFocusedIdProvider);
-
-    switch (focusedId) {
-      case PlutoLayoutId.top:
-        return PlutoLayoutContainerDirection.top;
-      case PlutoLayoutId.left:
-        return PlutoLayoutContainerDirection.left;
-      case PlutoLayoutId.right:
-        return PlutoLayoutContainerDirection.right;
-      case PlutoLayoutId.bottom:
-        return PlutoLayoutContainerDirection.bottom;
-      default:
-        return null;
-    }
+  PlutoLayoutId? getFocusedLayoutId() {
+    return ref.read(layoutFocusedIdProvider);
   }
 
   void handleEvent(PlutoLayoutEvent event) {
@@ -185,17 +172,16 @@ class _TabViewState extends ConsumerState<_TabView> {
   void _handleInDecreaseTabViewEvent(
     PlutoLayoutHasInDecreaseTabViewEvent event,
   ) {
-    final containerDirection =
-        event.containerDirection ?? getFocusedContainerDirection();
+    final eventLayoutId = event.layoutId ?? getFocusedLayoutId();
 
-    if (containerDirection != direction) return;
+    final layoutId = ref.read(layoutIdProvider);
+
+    if (eventLayoutId != layoutId) return;
 
     final hasEnabledItem =
         ref.read(_itemsProvider).firstWhereOrNull(isEnabledItem) != null;
 
     if (!hasEnabledItem) return;
-
-    final layoutId = ref.read(layoutIdProvider);
 
     final bool isIncreased = event is PlutoIncreaseTabViewEvent;
 
@@ -235,7 +221,7 @@ class _TabViewState extends ConsumerState<_TabView> {
     final int length = enabledItems.length;
 
     Widget resizeTabItemOrNot(int index, PlutoLayoutTabItem item) {
-      Widget child = item.tabViewBuilder!(context);
+      Widget child = _TabItemViewContainer(layoutId: layoutId, item: item);
 
       if (!widget.mode.isShowOneMode && index < length - 1) {
         child = ResizeIndicator<PlutoLayoutTabItem>(
@@ -465,5 +451,30 @@ class _TabItemsDelegate extends MultiChildLayoutDelegate {
   @override
   bool shouldRelayout(covariant MultiChildLayoutDelegate oldDelegate) {
     return true;
+  }
+}
+
+class _TabItemViewContainer extends ConsumerWidget {
+  const _TabItemViewContainer({
+    required this.layoutId,
+    required this.item,
+  });
+
+  final PlutoLayoutId layoutId;
+
+  final PlutoLayoutTabItem item;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return GestureDetector(
+      onTap: () {
+        _TabItemFocusHelper.setFocus(
+          ref: ref,
+          layoutId: layoutId,
+          itemId: item.id,
+        );
+      },
+      child: item.tabViewBuilder!(context),
+    );
   }
 }

@@ -12,7 +12,7 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutContainerDirection.left,
+          PlutoLayoutId.left,
           'tab1',
         ),
       },

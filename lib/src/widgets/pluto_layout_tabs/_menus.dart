@@ -88,16 +88,14 @@ class _MenusState extends ConsumerState<_Menus> {
   }
 
   void toggleTab(
-    WidgetRef ref,
     PlutoLayoutTabItem item,
     bool flag, {
     bool? forceShowOne,
+    bool setFocus = true,
   }) {
     if (widget.mode.isShowOneMust) flag = true;
 
     final layoutId = ref.read(layoutIdProvider);
-
-    ref.read(layoutFocusedIdProvider.notifier).state = layoutId;
 
     final layoutData = ref.read(layoutDataProvider);
 
@@ -112,6 +110,22 @@ class _MenusState extends ConsumerState<_Menus> {
 
     final maxSize = layoutData.getTabItemViewMaxSize(layoutId);
 
+    if (setFocus) {
+      if (flag) {
+        _TabItemFocusHelper.setFocus(
+          ref: ref,
+          layoutId: layoutId,
+          itemId: item.id,
+        );
+      } else if (_TabItemFocusHelper.getFocusedTabItemId(ref) == item.id) {
+        _TabItemFocusHelper.setFocus(
+          ref: ref,
+          layoutId: items.isEmpty ? null : layoutId,
+          itemId: null,
+        );
+      }
+    }
+
     PlutoLayoutTabItemSizeResolver._update(
       maxSize: maxSize,
       minSize: PlutoLayoutData.minTabSize,
@@ -120,7 +134,9 @@ class _MenusState extends ConsumerState<_Menus> {
   }
 
   void _handleToggleTabViewEvent(PlutoToggleTabViewEvent event) {
-    if (event.containerDirection != widget.direction) return;
+    final layoutId = ref.read(layoutIdProvider);
+
+    if (event.layoutId != layoutId) return;
 
     final item = ref
         .read(_itemsProvider)
@@ -128,38 +144,39 @@ class _MenusState extends ConsumerState<_Menus> {
 
     if (item == null) return;
 
-    toggleTab(ref, item, !item.enabled);
+    toggleTab(item, !item.enabled);
   }
 
   void _handleRotateTabViewEvent(PlutoRotateTabViewEvent event) {
-    if (event.containerDirection != widget.direction) return;
+    final layoutId = ref.read(layoutIdProvider);
+
+    if (event.layoutId != layoutId) return;
 
     final items = ref.read(_itemsProvider);
 
     if (items.isEmpty) return;
 
     if (items.length == 1) {
-      toggleTab(ref, items.first, !items.first.enabled);
+      toggleTab(items.first, !items.first.enabled);
       return;
     }
 
     final enabledIndex = items.indexWhere((e) => e.enabled);
 
     if (enabledIndex == -1) {
-      toggleTab(ref, items.first, true);
+      toggleTab(items.first, true);
       return;
     }
 
     if (enabledIndex == items.length - 1) {
       toggleTab(
-        ref,
         widget.mode.isShowOneMust ? items.first : items.last,
         widget.mode.isShowOneMust ? true : false,
       );
       return;
     }
 
-    toggleTab(ref, items[enabledIndex + 1], true, forceShowOne: true);
+    toggleTab(items[enabledIndex + 1], true, forceShowOne: true);
   }
 
   void _handleHideAllTabViewEvent(PlutoHideAllTabViewEvent event) {
@@ -173,9 +190,24 @@ class _MenusState extends ConsumerState<_Menus> {
   void _handleRemoveTabItemEvent(PlutoRemoveTabItemEvent event) {
     final layoutId = ref.read(layoutIdProvider);
 
-    if (layoutId != event.layoutId) return;
+    if (event.layoutId != layoutId) return;
 
-    ref.read(_itemsProvider.notifier).remove(event.item);
+    final removeIdx =
+        ref.read(_itemsProvider).indexWhere((e) => e.id == event.itemId);
+
+    if (removeIdx == -1) return;
+
+    ref.read(_itemsProvider.notifier).remove(event.itemId);
+
+    if (!widget.mode.isShowOneMust) return;
+
+    final items = ref.read(_itemsProvider);
+
+    if (items.isEmpty || items.where((e) => e.enabled).isNotEmpty) return;
+
+    final idx = removeIdx >= items.length ? items.length - 1 : removeIdx;
+
+    toggleTab(items[idx], true, setFocus: false);
   }
 
   @override
@@ -197,15 +229,14 @@ class _MenusState extends ConsumerState<_Menus> {
         draggingTabMenu != null && draggingTabMenu.layoutId != layoutId;
 
     Widget draggableOrNot(PlutoLayoutTabItem item, {bool dragging = false}) {
-      Widget button = ToggleButton(
-        key: ValueKey('ToggleButton_${item.id}'),
-        title: item.title,
-        icon: item.icon,
-        enabled: item.enabled,
-        changed: (flag) => toggleTab(ref, item, flag),
+      Widget menu = _MenuContainer(
+        key: ValueKey('_MenuContainer_${item.id}'),
+        layoutId: layoutId,
+        item: item,
+        toggleTab: toggleTab,
       );
 
-      if (!widget.draggable) return button;
+      if (!widget.draggable) return menu;
 
       return _Draggable(
         key: ValueKey('_Draggable_${item.id}'),
@@ -216,7 +247,7 @@ class _MenusState extends ConsumerState<_Menus> {
         direction: widget.direction,
         quarterTurns: quarterTurns,
         dragging: dragging,
-        child: button,
+        child: menu,
       );
     }
 
@@ -287,6 +318,63 @@ class _RenderMenusBox extends RenderProxyBox {
   }
 }
 
+class _MenuContainer extends ConsumerWidget {
+  const _MenuContainer({
+    required this.layoutId,
+    required this.item,
+    required this.toggleTab,
+    super.key,
+  });
+
+  final PlutoLayoutId layoutId;
+
+  final PlutoLayoutTabItem item;
+
+  final void Function(
+    PlutoLayoutTabItem item,
+    bool flag, {
+    bool? forceShowOne,
+  }) toggleTab;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
+    return DecoratedBox(
+      key: const ValueKey('_MenuContainer_DecoratedBox'),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: _TabItemFocusHelper.watchIsFocused(
+            ref: ref,
+            layoutId: layoutId,
+            itemId: item.id,
+          )
+              ? BorderSide(width: 3, color: theme.toggleableActiveColor)
+              : BorderSide.none,
+        ),
+      ),
+      child: ToggleButton(
+        title: item.title,
+        icon: item.icon,
+        trailing: item.showRemoveButton
+            ? IconButton(
+                iconSize: 14,
+                color: theme.disabledColor,
+                onPressed: () {
+                  ref
+                      .read(layoutEventsProvider)
+                      .add(PlutoRemoveTabItemEvent(layoutId, item.id));
+                },
+                icon: const Icon(Icons.close),
+              )
+            : null,
+        enabled: item.enabled,
+        changed: (flag) => toggleTab(item, flag),
+      ),
+    );
+  }
+}
+
 class _Draggable extends ConsumerWidget {
   const _Draggable({
     required this.layoutId,
@@ -327,18 +415,27 @@ class _Draggable extends ConsumerWidget {
       final index = dragging ? items.length : items.indexOf(item);
 
       if (data.layoutId == layoutId) {
-        itemsNotifier.remove(data.item);
+        itemsNotifier.remove(data.item.id);
       } else {
         final events = ref.read(layoutEventsProvider);
 
-        events.add(PlutoRemoveTabItemEvent(data.layoutId, data.item));
+        events.add(PlutoRemoveTabItemEvent(data.layoutId, data.item.id));
       }
 
       itemsNotifier.insert(index, data.item);
 
-      if (mode.isShowOneMode &&
-          data.item.enabled &&
-          items.where((e) => e.enabled).isNotEmpty) {
+      if (data.item.enabled) {
+        _TabItemFocusHelper.setFocus(
+          ref: ref,
+          layoutId: layoutId,
+          itemId: data.item.id,
+        );
+      }
+
+      if (!mode.isShowOneMode) return;
+
+      if (data.item.enabled ||
+          (mode.isShowOneMust && items.where((e) => e.enabled).isEmpty)) {
         itemsNotifier.setEnabled(data.item.id, true, mode);
       }
     };
@@ -357,11 +454,18 @@ class _Draggable extends ConsumerWidget {
     }
 
     if (dragging) {
+      final theme = Theme.of(context);
+
       return DecoratedBox(
         key: ValueKey('_DraggableDragging_${layoutId.name}'),
         position: DecorationPosition.foreground,
         decoration: BoxDecoration(
           color: Theme.of(context).dialogBackgroundColor,
+          border: Border(
+            bottom: items.where((i) => i.enabled).isEmpty
+                ? BorderSide(color: theme.dividerColor)
+                : BorderSide.none,
+          ),
         ),
         child: child,
       );
@@ -379,8 +483,10 @@ class _Draggable extends ConsumerWidget {
       dragAnchorStrategy: _childDragAnchorStrategy(direction),
       onDragStarted: () => ref.read(_draggingTabMenu.notifier).state = data,
       onDragEnd: (_) => ref.read(_draggingTabMenu.notifier).state = null,
-      feedback: Material(
-        child: RotatedBox(quarterTurns: quarterTurns, child: child),
+      feedback: ProviderScope(
+        child: Material(
+          child: RotatedBox(quarterTurns: quarterTurns, child: child),
+        ),
       ),
       child: DragTarget<_DragData>(
         onWillAccept: _onWillAccept,

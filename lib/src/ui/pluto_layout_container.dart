@@ -74,6 +74,7 @@ class _PlutoLayoutContainerState extends ConsumerState<PlutoLayoutContainer> {
           onTap: gestureOnTap,
           child: _FocusedContainer(
             layoutId: layoutId,
+            focusNode: focusNode,
             backgroundColor: widget.backgroundColor,
             child: widget.child,
           ),
@@ -85,18 +86,10 @@ class _PlutoLayoutContainerState extends ConsumerState<PlutoLayoutContainer> {
       final layoutEvents = ref.read(layoutEventsProvider);
 
       containerWidget = Actions(
-        actions: {
-          PlutoLayoutActionHideAllTabViewIntent:
-              PlutoLayoutActionHideAllTabViewAction(layoutEvents),
-          PlutoLayoutActionToggleTabViewIntent:
-              PlutoLayoutActionToggleTabViewAction(layoutEvents),
-          PlutoLayoutActionRotateTabViewIntent:
-              PlutoLayoutActionRotateTabViewAction(layoutEvents),
-          PlutoLayoutActionIncreaseTabViewIntent:
-              PlutoLayoutActionIncreaseTabViewAction(layoutEvents),
-          PlutoLayoutActionDecreaseTabViewIntent:
-              PlutoLayoutActionDecreaseTabViewAction(layoutEvents),
-        },
+        actions: PlutoLayoutActions.getActionsByShortcuts(
+          layoutShortcuts,
+          layoutEvents,
+        ),
         child: containerWidget,
       );
     }
@@ -108,11 +101,14 @@ class _PlutoLayoutContainerState extends ConsumerState<PlutoLayoutContainer> {
 class _FocusedContainer extends ConsumerWidget {
   const _FocusedContainer({
     required this.layoutId,
+    required this.focusNode,
     this.backgroundColor,
     required this.child,
   });
 
   final PlutoLayoutId layoutId;
+
+  final FocusNode focusNode;
 
   final Color? backgroundColor;
 
@@ -125,6 +121,10 @@ class _FocusedContainer extends ConsumerWidget {
     final layoutFocusedId = ref.watch(layoutFocusedIdProvider);
 
     final bool focused = layoutFocusedId == layoutId;
+
+    if (focused && !focusNode.hasFocus) {
+      focusNode.requestFocus();
+    }
 
     return DecoratedBox(
       decoration: BoxDecoration(
