@@ -45,13 +45,13 @@ class PlutoLayoutTabs extends ConsumerWidget {
     PlutoLayoutTabMode mode,
   ) {
     assert(
-      !mode.isShowOneMode || items.where((e) => e.enabled).length < 2,
+      !mode.isShowOneMode || items.where(_TabsHelper.isEnabled).length < 2,
       'If the mode is showOne or showOneMust, the enabled item must be absent or one.',
     );
 
     if (!mode.isShowOneMust || items.isEmpty) return items;
 
-    if (items.where((e) => e.enabled).length == 1) return items;
+    if (items.where(_TabsHelper.isEnabled).length == 1) return items;
 
     return [
       items.first.copyWith(enabled: true),
@@ -199,7 +199,16 @@ class PlutoLayoutTabs extends ConsumerWidget {
   }
 }
 
-class _TabItemFocusHelper {
+class _TabsHelper {
+  static bool isEnabledTabView(PlutoLayoutTabItem e) =>
+      e.enabled && e.tabViewBuilder != null;
+
+  static bool isEnabled(PlutoLayoutTabItem e) => e.enabled;
+
+  static PlutoLayoutId? getFocusedLayoutId(WidgetRef ref) {
+    return ref.read(focusedLayoutIdProvider);
+  }
+
   static Object? getFocusedItemId(WidgetRef ref) =>
       ref.read(_focusedItemIdViewProvider);
 

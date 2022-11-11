@@ -67,6 +67,8 @@ class _DemoPageState extends State<DemoPage>
           shortcuts: {
             LogicalKeySet(LogicalKeyboardKey.escape):
                 PlutoLayoutActions.hideAllTabView(),
+            LogicalKeySet(LogicalKeyboardKey.enter):
+                PlutoLayoutActions.toggleTabView(),
             LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
                 PlutoLayoutActions.rotateTabView(
               PlutoLayoutId.left,
@@ -85,6 +87,16 @@ class _DemoPageState extends State<DemoPage>
             LogicalKeySet(
                     LogicalKeyboardKey.control, LogicalKeyboardKey.arrowDown):
                 PlutoLayoutActions.decreaseTabItemView(),
+            LogicalKeySet(LogicalKeyboardKey.tab):
+                PlutoLayoutActions.rotateFocusedTabItem(),
+            LogicalKeySet(LogicalKeyboardKey.shift, LogicalKeyboardKey.tab):
+                PlutoLayoutActions.rotateFocusedTabItem(reverse: true),
+            LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.control,
+                    LogicalKeyboardKey.arrowRight):
+                PlutoLayoutActions.rotateFocusedContainer(),
+            LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.control,
+                    LogicalKeyboardKey.arrowLeft):
+                PlutoLayoutActions.rotateFocusedContainer(reverse: true),
           },
           body: PlutoLayoutContainer(
             child: TabBarView(

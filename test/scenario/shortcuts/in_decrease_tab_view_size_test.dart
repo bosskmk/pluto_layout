@@ -14,8 +14,8 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutId.left,
-          'tab1',
+          layoutId: PlutoLayoutId.left,
+          itemId: 'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowLeft):
             PlutoLayoutActions.decreaseTabView(
@@ -76,8 +76,8 @@ void main() {
         shortcuts: {
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
               PlutoLayoutActions.toggleTabView(
-            PlutoLayoutId.left,
-            'tab1',
+            layoutId: PlutoLayoutId.left,
+            itemId: 'tab1',
           ),
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowLeft):
               PlutoLayoutActions.decreaseTabView(
@@ -140,8 +140,8 @@ void main() {
         shortcuts: {
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
               PlutoLayoutActions.toggleTabView(
-            PlutoLayoutId.left,
-            'tab1',
+            layoutId: PlutoLayoutId.left,
+            itemId: 'tab1',
           ),
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowLeft):
               PlutoLayoutActions.decreaseTabView(
@@ -202,8 +202,8 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutId.left,
-          'tab1',
+          layoutId: PlutoLayoutId.left,
+          itemId: 'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowRight):
             PlutoLayoutActions.increaseTabView(
@@ -264,8 +264,8 @@ void main() {
         shortcuts: {
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
               PlutoLayoutActions.toggleTabView(
-            PlutoLayoutId.left,
-            'tab1',
+            layoutId: PlutoLayoutId.left,
+            itemId: 'tab1',
           ),
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowRight):
               PlutoLayoutActions.increaseTabView(
@@ -328,8 +328,8 @@ void main() {
         shortcuts: {
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
               PlutoLayoutActions.toggleTabView(
-            PlutoLayoutId.left,
-            'tab1',
+            layoutId: PlutoLayoutId.left,
+            itemId: 'tab1',
           ),
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowRight):
               PlutoLayoutActions.increaseTabView(
@@ -390,8 +390,8 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutId.right,
-          'tab1',
+          layoutId: PlutoLayoutId.right,
+          itemId: 'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowLeft):
             PlutoLayoutActions.increaseTabView(
@@ -452,8 +452,8 @@ void main() {
         shortcuts: {
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
               PlutoLayoutActions.toggleTabView(
-            PlutoLayoutId.right,
-            'tab1',
+            layoutId: PlutoLayoutId.right,
+            itemId: 'tab1',
           ),
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowLeft):
               PlutoLayoutActions.decreaseTabView(
@@ -516,8 +516,8 @@ void main() {
         shortcuts: {
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
               PlutoLayoutActions.toggleTabView(
-            PlutoLayoutId.right,
-            'tab1',
+            layoutId: PlutoLayoutId.right,
+            itemId: 'tab1',
           ),
           LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowRight):
               PlutoLayoutActions.increaseTabView(
@@ -577,8 +577,8 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutId.top,
-          'tab1',
+          layoutId: PlutoLayoutId.top,
+          itemId: 'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowUp):
             PlutoLayoutActions.decreaseTabView(
@@ -638,8 +638,8 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutId.top,
-          'tab1',
+          layoutId: PlutoLayoutId.top,
+          itemId: 'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowUp):
             PlutoLayoutActions.decreaseTabView(
@@ -699,8 +699,8 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutId.top,
-          'tab1',
+          layoutId: PlutoLayoutId.top,
+          itemId: 'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowDown):
             PlutoLayoutActions.increaseTabView(
@@ -760,8 +760,8 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutId.top,
-          'tab1',
+          layoutId: PlutoLayoutId.top,
+          itemId: 'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowDown):
             PlutoLayoutActions.increaseTabView(
@@ -821,8 +821,8 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutId.bottom,
-          'tab1',
+          layoutId: PlutoLayoutId.bottom,
+          itemId: 'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowDown):
             PlutoLayoutActions.decreaseTabView(
@@ -883,8 +883,8 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutId.bottom,
-          'tab1',
+          layoutId: PlutoLayoutId.bottom,
+          itemId: 'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowUp):
             PlutoLayoutActions.decreaseTabView(
@@ -944,8 +944,8 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutId.bottom,
-          'tab1',
+          layoutId: PlutoLayoutId.bottom,
+          itemId: 'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowUp):
             PlutoLayoutActions.increaseTabView(
@@ -1006,8 +1006,8 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutId.bottom,
-          'tab1',
+          layoutId: PlutoLayoutId.bottom,
+          itemId: 'tab1',
         ),
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.arrowDown):
             PlutoLayoutActions.increaseTabView(

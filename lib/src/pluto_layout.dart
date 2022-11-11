@@ -1,7 +1,7 @@
 part of pluto_layout;
 
 /// Shortcut registration type of [PlutoLayout.shortcuts].
-typedef PlutoLayoutShortcuts = Map<LogicalKeySet, PlutoLayoutIntent>;
+typedef PlutoLayoutShortcuts = Map<ShortcutActivator, PlutoLayoutIntent>;
 
 /// [PlutoLayout] is a UI package that can configure a menu or tab view on each side.
 ///
@@ -90,57 +90,13 @@ class _PlutoLayoutState extends State<PlutoLayout> {
         layoutShortcutsProvider.overrideWithValue(widget.shortcuts),
         layoutEventsProvider.overrideWithValue(_eventStreamController),
       ],
-      child: Consumer(
-        builder: (c, r, w) {
-          final layoutData = r.read(layoutDataProvider);
-
-          final frontId = r.watch(focusedLayoutIdProvider);
-
-          return CustomMultiChildLayout(
-            delegate: _PlutoLayoutDelegate(layoutData, _eventStreamController),
-            children: <LayoutId>[
-              LayoutId(
-                id: PlutoLayoutId.body,
-                child: _LayoutIdProviderScope(
-                  id: PlutoLayoutId.body,
-                  child: widget.body,
-                ),
-              ),
-              if (widget.right != null)
-                LayoutId(
-                  id: PlutoLayoutId.right,
-                  child: _LayoutIdProviderScope(
-                    id: PlutoLayoutId.right,
-                    child: widget.right!,
-                  ),
-                ),
-              if (widget.left != null)
-                LayoutId(
-                  id: PlutoLayoutId.left,
-                  child: _LayoutIdProviderScope(
-                    id: PlutoLayoutId.left,
-                    child: widget.left!,
-                  ),
-                ),
-              if (widget.bottom != null)
-                LayoutId(
-                  id: PlutoLayoutId.bottom,
-                  child: _LayoutIdProviderScope(
-                    id: PlutoLayoutId.bottom,
-                    child: widget.bottom!,
-                  ),
-                ),
-              if (widget.top != null)
-                LayoutId(
-                  id: PlutoLayoutId.top,
-                  child: _LayoutIdProviderScope(
-                    id: PlutoLayoutId.top,
-                    child: widget.top!,
-                  ),
-                ),
-            ]..sort((a, b) => a.id == frontId ? 1 : -1),
-          );
-        },
+      child: _LayoutWidget(
+        body: widget.body,
+        eventStreamController: _eventStreamController,
+        top: widget.top,
+        left: widget.left,
+        right: widget.right,
+        bottom: widget.bottom,
       ),
     );
 
@@ -153,6 +109,137 @@ class _PlutoLayoutState extends State<PlutoLayout> {
     }
 
     return layoutWidget;
+  }
+}
+
+class _LayoutWidget extends ConsumerStatefulWidget {
+  const _LayoutWidget({
+    required this.body,
+    required this.eventStreamController,
+    this.top,
+    this.left,
+    this.right,
+    this.bottom,
+  });
+
+  final PlutoLayoutContainer body;
+
+  final PlutoLayoutContainer? top;
+
+  final PlutoLayoutContainer? left;
+
+  final PlutoLayoutContainer? right;
+
+  final PlutoLayoutContainer? bottom;
+
+  final PlutoLayoutEventStreamController eventStreamController;
+
+  @override
+  ConsumerState<_LayoutWidget> createState() => _LayoutWidgetState();
+}
+
+class _LayoutWidgetState extends ConsumerState<_LayoutWidget> {
+  late final StreamSubscription<PlutoLayoutEvent> _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _subscription = widget.eventStreamController.listen(_eventListener);
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+
+    super.dispose();
+  }
+
+  void _eventListener(PlutoLayoutEvent event) {
+    if (event is PlutoRotateFocusedContainerEvent) {
+      _handleRotateFocusedContainer(event);
+    }
+  }
+
+  void _handleRotateFocusedContainer(PlutoRotateFocusedContainerEvent event) {
+    final focusedLayoutId = ref.read(focusedLayoutIdProvider);
+
+    final tabs =
+        (event.reverse ? event.order.reversed : event.order).where((e) {
+      switch (e) {
+        case PlutoLayoutId.top:
+          return widget.top != null;
+        case PlutoLayoutId.left:
+          return widget.left != null;
+        case PlutoLayoutId.right:
+          return widget.right != null;
+        case PlutoLayoutId.bottom:
+          return widget.bottom != null;
+        case PlutoLayoutId.body:
+          return true;
+      }
+    });
+
+    if (tabs.length <= 1) return;
+
+    final found = tabs.skipWhile((value) => value != focusedLayoutId);
+
+    final PlutoLayoutId nextFocus =
+        found.length <= 1 ? tabs.first : found.skip(1).first;
+
+    ref.read(focusedLayoutIdProvider.notifier).state = nextFocus;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final layoutData = ref.read(layoutDataProvider);
+
+    final frontId = ref.watch(focusedLayoutIdProvider);
+
+    return CustomMultiChildLayout(
+      delegate: _PlutoLayoutDelegate(layoutData, widget.eventStreamController),
+      children: <LayoutId>[
+        LayoutId(
+          id: PlutoLayoutId.body,
+          child: _LayoutIdProviderScope(
+            id: PlutoLayoutId.body,
+            child: widget.body,
+          ),
+        ),
+        if (widget.right != null)
+          LayoutId(
+            id: PlutoLayoutId.right,
+            child: _LayoutIdProviderScope(
+              id: PlutoLayoutId.right,
+              child: widget.right!,
+            ),
+          ),
+        if (widget.left != null)
+          LayoutId(
+            id: PlutoLayoutId.left,
+            child: _LayoutIdProviderScope(
+              id: PlutoLayoutId.left,
+              child: widget.left!,
+            ),
+          ),
+        if (widget.bottom != null)
+          LayoutId(
+            id: PlutoLayoutId.bottom,
+            child: _LayoutIdProviderScope(
+              id: PlutoLayoutId.bottom,
+              child: widget.bottom!,
+            ),
+          ),
+        if (widget.top != null)
+          LayoutId(
+            id: PlutoLayoutId.top,
+            child: _LayoutIdProviderScope(
+              id: PlutoLayoutId.top,
+              child: widget.top!,
+            ),
+          ),
+      ]..sort((a, b) => a.id == frontId ? 1 : -1),
+    );
   }
 }
 
@@ -263,13 +350,13 @@ class _LayoutIdProviderScope extends StatelessWidget {
 enum PlutoLayoutId {
   top,
   left,
+  body,
   right,
-  bottom,
-  body;
+  bottom;
 
   bool get isTop => this == PlutoLayoutId.top;
   bool get isLeft => this == PlutoLayoutId.left;
+  bool get isBody => this == PlutoLayoutId.body;
   bool get isRight => this == PlutoLayoutId.right;
   bool get isBottom => this == PlutoLayoutId.bottom;
-  bool get isBody => this == PlutoLayoutId.body;
 }

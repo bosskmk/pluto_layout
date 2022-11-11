@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pluto_layout/pluto_layout.dart';
 
+import '../../helper/build_widget_helper.dart';
+
 void main() {
   Future<void> buildWidget(
     WidgetTester tester, {
@@ -21,47 +23,27 @@ void main() {
     PlutoLayoutId? layoutIdToRemove,
     Object? itemIdToRemove,
   }) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: PlutoLayout(
-          shortcuts: {
-            LogicalKeySet(LogicalKeyboardKey.delete):
-                PlutoLayoutActions.removeTabItem(
-              layoutId: layoutIdToRemove,
-              itemId: itemIdToRemove,
-            ),
-          },
-          body: const PlutoLayoutContainer(child: Text('body container')),
-          top: PlutoLayoutContainer(
-            child: PlutoLayoutTabs(
-              mode: topMode,
-              items: top ?? [],
-              draggable: draggableTop,
-            ),
-          ),
-          left: PlutoLayoutContainer(
-            child: PlutoLayoutTabs(
-              mode: leftMode,
-              items: left ?? [],
-              draggable: draggableLeft,
-            ),
-          ),
-          right: PlutoLayoutContainer(
-            child: PlutoLayoutTabs(
-              mode: rightMode,
-              items: right ?? [],
-              draggable: draggableRight,
-            ),
-          ),
-          bottom: PlutoLayoutContainer(
-            child: PlutoLayoutTabs(
-              mode: bottomMode,
-              items: bottom ?? [],
-              draggable: draggableBottom,
-            ),
-          ),
+    await BuildWidgetHelper.plutoLayoutWithTabs(
+      tester,
+      shortcuts: {
+        LogicalKeySet(LogicalKeyboardKey.delete):
+            PlutoLayoutActions.removeTabItem(
+          layoutId: layoutIdToRemove,
+          itemId: itemIdToRemove,
         ),
-      ),
+      },
+      topItems: top,
+      leftItems: left,
+      rightItems: right,
+      bottomItems: bottom,
+      draggableTop: draggableTop,
+      draggableLeft: draggableLeft,
+      draggableRight: draggableRight,
+      draggableBottom: draggableBottom,
+      topMode: topMode,
+      leftMode: leftMode,
+      rightMode: rightMode,
+      bottomMode: bottomMode,
     );
   }
 

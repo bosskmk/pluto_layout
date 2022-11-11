@@ -78,6 +78,8 @@ class _MenusState extends ConsumerState<_Menus> {
       _handleHideAllTabViewEvent(event);
     } else if (event is PlutoRemoveTabItemEvent) {
       _handleRemoveTabItemEvent(event);
+    } else if (event is PlutoRotateFocusedTabItemEvent) {
+      _handleRotateFocusedTabItemEvent(event);
     }
   }
 
@@ -100,24 +102,16 @@ class _MenusState extends ConsumerState<_Menus> {
           forceShowOne: forceShowOne,
         );
 
-    final items = ref.read(_itemsProvider).where((e) => e.enabled);
+    final items = ref.read(_itemsProvider).where(_TabsHelper.isEnabled);
 
     final maxSize = layoutData.getTabItemViewMaxSize(layoutId);
 
-    if (setFocus) {
-      if (flag) {
-        _TabItemFocusHelper.setFocus(
-          ref: ref,
-          layoutId: layoutId,
-          itemId: item.id,
-        );
-      } else if (_TabItemFocusHelper.getFocusedItemId(ref) == item.id) {
-        _TabItemFocusHelper.setFocus(
-          ref: ref,
-          layoutId: items.isEmpty ? null : layoutId,
-          itemId: null,
-        );
-      }
+    if (setFocus && flag) {
+      _TabsHelper.setFocus(
+        ref: ref,
+        layoutId: layoutId,
+        itemId: item.id,
+      );
     }
 
     PlutoLayoutTabItemSizeResolver._update(
@@ -128,12 +122,17 @@ class _MenusState extends ConsumerState<_Menus> {
   }
 
   void _handleToggleTabViewEvent(PlutoToggleTabViewEvent event) {
+    final eventLayoutId = event.layoutId ?? _TabsHelper.getFocusedLayoutId(ref);
+
     final layoutId = ref.read(layoutIdProvider);
 
-    if (event.layoutId != layoutId) return;
+    if (eventLayoutId != layoutId) return;
 
-    final item =
-        ref.read(_itemsProvider).firstWhereOrNull((e) => e.id == event.itemId);
+    final eventItemId = event.itemId ?? _TabsHelper.getFocusedItemId(ref);
+
+    if (eventItemId == null) return;
+
+    final item = ref.read(_itemsProvider.notifier).findById(eventItemId);
 
     if (item == null) return;
 
@@ -154,7 +153,7 @@ class _MenusState extends ConsumerState<_Menus> {
       return;
     }
 
-    final enabledIndex = items.indexWhere((e) => e.enabled);
+    final enabledIndex = items.indexWhere(_TabsHelper.isEnabled);
 
     if (enabledIndex == -1) {
       toggleTab(items.first, true);
@@ -185,13 +184,11 @@ class _MenusState extends ConsumerState<_Menus> {
 
     final eventLayoutId = event.layoutId ?? ref.read(focusedLayoutIdProvider);
 
-    final eventItemId =
-        event.itemId ?? _TabItemFocusHelper.getFocusedItemId(ref);
+    final eventItemId = event.itemId ?? _TabsHelper.getFocusedItemId(ref);
 
     if (eventLayoutId != layoutId || eventItemId == null) return;
 
-    final removeIdx =
-        ref.read(_itemsProvider).indexWhere((e) => e.id == eventItemId);
+    final removeIdx = ref.read(_itemsProvider.notifier).indexById(eventItemId);
 
     if (removeIdx == -1) return;
 
@@ -201,11 +198,51 @@ class _MenusState extends ConsumerState<_Menus> {
 
     final items = ref.read(_itemsProvider);
 
-    if (items.isEmpty || items.where((e) => e.enabled).isNotEmpty) return;
+    if (items.isEmpty || items.where(_TabsHelper.isEnabled).isNotEmpty) return;
 
     final idx = removeIdx >= items.length ? items.length - 1 : removeIdx;
 
     toggleTab(items[idx], true, setFocus: false);
+  }
+
+  void _handleRotateFocusedTabItemEvent(PlutoRotateFocusedTabItemEvent event) {
+    final eventLayoutId = event.layoutId ?? _TabsHelper.getFocusedLayoutId(ref);
+
+    if (eventLayoutId == null) return;
+
+    final layoutId = ref.read(layoutIdProvider);
+
+    if (eventLayoutId != layoutId) return;
+
+    Object? focusedItemId = ref.read(_focusedItemIdViewProvider);
+
+    Iterable<PlutoLayoutTabItem> items = event.reverse
+        ? ref.watch(_itemsProvider).reversed
+        : ref.watch(_itemsProvider);
+
+    if (items.isEmpty) return;
+
+    Object nextFocus;
+
+    if (focusedItemId == null) {
+      nextFocus = items.first.id;
+    } else {
+      final item = items.firstWhereOrNull((e) => e.id == focusedItemId);
+
+      if (item == null) {
+        nextFocus = items.first.id;
+      } else {
+        final found = items.skipWhile((e) => e.id != item.id);
+
+        nextFocus = found.length <= 1 ? items.first.id : found.skip(1).first.id;
+      }
+    }
+
+    _TabsHelper.setFocus(
+      ref: ref,
+      layoutId: layoutId,
+      itemId: nextFocus,
+    );
   }
 
   @override
@@ -342,7 +379,7 @@ class _MenuContainer extends ConsumerWidget {
       key: const ValueKey('_MenuContainer_DecoratedBox'),
       decoration: BoxDecoration(
         border: Border(
-          bottom: _TabItemFocusHelper.watchIsFocused(
+          bottom: _TabsHelper.watchIsFocused(
             ref: ref,
             layoutId: layoutId,
             itemId: item.id,
@@ -423,7 +460,7 @@ class _Draggable extends ConsumerWidget {
       itemsNotifier.insert(index, data.item);
 
       if (data.item.enabled) {
-        _TabItemFocusHelper.setFocus(
+        _TabsHelper.setFocus(
           ref: ref,
           layoutId: layoutId,
           itemId: data.item.id,

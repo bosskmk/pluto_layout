@@ -3,6 +3,14 @@ part of pluto_layout_tabs;
 class _ItemsNotifier extends StateNotifier<List<PlutoLayoutTabItem>> {
   _ItemsNotifier(List<PlutoLayoutTabItem> items) : super(items);
 
+  PlutoLayoutTabItem? findById(Object id) {
+    return state.firstWhereOrNull((e) => e.id == id);
+  }
+
+  int indexById(Object id) {
+    return state.indexWhere((e) => e.id == id);
+  }
+
   void setEnabled(
     Object id,
     bool flag,

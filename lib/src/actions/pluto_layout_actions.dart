@@ -9,6 +9,28 @@ import '../pluto_layout_event_stream_controller.dart';
 ///
 /// {@macro pluto_layout_shortcuts_example}
 abstract class PlutoLayoutActions {
+  /// {@macro pluto_layout_action_rotate_focused_container_intent}
+  static PlutoLayoutActionRotateFocusedContainerIntent rotateFocusedContainer({
+    bool reverse = false,
+    List<PlutoLayoutId> order = PlutoLayoutId.values,
+  }) {
+    return PlutoLayoutActionRotateFocusedContainerIntent(
+      reverse: reverse,
+      order: order,
+    );
+  }
+
+  /// {@macro pluto_layout_action_rotate_focused_tab_item_intent}
+  static PlutoLayoutActionRotateFocusedTabItemIntent rotateFocusedTabItem({
+    bool reverse = false,
+    PlutoLayoutId? layoutId,
+  }) {
+    return PlutoLayoutActionRotateFocusedTabItemIntent(
+      layoutId: layoutId,
+      reverse: reverse,
+    );
+  }
+
   /// {@macro pluto_layout_action_hide_all_tab_view_intent}
   static PlutoLayoutActionHideAllTabViewIntent hideAllTabView({
     bool afterFocusToBody = true,
@@ -19,11 +41,14 @@ abstract class PlutoLayoutActions {
   }
 
   /// {@macro pluto_layout_action_toggle_tab_view_intent}
-  static PlutoLayoutActionToggleTabViewIntent toggleTabView(
-    PlutoLayoutId layoutId,
-    Object itemId,
-  ) {
-    return PlutoLayoutActionToggleTabViewIntent(layoutId, itemId);
+  static PlutoLayoutActionToggleTabViewIntent toggleTabView({
+    PlutoLayoutId? layoutId,
+    Object? itemId,
+  }) {
+    return PlutoLayoutActionToggleTabViewIntent(
+      layoutId: layoutId,
+      itemId: itemId,
+    );
   }
 
   /// {@macro pluto_layout_action_rotate_tab_view_intent}
@@ -106,13 +131,21 @@ abstract class PlutoLayoutActions {
   }
 
   static Map<Type, Action<Intent>> getActionsByShortcuts(
-    Map<LogicalKeySet, PlutoLayoutIntent> shortcuts,
+    Map<ShortcutActivator, PlutoLayoutIntent> shortcuts,
     PlutoLayoutEventStreamController layoutEvents,
   ) {
     final actions = <Type, Action<Intent>>{};
 
     for (final shortcut in shortcuts.entries) {
       switch (shortcut.value.runtimeType) {
+        case PlutoLayoutActionRotateFocusedContainerIntent:
+          actions[PlutoLayoutActionRotateFocusedContainerIntent] =
+              PlutoLayoutActionRotateFocusedContainerAction(layoutEvents);
+          break;
+        case PlutoLayoutActionRotateFocusedTabItemIntent:
+          actions[PlutoLayoutActionRotateFocusedTabItemIntent] =
+              PlutoLayoutActionRotateFocusedTabItemAction(layoutEvents);
+          break;
         case PlutoLayoutActionHideAllTabViewIntent:
           actions[PlutoLayoutActionHideAllTabViewIntent] =
               PlutoLayoutActionHideAllTabViewAction(layoutEvents);

@@ -10,16 +10,19 @@ import '../events/events.dart';
 ///
 /// [itemId] is the [PlutoLayoutTabItem.id] registered in the [PlutoLayoutTabs] widget.
 /// [itemId] must be an item registered in the [layoutId] location.
+///
+/// If [layoutId], [itemId] are null, the currently focused id is selected.
+/// If there is no focused id, no action is taken.
 /// {@endtemplate}
 class PlutoLayoutActionToggleTabViewIntent extends PlutoLayoutIntent {
-  const PlutoLayoutActionToggleTabViewIntent(
+  const PlutoLayoutActionToggleTabViewIntent({
     this.layoutId,
     this.itemId,
-  );
+  });
 
-  final PlutoLayoutId layoutId;
+  final PlutoLayoutId? layoutId;
 
-  final Object itemId;
+  final Object? itemId;
 }
 
 class PlutoLayoutActionToggleTabViewAction
@@ -29,8 +32,8 @@ class PlutoLayoutActionToggleTabViewAction
   @override
   void invoke(PlutoLayoutActionToggleTabViewIntent intent) {
     events.add(PlutoToggleTabViewEvent(
-      intent.layoutId,
-      intent.itemId,
+      layoutId: intent.layoutId,
+      itemId: intent.itemId,
     ));
   }
 }
