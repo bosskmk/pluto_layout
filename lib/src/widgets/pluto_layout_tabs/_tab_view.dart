@@ -72,20 +72,16 @@ class _TabViewState extends ConsumerState<_TabView> {
     super.dispose();
   }
 
-  bool isEnabledItem(e) => e.enabled && e.tabViewBuilder != null;
-
-  PlutoLayoutId? getFocusedLayoutId() {
-    return ref.read(focusedLayoutIdProvider);
-  }
-
   void handleEvent(PlutoLayoutEvent event) {
     if (event is PlutoRelayoutEvent) {
-      return _handleRelayoutEvent();
-    }
-
-    if (event is PlutoLayoutHasInDecreaseTabViewEvent) {
-      return _handleInDecreaseTabViewEvent(
-        event as PlutoLayoutHasInDecreaseTabViewEvent,
+      _handleRelayoutEvent();
+    } else if (event is PlutoLayoutInDecreaseTabViewEvent) {
+      _handleInDecreaseTabViewEvent(
+        event as PlutoLayoutInDecreaseTabViewEvent,
+      );
+    } else if (event is PlutoLayoutInDecreaseTabItemViewEvent) {
+      _handleInDecreaseTabItemViewEvent(
+        event as PlutoLayoutInDecreaseTabItemViewEvent,
       );
     }
   }
@@ -138,8 +134,10 @@ class _TabViewState extends ConsumerState<_TabView> {
 
     final layoutData = ref.read(layoutDataProvider);
 
-    final items =
-        ref.read(_itemsProvider).where(isEnabledItem).toList(growable: false);
+    final items = ref
+        .read(_itemsProvider)
+        .where(_TabsHelper.isEnabledTabView)
+        .toList(growable: false);
 
     final maxSize = layoutData.getTabItemViewMaxSize(layoutId);
 
@@ -170,30 +168,26 @@ class _TabViewState extends ConsumerState<_TabView> {
   }
 
   void _handleInDecreaseTabViewEvent(
-    PlutoLayoutHasInDecreaseTabViewEvent event,
+    PlutoLayoutInDecreaseTabViewEvent event,
   ) {
-    final eventLayoutId = event.layoutId ?? getFocusedLayoutId();
+    final eventLayoutId = event.layoutId ?? _TabsHelper.getFocusedLayoutId(ref);
 
     final layoutId = ref.read(layoutIdProvider);
 
     if (eventLayoutId != layoutId) return;
 
-    final hasEnabledItem =
-        ref.read(_itemsProvider).firstWhereOrNull(isEnabledItem) != null;
+    final hasEnabledItem = ref
+            .read(_itemsProvider)
+            .firstWhereOrNull(_TabsHelper.isEnabledTabView) !=
+        null;
 
     if (!hasEnabledItem) return;
 
-    final bool isIncreased = event is PlutoIncreaseTabViewEvent;
-
-    final reverse = !event.reverseByDirection && !direction.isIncreasedOffset;
-
-    final double size = isIncreased
-        ? reverse
-            ? -event.size
-            : event.size
-        : reverse
-            ? event.size
-            : -event.size;
+    final double size = _getSizeByInDecrease(
+      event.size,
+      event is PlutoIncreaseTabViewEvent,
+      event.reverseByDirection,
+    );
 
     resizeTabView(
       layoutId,
@@ -204,9 +198,52 @@ class _TabViewState extends ConsumerState<_TabView> {
     );
   }
 
+  void _handleInDecreaseTabItemViewEvent(
+    PlutoLayoutInDecreaseTabItemViewEvent event,
+  ) {
+    final eventLayoutId = event.layoutId ?? _TabsHelper.getFocusedLayoutId(ref);
+
+    final eventItemId = event.itemId ?? _TabsHelper.getFocusedItemId(ref);
+
+    if (eventLayoutId == null || eventItemId == null) return;
+
+    if (eventLayoutId != ref.read(layoutIdProvider)) return;
+
+    final item = ref.read(_itemsProvider.notifier).findById(eventItemId);
+
+    if (item == null) return;
+
+    final double size = _getSizeByInDecrease(
+      event.size,
+      event is PlutoIncreaseTabItemViewEvent,
+      event.reverseByDirection,
+    );
+
+    resizeTabItem(
+      item,
+      Offset(
+        widget.direction.isHorizontal ? 0 : size,
+        widget.direction.isHorizontal ? size : 0,
+      ),
+    );
+  }
+
+  double _getSizeByInDecrease(double size, bool increase, bool reverse) {
+    final reverseByDirection = !reverse && !direction.isIncreasedOffset;
+
+    return increase
+        ? reverseByDirection
+            ? -size
+            : size
+        : reverseByDirection
+            ? size
+            : -size;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final enabledItems = ref.watch(_itemsProvider).where(isEnabledItem);
+    final enabledItems =
+        ref.watch(_itemsProvider).where(_TabsHelper.isEnabledTabView);
 
     if (enabledItems.isEmpty) return const SizedBox.shrink();
 
@@ -221,7 +258,11 @@ class _TabViewState extends ConsumerState<_TabView> {
     final int length = enabledItems.length;
 
     Widget resizeTabItemOrNot(int index, PlutoLayoutTabItem item) {
-      Widget child = _TabItemViewContainer(layoutId: layoutId, item: item);
+      Widget child = _TabItemViewContainer(
+        layoutId: layoutId,
+        item: item,
+        key: ValueKey('_TabItemViewContainer_${item.id}'),
+      );
 
       if (!widget.mode.isShowOneMode && index < length - 1) {
         child = ResizeIndicator<PlutoLayoutTabItem>(
@@ -458,6 +499,7 @@ class _TabItemViewContainer extends ConsumerWidget {
   const _TabItemViewContainer({
     required this.layoutId,
     required this.item,
+    super.key,
   });
 
   final PlutoLayoutId layoutId;
@@ -468,7 +510,7 @@ class _TabItemViewContainer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
-        _TabItemFocusHelper.setFocus(
+        _TabsHelper.setFocus(
           ref: ref,
           layoutId: layoutId,
           itemId: item.id,

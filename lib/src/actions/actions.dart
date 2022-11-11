@@ -1,7 +1,11 @@
+export 'pluto_layout_action_decrease_tab_item_view.dart';
 export 'pluto_layout_action_decrease_tab_view.dart';
 export 'pluto_layout_action_hide_all_tab_view.dart';
+export 'pluto_layout_action_increase_tab_item_view.dart';
 export 'pluto_layout_action_increase_tab_view.dart';
 export 'pluto_layout_action_remove_tab_item.dart';
+export 'pluto_layout_action_rotate_focused_container.dart';
+export 'pluto_layout_action_rotate_focused_tab_item.dart';
 export 'pluto_layout_action_rotate_tab_view.dart';
 export 'pluto_layout_action_toggle_tab_view.dart';
 export 'pluto_layout_actions.dart';

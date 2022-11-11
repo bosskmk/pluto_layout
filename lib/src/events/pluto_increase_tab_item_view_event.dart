@@ -1,9 +1,7 @@
 import 'package:pluto_layout/pluto_layout.dart';
+import 'package:pluto_layout/src/events/events.dart';
 
-import 'events.dart';
-
-/// An event that increases the size
-/// of the tab view in the [layoutId] direction by [size].
+/// Event to increase the size of [itemId] located in [layoutId] by [size].
 ///
 /// The [reverseByDirection] property is a property to operate the size
 /// of the right and left or top and bottom tab views
@@ -11,16 +9,20 @@ import 'events.dart';
 ///
 /// For more information, please refer to the link below.
 /// https://pluto.weblaze.dev/introduction-to-plutlayout
-class PlutoIncreaseTabViewEvent extends PlutoLayoutEvent
-    implements PlutoLayoutInDecreaseTabViewEvent {
-  const PlutoIncreaseTabViewEvent(
-    this.layoutId, {
-    this.size = PlutoLayoutInDecreaseTabViewEvent.defaultSize,
+class PlutoIncreaseTabItemViewEvent extends PlutoLayoutEvent
+    implements PlutoLayoutInDecreaseTabItemViewEvent {
+  const PlutoIncreaseTabItemViewEvent({
+    this.layoutId,
+    this.itemId,
+    this.size = PlutoLayoutInDecreaseTabItemViewEvent.defaultSize,
     this.reverseByDirection = false,
   });
 
   @override
   final PlutoLayoutId? layoutId;
+
+  @override
+  final Object? itemId;
 
   @override
   final double size;
@@ -29,8 +31,10 @@ class PlutoIncreaseTabViewEvent extends PlutoLayoutEvent
   final bool reverseByDirection;
 }
 
-abstract class PlutoLayoutInDecreaseTabViewEvent {
+abstract class PlutoLayoutInDecreaseTabItemViewEvent {
   PlutoLayoutId? get layoutId;
+
+  Object? get itemId;
 
   double get size;
 

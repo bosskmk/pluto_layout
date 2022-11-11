@@ -9,7 +9,7 @@ class LeftTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PlutoLayoutTabs(
-      mode: PlutoLayoutTabMode.showOneMust,
+      mode: PlutoLayoutTabMode.showSelected,
       draggable: true,
       tabViewSizeResolver: const PlutoLayoutTabViewSizeConstrains(
         minSize: 100,

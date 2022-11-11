@@ -12,8 +12,8 @@ void main() {
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.alt, LogicalKeyboardKey.digit1):
             PlutoLayoutActions.toggleTabView(
-          PlutoLayoutId.left,
-          'tab1',
+          layoutId: PlutoLayoutId.left,
+          itemId: 'tab1',
         ),
       },
       body: const PlutoLayoutContainer(child: Text('body container')),
