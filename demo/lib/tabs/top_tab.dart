@@ -4,9 +4,7 @@ import 'package:pluto_menu_bar/pluto_menu_bar.dart';
 import '../helper/launch_url.dart';
 
 class TopTab extends StatefulWidget {
-  const TopTab({required this.tabController, super.key});
-
-  final TabController tabController;
+  const TopTab({super.key});
 
   @override
   State<TopTab> createState() => _TopTabState();
@@ -20,16 +18,6 @@ class _TopTabState extends State<TopTab> {
     super.initState();
 
     menuItems.addAll([
-      PlutoMenuItem(
-          title: 'Home',
-          onTap: () {
-            widget.tabController.animateTo(0);
-          }),
-      PlutoMenuItem(
-          title: 'About Me',
-          onTap: () {
-            widget.tabController.animateTo(1);
-          }),
       PlutoMenuItem(
         title: 'Links',
         children: [

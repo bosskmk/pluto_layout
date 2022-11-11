@@ -130,6 +130,16 @@ abstract class PlutoLayoutActions {
     return PlutoLayoutActionRemoveTabItemIntent(layoutId, itemId);
   }
 
+  static PlutoLayoutActionInsertTabItemIntent insertTabItem({
+    PlutoLayoutId? layoutId,
+    required PlutoLayoutActionInsertTabItemResolver itemResolver,
+  }) {
+    return PlutoLayoutActionInsertTabItemIntent(
+      layoutId: layoutId,
+      itemResolver: itemResolver,
+    );
+  }
+
   static Map<Type, Action<Intent>> getActionsByShortcuts(
     Map<ShortcutActivator, PlutoLayoutIntent> shortcuts,
     PlutoLayoutEventStreamController layoutEvents,
@@ -177,6 +187,10 @@ abstract class PlutoLayoutActions {
         case PlutoLayoutActionRemoveTabItemIntent:
           actions[PlutoLayoutActionRemoveTabItemIntent] =
               PlutoLayoutActionRemoveTabItemAction(layoutEvents);
+          break;
+        case PlutoLayoutActionInsertTabItemIntent:
+          actions[PlutoLayoutActionInsertTabItemIntent] =
+              PlutoLayoutActionInsertTabItemAction(layoutEvents);
           break;
       }
     }

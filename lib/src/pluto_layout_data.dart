@@ -89,8 +89,7 @@ class PlutoLayoutData {
         return size.height -
             topSize.height -
             bottomSize.height -
-            bodyTabMenuSize.height -
-            bottomTabMenuSize.height;
+            bodyTabMenuSize.height;
       case PlutoLayoutId.top:
       case PlutoLayoutId.bottom:
         return size.height - topTabMenuSize.height - bottomTabMenuSize.height;

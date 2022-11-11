@@ -275,8 +275,10 @@ class _PlutoLayoutDelegate extends MultiChildLayoutDelegate {
         BoxConstraints.loose(
           Size(
             size.width,
-            max(size.height - _size.topSize.height - _size.bottomSize.height,
-                0),
+            max(
+              size.height - _size.topSize.height - _size.bottomSize.height,
+              0,
+            ),
           ),
         ),
       );
@@ -290,8 +292,10 @@ class _PlutoLayoutDelegate extends MultiChildLayoutDelegate {
         BoxConstraints.loose(
           Size(
             size.width,
-            max(size.height - _size.topSize.height - _size.bottomSize.height,
-                0),
+            max(
+              size.height - _size.topSize.height - _size.bottomSize.height,
+              0,
+            ),
           ),
         ),
       );
@@ -303,11 +307,16 @@ class _PlutoLayoutDelegate extends MultiChildLayoutDelegate {
 
     id = PlutoLayoutId.body;
     if (hasChild(id)) {
+      final double minSize = _size.bodyTabMenuSize.height;
+
       _size.bodySize = layoutChild(
         id,
         BoxConstraints.tight(Size(
           max(size.width - _size.leftSize.width - _size.rightSize.width, 0),
-          max(size.height - _size.topSize.height - _size.bottomSize.height, 0),
+          max(
+            size.height - _size.topSize.height - _size.bottomSize.height,
+            minSize,
+          ),
         )),
       );
       positionChild(id, Offset(_size.leftSize.width, _size.topSize.height));

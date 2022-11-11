@@ -5,6 +5,7 @@ class _TabView extends ConsumerStatefulWidget {
     required this.direction,
     required this.mode,
     required this.tabViewSizeResolver,
+    this.disableResize = false,
   }) : super(key: const ValueKey('_TabView'));
 
   final PlutoLayoutContainerDirection direction;
@@ -12,6 +13,8 @@ class _TabView extends ConsumerStatefulWidget {
   final PlutoLayoutTabMode mode;
 
   final PlutoLayoutTabViewSizeResolver? tabViewSizeResolver;
+
+  final bool disableResize;
 
   @override
   ConsumerState<_TabView> createState() => _TabViewState();
@@ -86,8 +89,11 @@ class _TabViewState extends ConsumerState<_TabView> {
     }
   }
 
-  void resizeTabView(PlutoLayoutId id, Offset offset) {
-    ref.read(focusedLayoutIdProvider.notifier).state = id;
+  void resizeTabView(PlutoLayoutId id, Offset offset, {bool setFocus = true}) {
+    if (setFocus) {
+      ref.read(focusedLayoutIdProvider.notifier).state = id;
+    }
+
     final layoutData = ref.read(layoutDataProvider);
     final minimumSize = layoutData.getTabViewMinSize(id);
     final maximumSize = layoutData.getTabViewMaxSize(id);
@@ -164,7 +170,7 @@ class _TabViewState extends ConsumerState<_TabView> {
   }
 
   void _handleRelayoutEvent() {
-    resizeTabView(ref.read(layoutIdProvider), Offset.zero);
+    resizeTabView(ref.read(layoutIdProvider), Offset.zero, setFocus: false);
   }
 
   void _handleInDecreaseTabViewEvent(
@@ -264,7 +270,9 @@ class _TabViewState extends ConsumerState<_TabView> {
         key: ValueKey('_TabItemViewContainer_${item.id}'),
       );
 
-      if (!widget.mode.isShowOneMode && index < length - 1) {
+      if (!widget.disableResize &&
+          !widget.mode.isShowOneMode &&
+          index < length - 1) {
         child = ResizeIndicator<PlutoLayoutTabItem>(
           item: item,
           onResize: resizeTabItem,
@@ -276,7 +284,7 @@ class _TabViewState extends ConsumerState<_TabView> {
       return LayoutId(id: item.id, child: child);
     }
 
-    final child = DecoratedBox(
+    Widget child = DecoratedBox(
       position: DecorationPosition.foreground,
       decoration: BoxDecoration(
         border: Border(
@@ -300,6 +308,16 @@ class _TabViewState extends ConsumerState<_TabView> {
       ),
     );
 
+    if (!widget.disableResize &&
+        widget.tabViewSizeResolver?.resizable != false) {
+      child = ResizeIndicator<PlutoLayoutId>(
+        item: layoutId,
+        position: tabViewResizePosition,
+        onResize: resizeTabView,
+        child: child,
+      );
+    }
+
     return CustomSingleChildLayout(
       delegate: _TabViewDelegate(
         layoutId,
@@ -308,14 +326,7 @@ class _TabViewState extends ConsumerState<_TabView> {
         widget.tabViewSizeResolver,
         layoutData,
       ),
-      child: widget.tabViewSizeResolver?.resizable == false
-          ? child
-          : ResizeIndicator<PlutoLayoutId>(
-              item: layoutId,
-              position: tabViewResizePosition,
-              onResize: resizeTabView,
-              child: child,
-            ),
+      child: child,
     );
   }
 }

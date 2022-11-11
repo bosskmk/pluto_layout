@@ -80,6 +80,8 @@ class _MenusState extends ConsumerState<_Menus> {
       _handleRemoveTabItemEvent(event);
     } else if (event is PlutoRotateFocusedTabItemEvent) {
       _handleRotateFocusedTabItemEvent(event);
+    } else if (event is PlutoInsertTabItemEvent) {
+      _handleInsertTabItemEvent(event);
     }
   }
 
@@ -217,8 +219,8 @@ class _MenusState extends ConsumerState<_Menus> {
     Object? focusedItemId = ref.read(_focusedItemIdViewProvider);
 
     Iterable<PlutoLayoutTabItem> items = event.reverse
-        ? ref.watch(_itemsProvider).reversed
-        : ref.watch(_itemsProvider);
+        ? ref.read(_itemsProvider).reversed
+        : ref.read(_itemsProvider);
 
     if (items.isEmpty) return;
 
@@ -243,6 +245,36 @@ class _MenusState extends ConsumerState<_Menus> {
       layoutId: layoutId,
       itemId: nextFocus,
     );
+  }
+
+  void _handleInsertTabItemEvent(PlutoInsertTabItemEvent event) {
+    final eventLayoutId = event.layoutId ?? _TabsHelper.getFocusedLayoutId(ref);
+
+    if (eventLayoutId == null) return;
+
+    final layoutId = ref.read(layoutIdProvider);
+
+    if (eventLayoutId != layoutId) return;
+
+    final items = ref.read(_itemsProvider);
+
+    final resolvedItem = event.itemResolver(items: items);
+
+    int index = resolvedItem.index ?? items.length;
+
+    ref.read(_itemsProvider.notifier).insert(index, resolvedItem.item);
+
+    if (resolvedItem.item.enabled && widget.mode.isShowOneMode) {
+      ref
+          .read(_itemsProvider.notifier)
+          .setEnabled(resolvedItem.item.id, true, widget.mode);
+
+      _TabsHelper.setFocus(
+        ref: ref,
+        layoutId: layoutId,
+        itemId: resolvedItem.item.id,
+      );
+    }
   }
 
   @override
@@ -488,25 +520,26 @@ class _Draggable extends ConsumerWidget {
       );
     }
 
-    if (dragging) {
-      final theme = Theme.of(context);
+    if (!dragging) return child;
 
-      return DecoratedBox(
-        key: ValueKey('_DraggableDragging_${layoutId.name}'),
-        position: DecorationPosition.foreground,
-        decoration: BoxDecoration(
-          color: Theme.of(context).dialogBackgroundColor,
-          border: Border(
-            bottom: items.where((i) => i.enabled).isEmpty
-                ? BorderSide(color: theme.dividerColor)
-                : BorderSide.none,
-          ),
+    final theme = Theme.of(context);
+
+    final border = items.where(_TabsHelper.isEnabled).isEmpty
+        ? BorderSide(color: theme.dividerColor)
+        : BorderSide.none;
+
+    return DecoratedBox(
+      key: ValueKey('_DraggableDragging_${layoutId.name}'),
+      position: DecorationPosition.foreground,
+      decoration: BoxDecoration(
+        color: Theme.of(context).dialogBackgroundColor,
+        border: Border(
+          top: layoutId.isBottom ? border : BorderSide.none,
+          bottom: layoutId.isBottom ? BorderSide.none : border,
         ),
-        child: child,
-      );
-    }
-
-    return child;
+      ),
+      child: child,
+    );
   }
 
   @override

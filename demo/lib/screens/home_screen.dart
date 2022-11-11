@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pluto_grid/pluto_grid.dart';
+import 'package:pluto_layout/pluto_layout.dart';
 import 'package:pluto_menu_bar/pluto_menu_bar.dart';
 
 import '../example_text.dart';
@@ -11,16 +12,12 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with AutomaticKeepAliveClientMixin {
+class _HomeScreenState extends State<HomeScreen> {
   final List<PlutoColumn> columns = [];
 
   final List<PlutoRow> rows = [];
 
   final List<PlutoMenuItem> bodyMenuItems = [];
-
-  @override
-  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -113,60 +110,60 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-
     final theme = Theme.of(context);
 
-    return SingleChildScrollView(
-      child: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 800),
-          alignment: Alignment.topCenter,
-          child: Padding(
-            padding: const EdgeInsets.all(50),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(ExampleText.bodyTitle),
-                const SizedBox(height: 15),
-                const Text(ExampleText.bodyDesc1),
-                const SizedBox(height: 50),
-                const Text(ExampleText.bodyPlutoGridTitle),
-                const SizedBox(height: 15),
-                const Text(ExampleText.bodyPlutoGridDesc1),
-                const SizedBox(height: 10),
-                SizedBox(
-                  height: 300,
-                  child: PlutoGrid(
-                    columns: columns,
-                    rows: rows,
-                    configuration: PlutoGridConfiguration(
-                      style: PlutoGridStyleConfig.dark(
-                        gridBackgroundColor: theme.dialogBackgroundColor,
-                        borderColor: theme.dividerColor,
-                        rowColor: theme.dialogBackgroundColor,
-                        activatedColor: theme.backgroundColor,
-                        activatedBorderColor: theme.toggleableActiveColor,
-                        gridBorderRadius: BorderRadius.circular(10),
+    return PlutoLayoutTabsOrChild(
+      child: SingleChildScrollView(
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 800),
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: const EdgeInsets.all(50),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(ExampleText.bodyTitle),
+                  const SizedBox(height: 15),
+                  const Text(ExampleText.bodyDesc1),
+                  const SizedBox(height: 50),
+                  const Text(ExampleText.bodyPlutoGridTitle),
+                  const SizedBox(height: 15),
+                  const Text(ExampleText.bodyPlutoGridDesc1),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 300,
+                    child: PlutoGrid(
+                      columns: columns,
+                      rows: rows,
+                      configuration: PlutoGridConfiguration(
+                        style: PlutoGridStyleConfig.dark(
+                          gridBackgroundColor: theme.dialogBackgroundColor,
+                          borderColor: theme.dividerColor,
+                          rowColor: theme.dialogBackgroundColor,
+                          activatedColor: theme.backgroundColor,
+                          activatedBorderColor: theme.toggleableActiveColor,
+                          gridBorderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 50),
-                const Text(ExampleText.bodyPlutoMenuBarTitle),
-                const SizedBox(height: 15),
-                const Text(ExampleText.bodyPlutoMenuBarDesc1),
-                const SizedBox(height: 10),
-                PlutoMenuBar(
-                  mode: PlutoMenuBarMode.hover,
-                  backgroundColor: theme.dialogBackgroundColor,
-                  moreIconColor: theme.toggleableActiveColor,
-                  textStyle: TextStyle(
-                    color: theme.primaryColorLight,
+                  const SizedBox(height: 50),
+                  const Text(ExampleText.bodyPlutoMenuBarTitle),
+                  const SizedBox(height: 15),
+                  const Text(ExampleText.bodyPlutoMenuBarDesc1),
+                  const SizedBox(height: 10),
+                  PlutoMenuBar(
+                    mode: PlutoMenuBarMode.hover,
+                    backgroundColor: theme.dialogBackgroundColor,
+                    moreIconColor: theme.toggleableActiveColor,
+                    textStyle: TextStyle(
+                      color: theme.primaryColorLight,
+                    ),
+                    menus: bodyMenuItems,
                   ),
-                  menus: bodyMenuItems,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
