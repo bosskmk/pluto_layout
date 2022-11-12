@@ -4,45 +4,29 @@ part of pluto_layout_tabs;
 ///
 /// Set the information constituting the tab menu.
 ///
-/// {@template pluto_layout_tab_item_id}
-/// [id] must pass a unique value. (Usually, if the title is unique, it will be delivered.)
-/// {@endtemplate}
+/// [id]
+/// {@macro pluto_layout_tab_item_id}
 ///
-/// {@template pluto_layout_tab_item_title}
-/// [title] is the title of the menu to be displayed.
-/// {@endtemplate}
+/// [title]
+/// {@macro pluto_layout_tab_item_title}
 ///
-/// {@template pluto_layout_tab_item_icon}
-/// [icon] is the icon to display before the menu title.
-/// {@endtemplate}
+/// [icon]
+/// {@macro pluto_layout_tab_item_icon}
 ///
-/// {@template pluto_layout_tab_item_tabViewWidget}
-/// [tabViewWidget] is a callback function that returns a tab view widget
-/// that will be displayed when the menu is tapped.
-/// Just pass a function that returns [Widget].
+/// [tabViewWidget]
+/// {@macro pluto_layout_tab_item_tabViewWidget}
 ///
-/// {@template pluto_layout_tab_item_showRemoveButton}
-/// [showRemoveButton] displays an X button to remove a tab
-/// at the right end of the menu when the value is true.
-/// {@endtemplate}
+/// [sizeResolver]
+/// {@macro pluto_layout_tab_item_sizeResolver}
 ///
-/// ```dart
-/// tabViewBuilder: (c) {
-///   return Padding(
-///     padding: EdgeInsets.all(15),
-///     child: ListView(
-///       children: const [
-///         Text('Example contents'),
-///         SizedBox(height: 15),
-///         Text('Example contents),
-///         SizedBox(height: 10),
-///         Text('Example contents),
-///       ],
-///     ),
-///   );
-/// },
-/// ```
-/// {@endtemplate}
+/// [showRemoveButton]
+/// {@macro pluto_layout_tab_item_showRemoveButton}
+///
+/// [enabled]
+/// {@macro pluto_layout_tab_item_enabled}
+///
+/// [maintainState]
+/// {@macro pluto_layout_tab_item_maintainState}
 class PlutoLayoutTabItem {
   PlutoLayoutTabItem({
     required this.id,
@@ -65,26 +49,64 @@ class PlutoLayoutTabItem {
     double? size,
   }) : _size = size ?? 0;
 
-  /// {@macro pluto_layout_tab_item_id}
+  /// {@template pluto_layout_tab_item_id}
+  /// [id] must pass a unique value. (Usually, if the title is unique, it will be delivered.)
+  /// {@endtemplate}
   final Object id;
 
-  /// {@macro pluto_layout_tab_item_title}
+  /// {@template pluto_layout_tab_item_title}
+  /// [title] is the title of the menu to be displayed.
+  /// {@endtemplate}
   final String title;
 
-  /// {@macro pluto_layout_tab_item_icon}
+  /// {@template pluto_layout_tab_item_icon}
+  /// [icon] is the icon to display before the menu title.
+  /// {@endtemplate}
   final Widget? icon;
 
-  /// {@macro pluto_layout_tab_item_tabViewWidget}
+  /// {@template pluto_layout_tab_item_tabViewWidget}
+  /// [tabViewWidget] is a callback function that returns a tab view widget
+  /// that will be displayed when the menu is tapped.
+  /// Just pass a function that returns [Widget].
+  ///
+  /// ```dart
+  /// tabViewWidget: Padding(
+  ///   padding: EdgeInsets.all(15),
+  ///   child: ListView(
+  ///     children: const [
+  ///       Text('Example contents'),
+  ///       SizedBox(height: 15),
+  ///       Text('Example contents),
+  ///       SizedBox(height: 10),
+  ///       Text('Example contents),
+  ///     ],
+  ///   ),
+  /// ),
+  /// ```
+  /// {@endtemplate}
   final Widget? tabViewWidget;
 
-  /// {@macro pluto_layout_tab_view_size_resolver}
+  /// {@template pluto_layout_tab_item_sizeResolver}
+  /// [sizeResolver] is set the size of the tab item view.
+  /// {@endtemplate}
   final PlutoLayoutTabItemSizeResolver sizeResolver;
 
-  /// {@macro pluto_layout_tab_item_showRemoveButton}
+  /// {@template pluto_layout_tab_item_showRemoveButton}
+  /// [showRemoveButton] displays an X button to remove a tab
+  /// at the right end of the menu when the value is true.
+  /// {@endtemplate}
   final bool showRemoveButton;
 
-  /// The open and closed state of the tab view.
+  /// {@template pluto_layout_tab_item_enabled}
+  /// [enabled] The open and closed state of the tab view.
+  /// {@endtemplate}
   final bool enabled;
+
+  /// {@template pluto_layout_tab_item_maintainState}
+  /// If [tabViewWidget.key] is [GlobalKey], the state is maintained
+  /// even when the tab is closed or moved.
+  /// {@endtemplate}
+  bool get maintainState => tabViewWidget?.key is GlobalKey;
 
   double _size = 0;
 

@@ -248,22 +248,23 @@ class _TabViewState extends ConsumerState<_TabView> {
 
   @override
   Widget build(BuildContext context) {
-    final enabledItems =
-        ref.watch(_itemsProvider).where(_TabsHelper.isEnabledTabView);
-
-    if (enabledItems.isEmpty) return const SizedBox.shrink();
-
     final theme = Theme.of(context);
 
     final layoutId = ref.read(layoutIdProvider);
 
     final layoutData = ref.read(layoutDataProvider);
 
+    final items = ref.watch(_itemsProvider).where(_TabsHelper.hasTabViewWidget);
+
+    final enabledItems = items.where(_TabsHelper.isEnabled);
+
+    final isEnabledEmpty = enabledItems.isEmpty;
+
+    final lastEnabledItemId = enabledItems.lastOrNull;
+
     final border = BorderSide(color: theme.dividerColor);
 
-    final int length = enabledItems.length;
-
-    Widget resizeTabItemOrNot(int index, PlutoLayoutTabItem item) {
+    Widget resizeTabItemOrNot(PlutoLayoutTabItem item) {
       Widget child = _TabItemViewContainer(
         layoutId: layoutId,
         item: item,
@@ -272,7 +273,8 @@ class _TabViewState extends ConsumerState<_TabView> {
 
       if (!widget.disableResize &&
           !widget.mode.isShowOneMode &&
-          index < length - 1) {
+          item.enabled &&
+          item.id != lastEnabledItemId) {
         child = ResizeIndicator<PlutoLayoutTabItem>(
           item: item,
           onResize: resizeTabItem,
@@ -298,12 +300,11 @@ class _TabViewState extends ConsumerState<_TabView> {
         delegate: _TabItemsDelegate(
           direction,
           layoutData,
-          enabledItems,
+          items,
           itemResizeNotifier,
         ),
         children: [
-          for (int i = 0; i < length; i += 1)
-            resizeTabItemOrNot(i, enabledItems.elementAt(i)),
+          for (final item in items) resizeTabItemOrNot(item),
         ],
       ),
     );
@@ -321,6 +322,7 @@ class _TabViewState extends ConsumerState<_TabView> {
     return CustomSingleChildLayout(
       delegate: _TabViewDelegate(
         layoutId,
+        isEnabledEmpty,
         direction,
         tabSize,
         widget.tabViewSizeResolver,
@@ -334,6 +336,7 @@ class _TabViewState extends ConsumerState<_TabView> {
 class _TabViewDelegate extends SingleChildLayoutDelegate {
   _TabViewDelegate(
     this.layoutId,
+    this.isEnabledEmpty,
     this.direction,
     this.tabSize,
     this.tabViewSizeResolver,
@@ -341,6 +344,8 @@ class _TabViewDelegate extends SingleChildLayoutDelegate {
   ) : super(relayout: tabSize);
 
   final PlutoLayoutId layoutId;
+
+  final bool isEnabledEmpty;
 
   final PlutoLayoutContainerDirection direction;
 
@@ -360,6 +365,8 @@ class _TabViewDelegate extends SingleChildLayoutDelegate {
 
   @override
   Size getSize(BoxConstraints constraints) {
+    if (isEnabledEmpty) return Size.zero;
+
     switch (direction) {
       case PlutoLayoutContainerDirection.top:
       case PlutoLayoutContainerDirection.bottom:
@@ -377,6 +384,8 @@ class _TabViewDelegate extends SingleChildLayoutDelegate {
 
   @override
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
+    if (isEnabledEmpty) return BoxConstraints.tight(Size.zero);
+
     switch (direction) {
       case PlutoLayoutContainerDirection.top:
       case PlutoLayoutContainerDirection.bottom:
@@ -440,21 +449,30 @@ class _TabItemsDelegate extends MultiChildLayoutDelegate {
 
   @override
   void performLayout(Size size) {
-    _reset(size);
+    final enabledItems = items.where(_TabsHelper.isEnabled);
+    final enabledLength = enabledItems.length;
 
-    final length = items.length;
+    _reset(size, enabledItems);
+
     final double defaultSize = max(
-      direction.isHorizontal ? size.height / length : size.width / length,
+      direction.isHorizontal
+          ? size.height / enabledLength
+          : size.width / enabledLength,
       0,
     );
-    int count = 0;
+    int enabledCount = 0;
     double position = 0;
     double remaining = direction.isHorizontal ? size.height : size.width;
-    isLast(int c) => c + 1 == length;
+    isLast(int c) => c + 1 == enabledLength;
 
     for (final item in items) {
+      if (!item.enabled) {
+        layoutChild(item.id, BoxConstraints.loose(size));
+        continue;
+      }
+
       if (item._size.isNaN) item._size = defaultSize;
-      if (isLast(count)) item._size = max(remaining, 0);
+      if (isLast(enabledCount)) item._size = max(remaining, 0);
 
       final constrain = direction.isHorizontal
           ? BoxConstraints.tight(
@@ -480,6 +498,7 @@ class _TabItemsDelegate extends MultiChildLayoutDelegate {
             direction.isHorizontal ? position : 0,
           ),
         );
+        ++enabledCount;
         position += direction.isHorizontal ? s.height : s.width;
         remaining -= item._size;
       }
@@ -488,7 +507,7 @@ class _TabItemsDelegate extends MultiChildLayoutDelegate {
     _previousSize = size;
   }
 
-  void _reset(Size size) {
+  void _reset(Size size, Iterable<PlutoLayoutTabItem> enabledItems) {
     if (_previousSize == size) return;
 
     final maxSize = direction.isHorizontal ? size.height : size.width;
@@ -496,7 +515,7 @@ class _TabItemsDelegate extends MultiChildLayoutDelegate {
     PlutoLayoutTabItemSizeResolver._update(
       maxSize: maxSize,
       minSize: PlutoLayoutData.minTabSize,
-      items: items,
+      items: enabledItems,
     );
   }
 
@@ -519,15 +538,19 @@ class _TabItemViewContainer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return GestureDetector(
-      onTap: () {
-        _TabsHelper.setFocus(
-          ref: ref,
-          layoutId: layoutId,
-          itemId: item.id,
-        );
-      },
-      child: item.tabViewWidget!,
+    return Visibility(
+      visible: item.enabled,
+      maintainState: item.maintainState,
+      child: GestureDetector(
+        onTap: () {
+          _TabsHelper.setFocus(
+            ref: ref,
+            layoutId: layoutId,
+            itemId: item.id,
+          );
+        },
+        child: item.tabViewWidget!,
+      ),
     );
   }
 }

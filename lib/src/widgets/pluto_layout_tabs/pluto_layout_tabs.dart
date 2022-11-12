@@ -239,6 +239,8 @@ class _TabsHelper {
 
   static bool isEnabled(PlutoLayoutTabItem e) => e.enabled;
 
+  static bool hasTabViewWidget(PlutoLayoutTabItem e) => e.tabViewWidget != null;
+
   static PlutoLayoutId? getFocusedLayoutId(WidgetRef ref) {
     return ref.read(focusedLayoutIdProvider);
   }
