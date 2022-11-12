@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pluto_grid/pluto_grid.dart';
 import 'package:pluto_layout/pluto_layout.dart';
 
 import 'screens/screens.dart';
@@ -97,12 +98,9 @@ class _DemoPageState extends State<DemoPage>
                   item: PlutoLayoutTabItem(
                     id: '$index',
                     title: 'New $index',
-                    enabled: true,
+                    enabled: false,
                     showRemoveButton: true,
-                    tabViewBuilder: (e) => const ColoredBox(
-                      color: Colors.white,
-                      child: Text('new tab'),
-                    ),
+                    tabViewWidget: _NewGrid(key: GlobalKey()),
                   ),
                 );
               },
@@ -123,6 +121,63 @@ class _DemoPageState extends State<DemoPage>
           bottom: const PlutoLayoutContainer(
             child: BottomTab(),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NewGrid extends StatefulWidget {
+  const _NewGrid({Key? key}) : super(key: key);
+
+  @override
+  State<_NewGrid> createState() => _NewGridState();
+}
+
+class _NewGridState extends State<_NewGrid> {
+  final List<PlutoColumn> columns = List.generate(20, (i) => i)
+      .map(
+        (e) => PlutoColumn(
+          title: '$e',
+          field: '$e',
+          type: PlutoColumnType.text(),
+        ),
+      )
+      .toList();
+
+  final List<PlutoRow> rows = [];
+
+  @override
+  void initState() {
+    super.initState();
+    rows.addAll(
+      List.generate(100, (i) => i).map(
+        (e) => PlutoRow(
+          cells: Map.fromEntries(columns.map(
+            (e) => MapEntry(
+              e.field,
+              PlutoCell(value: ''),
+            ),
+          )),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return PlutoGrid(
+      columns: columns,
+      rows: rows,
+      configuration: PlutoGridConfiguration(
+        style: PlutoGridStyleConfig.dark(
+          gridBackgroundColor: theme.dialogBackgroundColor,
+          borderColor: theme.dividerColor,
+          rowColor: theme.dialogBackgroundColor,
+          activatedColor: theme.backgroundColor,
+          activatedBorderColor: theme.toggleableActiveColor,
         ),
       ),
     );

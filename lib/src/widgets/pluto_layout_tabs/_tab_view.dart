@@ -527,7 +527,7 @@ class _TabItemViewContainer extends ConsumerWidget {
           itemId: item.id,
         );
       },
-      child: item.tabViewBuilder!(context),
+      child: item.tabViewWidget!,
     );
   }
 }

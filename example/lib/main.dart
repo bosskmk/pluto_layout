@@ -56,12 +56,12 @@ class _ExamplePageState extends State<ExamplePage> {
               PlutoLayoutTabItem(
                 id: 'top1',
                 title: 'top1',
-                tabViewBuilder: (e) => const Text('top1'),
+                tabViewWidget: const Text('top1'),
               ),
               PlutoLayoutTabItem(
                 id: 'top2',
                 title: 'top2',
-                tabViewBuilder: (e) => const Text('top2'),
+                tabViewWidget: const Text('top2'),
               ),
             ],
           ),
@@ -72,12 +72,12 @@ class _ExamplePageState extends State<ExamplePage> {
               PlutoLayoutTabItem(
                 id: 'left1',
                 title: 'left1',
-                tabViewBuilder: (e) => const Text('left1'),
+                tabViewWidget: const Text('left1'),
               ),
               PlutoLayoutTabItem(
                 id: 'left2',
                 title: 'left2',
-                tabViewBuilder: (e) => const Text('left2'),
+                tabViewWidget: const Text('left2'),
               ),
             ],
           ),
@@ -88,12 +88,12 @@ class _ExamplePageState extends State<ExamplePage> {
               PlutoLayoutTabItem(
                 id: 'right1',
                 title: 'right1',
-                tabViewBuilder: (e) => const Text('right1'),
+                tabViewWidget: const Text('right1'),
               ),
               PlutoLayoutTabItem(
                 id: 'right2',
                 title: 'right2',
-                tabViewBuilder: (e) => const Text('right2'),
+                tabViewWidget: const Text('right2'),
               ),
             ],
           ),
@@ -104,12 +104,12 @@ class _ExamplePageState extends State<ExamplePage> {
               PlutoLayoutTabItem(
                 id: 'bottom1',
                 title: 'bottom1',
-                tabViewBuilder: (e) => const Text('bottom1'),
+                tabViewWidget: const Text('bottom1'),
               ),
               PlutoLayoutTabItem(
                 id: 'bottom2',
                 title: 'bottom2',
-                tabViewBuilder: (e) => const Text('bottom2'),
+                tabViewWidget: const Text('bottom2'),
               ),
             ],
           ),

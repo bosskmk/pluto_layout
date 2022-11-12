@@ -235,7 +235,7 @@ class PlutoLayoutTabs extends ConsumerWidget {
 
 class _TabsHelper {
   static bool isEnabledTabView(PlutoLayoutTabItem e) =>
-      e.enabled && e.tabViewBuilder != null;
+      e.enabled && e.tabViewWidget != null;
 
   static bool isEnabled(PlutoLayoutTabItem e) => e.enabled;
 

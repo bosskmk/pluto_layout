@@ -16,8 +16,8 @@ part of pluto_layout_tabs;
 /// [icon] is the icon to display before the menu title.
 /// {@endtemplate}
 ///
-/// {@template pluto_layout_tab_item_tabViewBuilder}
-/// [tabViewBuilder] is a callback function that returns a tab view widget
+/// {@template pluto_layout_tab_item_tabViewWidget}
+/// [tabViewWidget] is a callback function that returns a tab view widget
 /// that will be displayed when the menu is tapped.
 /// Just pass a function that returns [Widget].
 ///
@@ -48,7 +48,7 @@ class PlutoLayoutTabItem {
     required this.id,
     required this.title,
     this.icon,
-    this.tabViewBuilder,
+    this.tabViewWidget,
     this.sizeResolver = const PlutoLayoutTabItemSizeFlexible(),
     this.showRemoveButton = false,
     this.enabled = false,
@@ -58,7 +58,7 @@ class PlutoLayoutTabItem {
     required this.id,
     required this.title,
     this.icon,
-    this.tabViewBuilder,
+    this.tabViewWidget,
     this.sizeResolver = const PlutoLayoutTabItemSizeFlexible(),
     this.showRemoveButton = false,
     this.enabled = false,
@@ -74,8 +74,8 @@ class PlutoLayoutTabItem {
   /// {@macro pluto_layout_tab_item_icon}
   final Widget? icon;
 
-  /// {@macro pluto_layout_tab_item_tabViewBuilder}
-  final Widget Function(BuildContext context)? tabViewBuilder;
+  /// {@macro pluto_layout_tab_item_tabViewWidget}
+  final Widget? tabViewWidget;
 
   /// {@macro pluto_layout_tab_view_size_resolver}
   final PlutoLayoutTabItemSizeResolver sizeResolver;
@@ -92,7 +92,7 @@ class PlutoLayoutTabItem {
     Object? id,
     String? title,
     Widget? icon,
-    Widget Function(BuildContext context)? tabViewBuilder,
+    Widget? tabViewWidget,
     PlutoLayoutTabItemSizeResolver? sizeResolver,
     bool? showRemoveButton,
     bool? enabled,
@@ -102,7 +102,7 @@ class PlutoLayoutTabItem {
       id: id ?? this.id,
       title: title ?? this.title,
       icon: icon ?? this.icon,
-      tabViewBuilder: tabViewBuilder ?? this.tabViewBuilder,
+      tabViewWidget: tabViewWidget ?? this.tabViewWidget,
       sizeResolver: sizeResolver ?? this.sizeResolver,
       showRemoveButton: showRemoveButton ?? this.showRemoveButton,
       enabled: enabled ?? this.enabled,

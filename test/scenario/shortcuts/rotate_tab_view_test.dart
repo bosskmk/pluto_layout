@@ -22,12 +22,12 @@ void main() {
           PlutoLayoutTabItem(
             id: 'tab1',
             title: 'tab1',
-            tabViewBuilder: (c) => const Text('tab1 view'),
+            tabViewWidget: const Text('tab1 view'),
           ),
           PlutoLayoutTabItem(
             id: 'tab2',
             title: 'tab2',
-            tabViewBuilder: (c) => const Text('tab2 view'),
+            tabViewWidget: const Text('tab2 view'),
           ),
         ],
       )),
@@ -83,12 +83,12 @@ void main() {
             PlutoLayoutTabItem(
               id: 'tab1',
               title: 'tab1',
-              tabViewBuilder: (c) => const Text('tab1 view'),
+              tabViewWidget: const Text('tab1 view'),
             ),
             PlutoLayoutTabItem(
               id: 'tab2',
               title: 'tab2',
-              tabViewBuilder: (c) => const Text('tab2 view'),
+              tabViewWidget: const Text('tab2 view'),
             ),
           ],
         )),
