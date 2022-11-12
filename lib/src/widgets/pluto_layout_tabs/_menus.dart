@@ -264,7 +264,9 @@ class _MenusState extends ConsumerState<_Menus> {
 
     ref.read(_itemsProvider.notifier).insert(index, resolvedItem.item);
 
-    if (resolvedItem.item.enabled && widget.mode.isShowOneMode) {
+    if (resolvedItem.item.enabled ||
+        (widget.mode.isShowOneMode &&
+            items.firstWhereOrNull(_TabsHelper.isEnabled) == null)) {
       ref
           .read(_itemsProvider.notifier)
           .setEnabled(resolvedItem.item.id, true, widget.mode);
