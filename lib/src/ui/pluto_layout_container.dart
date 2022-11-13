@@ -24,6 +24,13 @@ class PlutoLayoutContainer extends ConsumerStatefulWidget {
   @override
   ConsumerState<PlutoLayoutContainer> createState() =>
       _PlutoLayoutContainerState();
+
+  /// Access [FocusNode] of [PlutoLayoutContainer] with [BuildContext] in child widget.
+  static FocusNode? getFocusNode(BuildContext context) {
+    return context
+        .findRootAncestorStateOfType<_PlutoLayoutContainerState>()
+        ?.focusNode;
+  }
 }
 
 class _PlutoLayoutContainerState extends ConsumerState<PlutoLayoutContainer> {

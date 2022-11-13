@@ -546,7 +546,7 @@ class _TabItemViewContainer extends ConsumerWidget {
           _TabsHelper.setFocus(
             ref: ref,
             layoutId: layoutId,
-            itemId: item.id,
+            item: item,
           );
         },
         child: item.tabViewWidget!,

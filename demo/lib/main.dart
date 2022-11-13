@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pluto_grid/pluto_grid.dart';
@@ -26,16 +25,8 @@ class DemoApp extends StatelessWidget {
   }
 }
 
-class DemoPage extends StatefulWidget {
+class DemoPage extends StatelessWidget {
   const DemoPage({super.key});
-
-  @override
-  State<DemoPage> createState() => _DemoPageState();
-}
-
-class _DemoPageState extends State<DemoPage>
-    with SingleTickerProviderStateMixin {
-  final String httpProtocol = kReleaseMode ? 'https' : 'http';
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +91,10 @@ class _DemoPageState extends State<DemoPage>
                     title: 'New $index',
                     enabled: false,
                     showRemoveButton: true,
-                    tabViewWidget: _NewGrid(key: GlobalKey()),
+                    tabViewWidget: _NewGrid(
+                      key: GlobalKey(),
+                      focusNode: FocusNode(),
+                    ),
                   ),
                 );
               },
@@ -127,14 +121,23 @@ class _DemoPageState extends State<DemoPage>
   }
 }
 
-class _NewGrid extends StatefulWidget {
-  const _NewGrid({Key? key}) : super(key: key);
+class _NewGrid extends StatefulWidget
+    implements PlutoLayoutTabViewWidgetHasFocusNode {
+  const _NewGrid({
+    required this.focusNode,
+    super.key,
+  });
+
+  @override
+  final FocusNode focusNode;
 
   @override
   State<_NewGrid> createState() => _NewGridState();
 }
 
 class _NewGridState extends State<_NewGrid> {
+  late final PlutoGridStateManager stateManager;
+
   final List<PlutoColumn> columns = List.generate(20, (i) => i)
       .map(
         (e) => PlutoColumn(
@@ -150,6 +153,7 @@ class _NewGridState extends State<_NewGrid> {
   @override
   void initState() {
     super.initState();
+
     rows.addAll(
       List.generate(100, (i) => i).map(
         (e) => PlutoRow(
@@ -165,21 +169,70 @@ class _NewGridState extends State<_NewGrid> {
   }
 
   @override
+  void dispose() {
+    widget.focusNode.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return PlutoGrid(
-      columns: columns,
-      rows: rows,
-      configuration: PlutoGridConfiguration(
-        style: PlutoGridStyleConfig.dark(
-          gridBackgroundColor: theme.dialogBackgroundColor,
-          borderColor: theme.dividerColor,
-          rowColor: theme.dialogBackgroundColor,
-          activatedColor: theme.backgroundColor,
-          activatedBorderColor: theme.toggleableActiveColor,
+    return Focus(
+      focusNode: widget.focusNode,
+      onFocusChange: (flag) {
+        if (widget.focusNode.hasPrimaryFocus) {
+          stateManager.setKeepFocus(flag);
+        }
+      },
+      child: PlutoGrid(
+        columns: columns,
+        rows: rows,
+        onLoaded: (e) {
+          stateManager = e.stateManager;
+          stateManager.setShowColumnFilter(true, notify: false);
+          stateManager.setCurrentCell(stateManager.firstCell, 0);
+        },
+        configuration: PlutoGridConfiguration(
+          shortcut: PlutoGridShortcut(
+            actions: {
+              ...PlutoGridShortcut.defaultActions,
+              LogicalKeySet(LogicalKeyboardKey.escape):
+                  _SetParentFocus(context),
+            },
+          ),
+          style: PlutoGridStyleConfig.dark(
+            gridBackgroundColor: theme.dialogBackgroundColor,
+            borderColor: theme.dividerColor,
+            rowColor: theme.dialogBackgroundColor,
+            activatedColor: theme.backgroundColor,
+            activatedBorderColor: theme.toggleableActiveColor,
+          ),
         ),
       ),
+    );
+  }
+}
+
+class _SetParentFocus extends PlutoGridShortcutAction {
+  _SetParentFocus(this.context);
+
+  final BuildContext context;
+
+  @override
+  void execute({
+    required PlutoKeyManagerEvent keyEvent,
+    required PlutoGridStateManager stateManager,
+  }) {
+    if (!stateManager.isEditing && !stateManager.mode.isPopup) {
+      PlutoLayoutContainer.getFocusNode(context)?.requestFocus();
+      return;
+    }
+
+    const PlutoGridActionDefaultEscapeKey().execute(
+      keyEvent: keyEvent,
+      stateManager: stateManager,
     );
   }
 }

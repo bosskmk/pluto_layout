@@ -83,6 +83,9 @@ class PlutoLayoutTabItem {
   ///   ),
   /// ),
   /// ```
+  ///
+  /// If [tabViewWidget] is a widget that implements [PlutoLayoutTabViewWidgetHasFocusNode]
+  /// Call [PlutoLayoutTabViewWidgetHasFocusNode.focusNode.requestFocus] when the tab is active.
   /// {@endtemplate}
   final Widget? tabViewWidget;
 
@@ -110,6 +113,20 @@ class PlutoLayoutTabItem {
 
   double _size = 0;
 
+  /// [tabViewWidget] is changed to the active state,
+  /// If it is a [Widget] that implements [PlutoLayoutTabViewWidgetHasFocusNode],
+  /// Call [PlutoLayoutTabViewWidgetHasFocusNode.focusNode.requestFocus].
+  void requestFocus() {
+    if (tabViewWidget is! PlutoLayoutTabViewWidgetHasFocusNode) return;
+
+    final focusNode =
+        (tabViewWidget as PlutoLayoutTabViewWidgetHasFocusNode).focusNode;
+
+    if (focusNode.hasFocus) return;
+
+    focusNode.requestFocus();
+  }
+
   PlutoLayoutTabItem copyWith({
     Object? id,
     String? title,
@@ -131,4 +148,12 @@ class PlutoLayoutTabItem {
       size: size ?? _size,
     );
   }
+}
+
+/// Calls [focusNode.requestFocus]
+/// when a tab is added as active or becomes active due to a toggle event.
+///
+/// You need to implement a getter that can access [FocusNode] in [PlutoLayoutTabItem.tabViewWidget].
+abstract class PlutoLayoutTabViewWidgetHasFocusNode implements Widget {
+  FocusNode get focusNode;
 }

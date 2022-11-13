@@ -251,11 +251,15 @@ class _TabsHelper {
   static void setFocus({
     required WidgetRef ref,
     required PlutoLayoutId? layoutId,
-    required Object? itemId,
+    required PlutoLayoutTabItem? item,
+    bool requestItemFocus = false,
   }) {
     ref.read(focusedLayoutIdProvider.notifier).state =
         layoutId ?? PlutoLayoutId.body;
-    ref.read(_focusedItemIdViewProvider.notifier).state = itemId;
+
+    ref.read(_focusedItemIdViewProvider.notifier).state = item?.id;
+
+    if (requestItemFocus) item?.requestFocus();
   }
 
   static bool watchIsFocused({

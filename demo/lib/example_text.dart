@@ -20,13 +20,6 @@ class ExampleText {
   static const String bodyTitle = 'Pluto Layout Example';
   static const String bodyDesc1 =
       'PlutoLayout can easily compose UI using various widgets.';
-  static const String bodyPlutoGridTitle = 'Pluto Grid';
-  static const String bodyPlutoGridDesc1 =
-      'PlutoGrid is a data grid that supports various functions such as cell editing, sorting, and column movement.';
-
-  static const String bodyPlutoMenuBarTitle = 'Pluto Menu Bar';
-  static const String bodyPlutoMenuBarDesc1 =
-      'PlutoMenuBar is a widget that allows you to compose nested submenus and opens menus with hover or tap';
 
   static const String donateTitle = 'Donate';
   static const String donateDesc1 =

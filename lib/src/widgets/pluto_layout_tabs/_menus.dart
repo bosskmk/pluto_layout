@@ -112,7 +112,8 @@ class _MenusState extends ConsumerState<_Menus> {
       _TabsHelper.setFocus(
         ref: ref,
         layoutId: layoutId,
-        itemId: item.id,
+        item: item,
+        requestItemFocus: true,
       );
     }
 
@@ -224,26 +225,26 @@ class _MenusState extends ConsumerState<_Menus> {
 
     if (items.isEmpty) return;
 
-    Object nextFocus;
+    PlutoLayoutTabItem nextFocus;
 
     if (focusedItemId == null) {
-      nextFocus = items.first.id;
+      nextFocus = items.first;
     } else {
       final item = items.firstWhereOrNull((e) => e.id == focusedItemId);
 
       if (item == null) {
-        nextFocus = items.first.id;
+        nextFocus = items.first;
       } else {
         final found = items.skipWhile((e) => e.id != item.id);
 
-        nextFocus = found.length <= 1 ? items.first.id : found.skip(1).first.id;
+        nextFocus = found.length <= 1 ? items.first : found.skip(1).first;
       }
     }
 
     _TabsHelper.setFocus(
       ref: ref,
       layoutId: layoutId,
-      itemId: nextFocus,
+      item: nextFocus,
     );
   }
 
@@ -274,7 +275,8 @@ class _MenusState extends ConsumerState<_Menus> {
       _TabsHelper.setFocus(
         ref: ref,
         layoutId: layoutId,
-        itemId: resolvedItem.item.id,
+        item: resolvedItem.item,
+        requestItemFocus: true,
       );
     }
   }
@@ -497,7 +499,7 @@ class _Draggable extends ConsumerWidget {
         _TabsHelper.setFocus(
           ref: ref,
           layoutId: layoutId,
-          itemId: data.item.id,
+          item: data.item,
         );
       }
 
