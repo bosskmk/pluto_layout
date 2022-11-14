@@ -10,7 +10,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pluto_layout/pluto_layout.dart';
 import 'package:pluto_layout/src/helper/resize_helper.dart';
 
-import '../../events/events.dart';
 import '../../pluto_layout_data.dart';
 import '../../pluto_layout_provider.dart';
 import '../../ui/pluto_layout_container_provider.dart';

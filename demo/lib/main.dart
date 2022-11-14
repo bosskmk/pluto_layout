@@ -28,6 +28,30 @@ class DemoApp extends StatelessWidget {
 class DemoPage extends StatelessWidget {
   const DemoPage({super.key});
 
+  PlutoInsertTabItemResult newTabResolver(
+      {required List<PlutoLayoutTabItem> items}) {
+    final foundNew = items
+        .where((e) => e.title.startsWith('New '))
+        .map((e) => int.parse(e.title.replaceAll('New ', '')))
+        .toList()
+      ..sort();
+
+    final int index = foundNew.isEmpty ? 1 : ++foundNew.last;
+
+    return PlutoInsertTabItemResult(
+      item: PlutoLayoutTabItem(
+        id: '$index',
+        title: 'New $index',
+        enabled: false,
+        showRemoveButton: true,
+        tabViewWidget: _NewGrid(
+          key: GlobalKey(),
+          focusNode: FocusNode(),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,28 +100,7 @@ class DemoPage extends StatelessWidget {
             LogicalKeySet(LogicalKeyboardKey.shift, LogicalKeyboardKey.keyN):
                 PlutoLayoutActions.insertTabItem(
               layoutId: PlutoLayoutId.body,
-              itemResolver: ({required items}) {
-                final foundNew = items
-                    .where((e) => e.title.startsWith('New '))
-                    .map((e) => int.parse(e.title.replaceAll('New ', '')))
-                    .toList()
-                  ..sort();
-
-                final int index = foundNew.isEmpty ? 1 : ++foundNew.last;
-
-                return PlutoInsertTabItemResult(
-                  item: PlutoLayoutTabItem(
-                    id: '$index',
-                    title: 'New $index',
-                    enabled: false,
-                    showRemoveButton: true,
-                    tabViewWidget: _NewGrid(
-                      key: GlobalKey(),
-                      focusNode: FocusNode(),
-                    ),
-                  ),
-                );
-              },
+              itemResolver: newTabResolver,
             ),
             LogicalKeySet(LogicalKeyboardKey.shift, LogicalKeyboardKey.keyW):
                 PlutoLayoutActions.removeTabItem(),
@@ -105,8 +108,8 @@ class DemoPage extends StatelessWidget {
           body: const PlutoLayoutContainer(
             child: HomeScreen(),
           ),
-          top: const PlutoLayoutContainer(
-            child: TopTab(),
+          top: PlutoLayoutContainer(
+            child: TopTab(newTabResolver: newTabResolver),
           ),
           left: const PlutoLayoutContainer(
             child: LeftTab(),

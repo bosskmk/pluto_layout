@@ -1,8 +1,6 @@
 import 'package:pluto_layout/pluto_layout.dart';
 
-import 'events.dart';
-
-/// Event to open and close tab views of [layoutId] in order.
+/// {@macro pluto_layout_action_rotate_tab_view_intent}
 class PlutoRotateTabViewEvent extends PlutoLayoutEvent {
   const PlutoRotateTabViewEvent(this.layoutId);
 

@@ -1,5 +1,8 @@
 part of pluto_layout_tabs;
 
+/// Renders a tab or widget that fills the [PlutoLayoutContainer].
+///
+/// If [items] exists, render tab otherwise [child].
 class PlutoLayoutTabsOrChild extends StatelessWidget {
   const PlutoLayoutTabsOrChild({
     this.items,

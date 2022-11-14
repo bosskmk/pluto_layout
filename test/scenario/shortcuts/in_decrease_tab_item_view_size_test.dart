@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pluto_layout/pluto_layout.dart';
-import 'package:pluto_layout/src/events/events.dart';
 
 import '../../helper/build_widget_helper.dart';
 

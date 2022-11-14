@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pluto_layout/pluto_layout.dart';
 
 import 'pluto_layout_data.dart';
-import 'pluto_layout_event_stream_controller.dart';
 
 /// ID according to the location of [PlutoLayoutContainer].
 final layoutIdProvider = Provider<PlutoLayoutId>(

@@ -24,6 +24,9 @@ class PlutoLayoutEventStreamController {
     _subject.add(event);
   }
 
+  /// Dispose the event controller.
+  ///
+  /// [PlutoLayout] Called when the widget is dispose.
   void dispose() {
     _subject.close();
   }

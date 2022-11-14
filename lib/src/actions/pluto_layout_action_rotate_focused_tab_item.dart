@@ -1,5 +1,4 @@
 import 'package:pluto_layout/pluto_layout.dart';
-import 'package:pluto_layout/src/events/events.dart';
 
 /// {@template pluto_layout_action_rotate_focused_tab_item_intent}
 /// Move the focus of the tab item located at [layoutId] in order.

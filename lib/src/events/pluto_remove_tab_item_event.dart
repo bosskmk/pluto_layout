@@ -1,10 +1,6 @@
 import 'package:pluto_layout/pluto_layout.dart';
-import 'package:pluto_layout/src/events/events.dart';
 
-/// Event to delete [itemId] located in [layoutId].
-///
-/// If [layoutId] and [itemId] are null,
-/// the focused tab is removed if there is a focused tab.
+/// {@macro pluto_layout_action_remove_tab_item_intent}
 class PlutoRemoveTabItemEvent extends PlutoLayoutEvent {
   const PlutoRemoveTabItemEvent(this.layoutId, this.itemId);
 

@@ -1,5 +1,4 @@
 import 'package:pluto_layout/pluto_layout.dart';
-import 'package:pluto_layout/src/events/events.dart';
 
 /// {@template pluto_layout_action_remove_tab_item_intent}
 /// Remove [itemId] located in [layoutId].

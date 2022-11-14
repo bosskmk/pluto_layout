@@ -1,7 +1,5 @@
 import 'package:pluto_layout/pluto_layout.dart';
 
-import '../events/events.dart';
-
 /// {@template pluto_layout_action_toggle_tab_view_intent}
 /// Toggles the tab view corresponding to [itemId].
 ///

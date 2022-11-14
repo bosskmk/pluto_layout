@@ -1,6 +1,6 @@
 import 'package:pluto_layout/pluto_layout.dart';
-import 'package:pluto_layout/src/events/events.dart';
 
+/// {@macro pluto_layout_action_insert_tab_item_intent}
 class PlutoInsertTabItemEvent extends PlutoLayoutEvent {
   const PlutoInsertTabItemEvent({
     this.layoutId,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pluto_layout/pluto_layout.dart';
-import 'package:pluto_layout/src/pluto_layout_event_stream_controller.dart';
 import 'package:pluto_layout/src/pluto_layout_provider.dart';
 import 'package:pluto_layout/src/ui/pluto_layout_container_provider.dart';
 

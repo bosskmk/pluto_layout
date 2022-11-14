@@ -70,6 +70,16 @@ class PlutoLayout extends StatefulWidget {
 
   @override
   State<PlutoLayout> createState() => _PlutoLayoutState();
+
+  /// [PlutoLayoutEventStreamController] to receive or emit events of [PlutoLayout].
+  ///
+  /// You can access [BuildContext] from child widgets of [PlutoLayout].
+  static PlutoLayoutEventStreamController? getEventStreamController(
+      BuildContext context) {
+    return context
+        .findRootAncestorStateOfType<_PlutoLayoutState>()
+        ?._eventStreamController;
+  }
 }
 
 class _PlutoLayoutState extends State<PlutoLayout> {

@@ -1,7 +1,5 @@
 import 'package:pluto_layout/pluto_layout.dart';
 
-import '../events/events.dart';
-
 /// {@template pluto_layout_action_decrease_tab_item_view_intent}
 /// Decrease the size of the tab item view of [itemId] located at [layoutId].
 ///
@@ -19,6 +17,9 @@ import '../events/events.dart';
 /// In the state where [layoutId] is not specified,
 /// use left, right or top, bottom with one arrow key
 /// to decrease the size according to the direction.
+///
+/// For more information, please refer to the link below.
+/// https://pluto.weblaze.dev/introduction-to-plutlayout
 /// {@endtemplate}
 class PlutoLayoutActionDecreaseTabItemViewIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionDecreaseTabItemViewIntent({

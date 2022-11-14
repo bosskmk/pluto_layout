@@ -1,9 +1,6 @@
 import 'events.dart';
 
-/// Event to close all tabviews.
-///
-/// If [afterFocusToBody] is true,
-/// the body container requests focus after the tab view is closed.
+/// {@macro pluto_layout_action_hide_all_tab_view_intent}
 class PlutoHideAllTabViewEvent extends PlutoLayoutEvent {
   const PlutoHideAllTabViewEvent({
     this.afterFocusToBody = true,
