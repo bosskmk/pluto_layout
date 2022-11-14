@@ -21,6 +21,7 @@ class PlutoLayoutActionInsertTabItemIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionInsertTabItemIntent({
     this.layoutId,
     required this.itemResolver,
+    super.actionsOnlyPrimaryFocus = true,
   });
 
   final PlutoLayoutId? layoutId;
@@ -30,7 +31,7 @@ class PlutoLayoutActionInsertTabItemIntent extends PlutoLayoutIntent {
 
 class PlutoLayoutActionInsertTabItemAction
     extends PlutoLayoutAction<PlutoLayoutActionInsertTabItemIntent> {
-  PlutoLayoutActionInsertTabItemAction(super.events);
+  PlutoLayoutActionInsertTabItemAction(super.events, super.focusNode);
 
   @override
   void invoke(PlutoLayoutActionInsertTabItemIntent intent) {

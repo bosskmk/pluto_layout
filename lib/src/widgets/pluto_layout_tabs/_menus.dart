@@ -23,6 +23,8 @@ class _Menus extends ConsumerStatefulWidget {
 class _MenusState extends ConsumerState<_Menus> {
   late final StreamSubscription<PlutoLayoutEvent> _eventListener;
 
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -34,6 +36,8 @@ class _MenusState extends ConsumerState<_Menus> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
+
     _eventListener.cancel();
 
     super.dispose();
@@ -113,6 +117,7 @@ class _MenusState extends ConsumerState<_Menus> {
         ref: ref,
         layoutId: layoutId,
         item: item,
+        scrollController: _scrollController,
         requestItemFocus: true,
       );
     }
@@ -245,6 +250,7 @@ class _MenusState extends ConsumerState<_Menus> {
       ref: ref,
       layoutId: layoutId,
       item: nextFocus,
+      scrollController: _scrollController,
     );
   }
 
@@ -276,6 +282,7 @@ class _MenusState extends ConsumerState<_Menus> {
         ref: ref,
         layoutId: layoutId,
         item: resolvedItem.item,
+        scrollController: _scrollController,
         requestItemFocus: true,
       );
     }
@@ -307,7 +314,9 @@ class _MenusState extends ConsumerState<_Menus> {
         toggleTab: toggleTab,
       );
 
-      if (!widget.draggable) return menu;
+      if (!widget.draggable) {
+        return KeyedSubtree(key: item._menuKey, child: menu);
+      }
 
       return _Draggable(
         key: ValueKey('_Draggable_${item.id}'),
@@ -332,6 +341,7 @@ class _MenusState extends ConsumerState<_Menus> {
         child: RotatedBox(
           quarterTurns: quarterTurns,
           child: SingleChildScrollView(
+            controller: _scrollController,
             reverse: widget.direction.isLeft,
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -524,7 +534,9 @@ class _Draggable extends ConsumerWidget {
       );
     }
 
-    if (!dragging) return child;
+    if (!dragging) {
+      return KeyedSubtree(key: item._menuKey, child: child);
+    }
 
     final theme = Theme.of(context);
 

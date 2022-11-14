@@ -111,6 +111,13 @@ class PlutoLayoutTabItem {
   /// {@endtemplate}
   bool get maintainState => tabViewWidget?.key is GlobalKey;
 
+  /// A key to access the menu's RenderBox to change the scroll position
+  /// when a menu located outside the scrollable area is focused.
+  GlobalObjectKey get _menuKey => GlobalObjectKey('_Menu_$id');
+
+  RenderBox? get _menuRenderBox =>
+      _menuKey.currentContext?.findRenderObject() as RenderBox?;
+
   double _size = 0;
 
   /// [tabViewWidget] is changed to the active state,
@@ -125,6 +132,17 @@ class PlutoLayoutTabItem {
     if (focusNode.hasFocus) return;
 
     focusNode.requestFocus();
+  }
+
+  /// Change the scroll position if the menu is located outside the scroll area.
+  void _scrollMenuToVisible(ScrollController? scrollController) {
+    if (scrollController == null) return;
+
+    final menuRenderBox = _menuRenderBox;
+
+    if (menuRenderBox == null) return;
+
+    scrollController.position.ensureVisible(menuRenderBox, alignment: 0.5);
   }
 
   PlutoLayoutTabItem copyWith({
@@ -153,7 +171,8 @@ class PlutoLayoutTabItem {
 /// Calls [focusNode.requestFocus]
 /// when a tab is added as active or becomes active due to a toggle event.
 ///
-/// You need to implement a getter that can access [FocusNode] in [PlutoLayoutTabItem.tabViewWidget].
+/// You need to implement a getter
+/// that can access [FocusNode] in [PlutoLayoutTabItem.tabViewWidget].
 abstract class PlutoLayoutTabViewWidgetHasFocusNode implements Widget {
   FocusNode get focusNode;
 }

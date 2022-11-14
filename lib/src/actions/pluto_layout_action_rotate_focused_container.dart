@@ -19,6 +19,7 @@ class PlutoLayoutActionRotateFocusedContainerIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionRotateFocusedContainerIntent({
     this.reverse = false,
     this.order = PlutoLayoutId.values,
+    super.actionsOnlyPrimaryFocus = true,
   });
 
   final bool reverse;
@@ -28,7 +29,7 @@ class PlutoLayoutActionRotateFocusedContainerIntent extends PlutoLayoutIntent {
 
 class PlutoLayoutActionRotateFocusedContainerAction
     extends PlutoLayoutAction<PlutoLayoutActionRotateFocusedContainerIntent> {
-  PlutoLayoutActionRotateFocusedContainerAction(super.events);
+  PlutoLayoutActionRotateFocusedContainerAction(super.events, super.focusNode);
 
   @override
   void invoke(PlutoLayoutActionRotateFocusedContainerIntent intent) {

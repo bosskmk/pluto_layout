@@ -99,6 +99,8 @@ class DemoPage extends StatelessWidget {
                 );
               },
             ),
+            LogicalKeySet(LogicalKeyboardKey.shift, LogicalKeyboardKey.keyW):
+                PlutoLayoutActions.removeTabItem(),
           },
           body: const PlutoLayoutContainer(
             child: HomeScreen(),
@@ -206,7 +208,7 @@ class _NewGridState extends State<_NewGrid> {
             gridBackgroundColor: theme.dialogBackgroundColor,
             borderColor: theme.dividerColor,
             rowColor: theme.dialogBackgroundColor,
-            activatedColor: theme.backgroundColor,
+            activatedColor: theme.focusColor,
             activatedBorderColor: theme.toggleableActiveColor,
           ),
         ),

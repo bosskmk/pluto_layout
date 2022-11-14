@@ -15,6 +15,7 @@ class PlutoLayoutActionRotateFocusedTabItemIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionRotateFocusedTabItemIntent({
     this.layoutId,
     this.reverse = false,
+    super.actionsOnlyPrimaryFocus = true,
   });
 
   final PlutoLayoutId? layoutId;
@@ -24,7 +25,7 @@ class PlutoLayoutActionRotateFocusedTabItemIntent extends PlutoLayoutIntent {
 
 class PlutoLayoutActionRotateFocusedTabItemAction
     extends PlutoLayoutAction<PlutoLayoutActionRotateFocusedTabItemIntent> {
-  PlutoLayoutActionRotateFocusedTabItemAction(super.events);
+  PlutoLayoutActionRotateFocusedTabItemAction(super.events, super.focusNode);
 
   @override
   void invoke(PlutoLayoutActionRotateFocusedTabItemIntent intent) {

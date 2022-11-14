@@ -23,6 +23,7 @@ class PlutoLayoutActionIncreaseTabViewIntent extends PlutoLayoutIntent {
     this.layoutId, {
     this.size = PlutoLayoutInDecreaseTabViewEvent.defaultSize,
     this.reverseByDirection = false,
+    super.actionsOnlyPrimaryFocus = true,
   }) : assert(size > 0);
 
   final PlutoLayoutId? layoutId;
@@ -34,7 +35,7 @@ class PlutoLayoutActionIncreaseTabViewIntent extends PlutoLayoutIntent {
 
 class PlutoLayoutActionIncreaseTabViewAction
     extends PlutoLayoutAction<PlutoLayoutActionIncreaseTabViewIntent> {
-  PlutoLayoutActionIncreaseTabViewAction(super.events);
+  PlutoLayoutActionIncreaseTabViewAction(super.events, super.focusNode);
 
   @override
   void invoke(PlutoLayoutActionIncreaseTabViewIntent intent) {

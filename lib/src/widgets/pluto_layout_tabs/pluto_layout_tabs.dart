@@ -252,6 +252,7 @@ class _TabsHelper {
     required WidgetRef ref,
     required PlutoLayoutId? layoutId,
     required PlutoLayoutTabItem? item,
+    ScrollController? scrollController,
     bool requestItemFocus = false,
   }) {
     ref.read(focusedLayoutIdProvider.notifier).state =
@@ -260,6 +261,8 @@ class _TabsHelper {
     ref.read(_focusedItemIdViewProvider.notifier).state = item?.id;
 
     if (requestItemFocus) item?.requestFocus();
+
+    item?._scrollMenuToVisible(scrollController);
   }
 
   static bool watchIsFocused({

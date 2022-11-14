@@ -96,6 +96,7 @@ class _PlutoLayoutContainerState extends ConsumerState<PlutoLayoutContainer> {
         actions: PlutoLayoutActions.getActionsByShortcuts(
           layoutShortcuts,
           layoutEvents,
+          focusNode,
         ),
         child: containerWidget,
       );

@@ -143,6 +143,7 @@ abstract class PlutoLayoutActions {
   static Map<Type, Action<Intent>> getActionsByShortcuts(
     Map<ShortcutActivator, PlutoLayoutIntent> shortcuts,
     PlutoLayoutEventStreamController layoutEvents,
+    FocusNode layoutFocusNode,
   ) {
     final actions = <Type, Action<Intent>>{};
 
@@ -150,47 +151,80 @@ abstract class PlutoLayoutActions {
       switch (shortcut.value.runtimeType) {
         case PlutoLayoutActionRotateFocusedContainerIntent:
           actions[PlutoLayoutActionRotateFocusedContainerIntent] =
-              PlutoLayoutActionRotateFocusedContainerAction(layoutEvents);
+              PlutoLayoutActionRotateFocusedContainerAction(
+            layoutEvents,
+            layoutFocusNode,
+          );
           break;
         case PlutoLayoutActionRotateFocusedTabItemIntent:
           actions[PlutoLayoutActionRotateFocusedTabItemIntent] =
-              PlutoLayoutActionRotateFocusedTabItemAction(layoutEvents);
+              PlutoLayoutActionRotateFocusedTabItemAction(
+            layoutEvents,
+            layoutFocusNode,
+          );
           break;
         case PlutoLayoutActionHideAllTabViewIntent:
           actions[PlutoLayoutActionHideAllTabViewIntent] =
-              PlutoLayoutActionHideAllTabViewAction(layoutEvents);
+              PlutoLayoutActionHideAllTabViewAction(
+            layoutEvents,
+            layoutFocusNode,
+          );
           break;
         case PlutoLayoutActionToggleTabViewIntent:
           actions[PlutoLayoutActionToggleTabViewIntent] =
-              PlutoLayoutActionToggleTabViewAction(layoutEvents);
+              PlutoLayoutActionToggleTabViewAction(
+            layoutEvents,
+            layoutFocusNode,
+          );
           break;
         case PlutoLayoutActionRotateTabViewIntent:
           actions[PlutoLayoutActionRotateTabViewIntent] =
-              PlutoLayoutActionRotateTabViewAction(layoutEvents);
+              PlutoLayoutActionRotateTabViewAction(
+            layoutEvents,
+            layoutFocusNode,
+          );
           break;
         case PlutoLayoutActionIncreaseTabViewIntent:
           actions[PlutoLayoutActionIncreaseTabViewIntent] =
-              PlutoLayoutActionIncreaseTabViewAction(layoutEvents);
+              PlutoLayoutActionIncreaseTabViewAction(
+            layoutEvents,
+            layoutFocusNode,
+          );
           break;
         case PlutoLayoutActionDecreaseTabViewIntent:
           actions[PlutoLayoutActionDecreaseTabViewIntent] =
-              PlutoLayoutActionDecreaseTabViewAction(layoutEvents);
+              PlutoLayoutActionDecreaseTabViewAction(
+            layoutEvents,
+            layoutFocusNode,
+          );
           break;
         case PlutoLayoutActionIncreaseTabItemViewIntent:
           actions[PlutoLayoutActionIncreaseTabItemViewIntent] =
-              PlutoLayoutActionIncreaseTabItemViewAction(layoutEvents);
+              PlutoLayoutActionIncreaseTabItemViewAction(
+            layoutEvents,
+            layoutFocusNode,
+          );
           break;
         case PlutoLayoutActionDecreaseTabItemViewIntent:
           actions[PlutoLayoutActionDecreaseTabItemViewIntent] =
-              PlutoLayoutActionDecreaseTabItemViewAction(layoutEvents);
+              PlutoLayoutActionDecreaseTabItemViewAction(
+            layoutEvents,
+            layoutFocusNode,
+          );
           break;
         case PlutoLayoutActionRemoveTabItemIntent:
           actions[PlutoLayoutActionRemoveTabItemIntent] =
-              PlutoLayoutActionRemoveTabItemAction(layoutEvents);
+              PlutoLayoutActionRemoveTabItemAction(
+            layoutEvents,
+            layoutFocusNode,
+          );
           break;
         case PlutoLayoutActionInsertTabItemIntent:
           actions[PlutoLayoutActionInsertTabItemIntent] =
-              PlutoLayoutActionInsertTabItemAction(layoutEvents);
+              PlutoLayoutActionInsertTabItemAction(
+            layoutEvents,
+            layoutFocusNode,
+          );
           break;
       }
     }
@@ -200,12 +234,26 @@ abstract class PlutoLayoutActions {
 }
 
 abstract class PlutoLayoutIntent extends Intent {
-  const PlutoLayoutIntent();
+  const PlutoLayoutIntent({required this.actionsOnlyPrimaryFocus});
+
+  final bool actionsOnlyPrimaryFocus;
 }
 
 abstract class PlutoLayoutAction<T extends PlutoLayoutIntent>
     extends Action<T> {
-  PlutoLayoutAction(this.events);
+  @mustCallSuper
+  PlutoLayoutAction(this.events, this.focusNode);
 
   final PlutoLayoutEventStreamController events;
+
+  final FocusNode focusNode;
+
+  bool canInvoke(T intent) {
+    return !intent.actionsOnlyPrimaryFocus || focusNode.hasPrimaryFocus;
+  }
+
+  @override
+  bool isEnabled(T intent) {
+    return canInvoke(intent);
+  }
 }

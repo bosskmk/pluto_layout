@@ -18,6 +18,7 @@ class PlutoLayoutActionToggleTabViewIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionToggleTabViewIntent({
     this.layoutId,
     this.itemId,
+    super.actionsOnlyPrimaryFocus = true,
   });
 
   final PlutoLayoutId? layoutId;
@@ -27,7 +28,7 @@ class PlutoLayoutActionToggleTabViewIntent extends PlutoLayoutIntent {
 
 class PlutoLayoutActionToggleTabViewAction
     extends PlutoLayoutAction<PlutoLayoutActionToggleTabViewIntent> {
-  PlutoLayoutActionToggleTabViewAction(super.events);
+  PlutoLayoutActionToggleTabViewAction(super.events, super.focusNode);
 
   @override
   void invoke(PlutoLayoutActionToggleTabViewIntent intent) {

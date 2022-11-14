@@ -8,15 +8,16 @@ import '../events/events.dart';
 /// {@endtemplate}
 class PlutoLayoutActionRotateTabViewIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionRotateTabViewIntent(
-    this.layoutId,
-  );
+    this.layoutId, {
+    super.actionsOnlyPrimaryFocus = true,
+  });
 
   final PlutoLayoutId layoutId;
 }
 
 class PlutoLayoutActionRotateTabViewAction
     extends PlutoLayoutAction<PlutoLayoutActionRotateTabViewIntent> {
-  PlutoLayoutActionRotateTabViewAction(super.events);
+  PlutoLayoutActionRotateTabViewAction(super.events, super.focusNode);
 
   @override
   void invoke(PlutoLayoutActionRotateTabViewIntent intent) {

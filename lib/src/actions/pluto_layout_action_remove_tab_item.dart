@@ -10,8 +10,9 @@ import 'package:pluto_layout/src/events/events.dart';
 class PlutoLayoutActionRemoveTabItemIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionRemoveTabItemIntent(
     this.layoutId,
-    this.itemId,
-  );
+    this.itemId, {
+    super.actionsOnlyPrimaryFocus = true,
+  });
 
   final PlutoLayoutId? layoutId;
 
@@ -20,7 +21,7 @@ class PlutoLayoutActionRemoveTabItemIntent extends PlutoLayoutIntent {
 
 class PlutoLayoutActionRemoveTabItemAction
     extends PlutoLayoutAction<PlutoLayoutActionRemoveTabItemIntent> {
-  PlutoLayoutActionRemoveTabItemAction(super.events);
+  PlutoLayoutActionRemoveTabItemAction(super.events, super.focusNode);
 
   @override
   void invoke(PlutoLayoutActionRemoveTabItemIntent intent) {

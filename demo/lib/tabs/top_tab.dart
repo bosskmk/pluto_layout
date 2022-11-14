@@ -1,7 +1,15 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pluto_menu_bar/pluto_menu_bar.dart';
 
 import '../helper/launch_url.dart';
+
+final _isAndroid = defaultTargetPlatform == TargetPlatform.android;
+final _isIOS = defaultTargetPlatform == TargetPlatform.iOS;
+final _isFuchsia = defaultTargetPlatform == TargetPlatform.fuchsia;
+final _isMobileWeb = kIsWeb && (_isAndroid || _isIOS || _isFuchsia);
+final _isMobileApp = !kIsWeb && (_isAndroid || _isIOS || _isFuchsia);
+final _isMobile = _isMobileWeb || _isMobileApp;
 
 class TopTab extends StatefulWidget {
   const TopTab({super.key});
@@ -32,6 +40,10 @@ class _TopTabState extends State<TopTab> {
                   title: 'PlutoMenuBar',
                   onTap: () => launchUrl(
                       'https://pluto.weblaze.dev/series/pluto-menu-bar')),
+              PlutoMenuItem(
+                  title: 'PlutoLayout',
+                  onTap: () => launchUrl(
+                      'https://pluto.weblaze.dev/series/pluto-layout')),
             ],
           ),
           PlutoMenuItem(
@@ -45,6 +57,10 @@ class _TopTabState extends State<TopTab> {
                   title: 'PlutoMenuBar',
                   onTap: () =>
                       launchUrl('https://github.com/bosskmk/pluto_menu_bar')),
+              PlutoMenuItem(
+                  title: 'PlutoLayout',
+                  onTap: () =>
+                      launchUrl('https://github.com/bosskmk/pluto_layout')),
             ],
           ),
         ],
@@ -58,7 +74,7 @@ class _TopTabState extends State<TopTab> {
 
     return PlutoMenuBar(
       height: 32,
-      mode: PlutoMenuBarMode.hover,
+      mode: _isMobile ? PlutoMenuBarMode.tap : PlutoMenuBarMode.hover,
       menus: menuItems,
       backgroundColor: theme.dialogBackgroundColor,
       moreIconColor: theme.toggleableActiveColor,

@@ -11,6 +11,7 @@ import '../events/events.dart';
 class PlutoLayoutActionHideAllTabViewIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionHideAllTabViewIntent({
     this.afterFocusToBody = true,
+    super.actionsOnlyPrimaryFocus = true,
   });
 
   final bool afterFocusToBody;
@@ -18,7 +19,7 @@ class PlutoLayoutActionHideAllTabViewIntent extends PlutoLayoutIntent {
 
 class PlutoLayoutActionHideAllTabViewAction
     extends PlutoLayoutAction<PlutoLayoutActionHideAllTabViewIntent> {
-  PlutoLayoutActionHideAllTabViewAction(super.events);
+  PlutoLayoutActionHideAllTabViewAction(super.events, super.focusNode);
 
   @override
   void invoke(PlutoLayoutActionHideAllTabViewIntent intent) {
