@@ -1,4 +1,4 @@
-## PlutoLayout - v0.2.2
+## PlutoLayout - v0.3.0
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -14,7 +14,7 @@ You can also assign custom shortcut keys to open or close tab views and resize t
 
 ### Screenshot
 
-![PlutoLayout Screenshot](https://bosskmk.github.io/images/pluto_layout/pluto_layout.gif)
+![PlutoLayout Screenshot](https://bosskmk.github.io/images/pluto_layout/pluto_layout_0.3.gif)
 
 ### Usage
 

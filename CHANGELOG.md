@@ -1,3 +1,9 @@
+## 0.3.0
+
+* Add showOneMust to PlutoLayoutTabMode.
+* Add draggable tab.
+* Add PlutoLayoutTabsOrChild widget.
+
 ## 0.2.2
 
 * Add tab size resolver.
