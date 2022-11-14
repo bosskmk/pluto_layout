@@ -1,5 +1,4 @@
 import 'package:pluto_layout/pluto_layout.dart';
-import 'package:pluto_layout/src/events/events.dart';
 
 /// {@template pluto_layout_action_rotate_focused_container_intent}
 /// Move the focus of [PlutoLayoutContainer] in order.
@@ -19,6 +18,7 @@ class PlutoLayoutActionRotateFocusedContainerIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionRotateFocusedContainerIntent({
     this.reverse = false,
     this.order = PlutoLayoutId.values,
+    super.actionsOnlyPrimaryFocus = true,
   });
 
   final bool reverse;
@@ -28,7 +28,7 @@ class PlutoLayoutActionRotateFocusedContainerIntent extends PlutoLayoutIntent {
 
 class PlutoLayoutActionRotateFocusedContainerAction
     extends PlutoLayoutAction<PlutoLayoutActionRotateFocusedContainerIntent> {
-  PlutoLayoutActionRotateFocusedContainerAction(super.events);
+  PlutoLayoutActionRotateFocusedContainerAction(super.events, super.focusNode);
 
   @override
   void invoke(PlutoLayoutActionRotateFocusedContainerIntent intent) {

@@ -1,7 +1,5 @@
 import 'package:pluto_layout/pluto_layout.dart';
 
-import '../events/events.dart';
-
 /// {@template pluto_layout_action_decrease_tab_view_intent}
 /// Decrease the size of the tab view
 /// corresponding to the [layoutId] position by a specific pixel.
@@ -17,12 +15,16 @@ import '../events/events.dart';
 /// In the state where [layoutId] is not specified,
 /// use left, right or top, bottom with one arrow key
 /// to decrease the size according to the direction.
+///
+/// For more information, please refer to the link below.
+/// https://pluto.weblaze.dev/introduction-to-plutlayout
 /// {@endtemplate}
 class PlutoLayoutActionDecreaseTabViewIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionDecreaseTabViewIntent(
     this.layoutId, {
     this.size = PlutoLayoutInDecreaseTabViewEvent.defaultSize,
     this.reverseByDirection = false,
+    super.actionsOnlyPrimaryFocus = true,
   }) : assert(size > 0);
 
   final PlutoLayoutId? layoutId;
@@ -34,7 +36,7 @@ class PlutoLayoutActionDecreaseTabViewIntent extends PlutoLayoutIntent {
 
 class PlutoLayoutActionDecreaseTabViewAction
     extends PlutoLayoutAction<PlutoLayoutActionDecreaseTabViewIntent> {
-  PlutoLayoutActionDecreaseTabViewAction(super.events);
+  PlutoLayoutActionDecreaseTabViewAction(super.events, super.focusNode);
 
   @override
   void invoke(PlutoLayoutActionDecreaseTabViewIntent intent) {

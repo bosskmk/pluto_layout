@@ -41,6 +41,12 @@ class _ItemsNotifier extends StateNotifier<List<PlutoLayoutTabItem>> {
   }
 
   void insert(int index, PlutoLayoutTabItem item) {
+    if (index < 0) index = 0;
+
+    final length = state.length;
+
+    if (index > length) index = length;
+
     state.insert(index, item);
     state = [...state];
   }

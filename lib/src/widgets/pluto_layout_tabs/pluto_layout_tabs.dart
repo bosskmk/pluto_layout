@@ -10,7 +10,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pluto_layout/pluto_layout.dart';
 import 'package:pluto_layout/src/helper/resize_helper.dart';
 
-import '../../events/events.dart';
 import '../../pluto_layout_data.dart';
 import '../../pluto_layout_provider.dart';
 import '../../ui/pluto_layout_container_provider.dart';
@@ -24,6 +23,7 @@ part '_menus.dart';
 part '_tab_view.dart';
 part 'pluto_layout_tab_item.dart';
 part 'pluto_layout_tab_item_size_resolver.dart';
+part 'pluto_layout_tabs_or_child.dart';
 
 final _focusedItemIdViewProvider = StateProvider<Object?>((ref) => null);
 
@@ -32,18 +32,33 @@ final _focusedItemIdViewProvider = StateProvider<Object?>((ref) => null);
 /// {@macro pluto_layout_example}
 class PlutoLayoutTabs extends ConsumerWidget {
   PlutoLayoutTabs({
-    List<PlutoLayoutTabItem> items = const [],
+    List<PlutoLayoutTabItem>? items,
     this.mode = PlutoLayoutTabMode.showOne,
     this.tabViewSizeResolver,
     bool? draggable,
     super.key,
-  })  : items = _updateConstrains(items, mode),
-        draggable = draggable ?? false;
+  })  : items = _updateConstrains(items ?? [], mode),
+        draggable = draggable ?? false,
+        _givenItemsProvider = false,
+        _expanded = false;
+
+  PlutoLayoutTabs._givenItemsProvider({
+    List<PlutoLayoutTabItem>? items,
+    this.mode = PlutoLayoutTabMode.showOne,
+    bool? draggable,
+    required bool expanded,
+  })  : items = _updateConstrains(items ?? [], mode),
+        draggable = draggable ?? false,
+        tabViewSizeResolver = null,
+        _givenItemsProvider = true,
+        _expanded = expanded;
 
   static List<PlutoLayoutTabItem> _updateConstrains(
     List<PlutoLayoutTabItem> items,
     PlutoLayoutTabMode mode,
   ) {
+    if (items.isEmpty) return items;
+
     assert(
       !mode.isShowOneMode || items.where(_TabsHelper.isEnabled).length < 2,
       'If the mode is showOne or showOneMust, the enabled item must be absent or one.',
@@ -109,6 +124,10 @@ class PlutoLayoutTabs extends ConsumerWidget {
   /// If the value is true, drag the item button to move the tab position.
   final bool draggable;
 
+  final bool _givenItemsProvider;
+
+  final bool _expanded;
+
   int _getTabsRotate(PlutoLayoutContainerDirection id) {
     switch (id) {
       case PlutoLayoutContainerDirection.top:
@@ -149,6 +168,12 @@ class PlutoLayoutTabs extends ConsumerWidget {
           : RotatedBox(quarterTurns: rotate, child: child);
     }
 
+    Widget expandedOrNot(bool expanded, Widget child) {
+      if (!expanded) return child;
+
+      return Expanded(child: child);
+    }
+
     final List<Widget> children = [
       rotateOrNot(
         childrenRotate,
@@ -158,52 +183,62 @@ class PlutoLayoutTabs extends ConsumerWidget {
           draggable: draggable,
         ),
       ),
-      rotateOrNot(
-        childrenRotate,
-        _TabView(
-          direction: containerDirection,
-          mode: mode,
-          tabViewSizeResolver: tabViewSizeResolver,
+      expandedOrNot(
+        _expanded,
+        rotateOrNot(
+          childrenRotate,
+          _TabView(
+            direction: containerDirection,
+            mode: mode,
+            disableResize: _expanded,
+            tabViewSizeResolver: tabViewSizeResolver,
+          ),
         ),
       ),
     ];
 
-    return ProviderScope(
-      overrides: [
-        _itemsProvider.overrideWith((ref) => _ItemsNotifier(items)),
-      ],
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: theme.dialogBackgroundColor,
-          border: Border(
-            top: containerDirection.isBottom ? border : BorderSide.none,
-            left: containerDirection.isRight ? border : BorderSide.none,
-            right: containerDirection.isLeft ? border : BorderSide.none,
-            bottom: containerDirection.isTop ? border : BorderSide.none,
-          ),
-        ),
-        child: rotateOrNot(
-          tabsRotate,
-          containerDirection.isHorizontal
-              ? Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: children,
-                )
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: children,
-                ),
+    final child = DecoratedBox(
+      decoration: BoxDecoration(
+        color: theme.dialogBackgroundColor,
+        border: Border(
+          top: containerDirection.isBottom ? border : BorderSide.none,
+          left: containerDirection.isRight ? border : BorderSide.none,
+          right: containerDirection.isLeft ? border : BorderSide.none,
+          bottom: containerDirection.isTop ? border : BorderSide.none,
         ),
       ),
+      child: rotateOrNot(
+        tabsRotate,
+        containerDirection.isHorizontal
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: children,
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: children,
+              ),
+      ),
     );
+
+    return _givenItemsProvider
+        ? child
+        : ProviderScope(
+            overrides: [
+              _itemsProvider.overrideWith((ref) => _ItemsNotifier(items)),
+            ],
+            child: child,
+          );
   }
 }
 
 class _TabsHelper {
   static bool isEnabledTabView(PlutoLayoutTabItem e) =>
-      e.enabled && e.tabViewBuilder != null;
+      e.enabled && e.tabViewWidget != null;
 
   static bool isEnabled(PlutoLayoutTabItem e) => e.enabled;
+
+  static bool hasTabViewWidget(PlutoLayoutTabItem e) => e.tabViewWidget != null;
 
   static PlutoLayoutId? getFocusedLayoutId(WidgetRef ref) {
     return ref.read(focusedLayoutIdProvider);
@@ -215,11 +250,18 @@ class _TabsHelper {
   static void setFocus({
     required WidgetRef ref,
     required PlutoLayoutId? layoutId,
-    required Object? itemId,
+    required PlutoLayoutTabItem? item,
+    ScrollController? scrollController,
+    bool requestItemFocus = false,
   }) {
     ref.read(focusedLayoutIdProvider.notifier).state =
         layoutId ?? PlutoLayoutId.body;
-    ref.read(_focusedItemIdViewProvider.notifier).state = itemId;
+
+    ref.read(_focusedItemIdViewProvider.notifier).state = item?.id;
+
+    if (requestItemFocus) item?.requestFocus();
+
+    item?._scrollMenuToVisible(scrollController);
   }
 
   static bool watchIsFocused({

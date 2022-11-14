@@ -70,6 +70,16 @@ class PlutoLayout extends StatefulWidget {
 
   @override
   State<PlutoLayout> createState() => _PlutoLayoutState();
+
+  /// [PlutoLayoutEventStreamController] to receive or emit events of [PlutoLayout].
+  ///
+  /// You can access [BuildContext] from child widgets of [PlutoLayout].
+  static PlutoLayoutEventStreamController? getEventStreamController(
+      BuildContext context) {
+    return context
+        .findRootAncestorStateOfType<_PlutoLayoutState>()
+        ?._eventStreamController;
+  }
 }
 
 class _PlutoLayoutState extends State<PlutoLayout> {
@@ -275,8 +285,10 @@ class _PlutoLayoutDelegate extends MultiChildLayoutDelegate {
         BoxConstraints.loose(
           Size(
             size.width,
-            max(size.height - _size.topSize.height - _size.bottomSize.height,
-                0),
+            max(
+              size.height - _size.topSize.height - _size.bottomSize.height,
+              0,
+            ),
           ),
         ),
       );
@@ -290,8 +302,10 @@ class _PlutoLayoutDelegate extends MultiChildLayoutDelegate {
         BoxConstraints.loose(
           Size(
             size.width,
-            max(size.height - _size.topSize.height - _size.bottomSize.height,
-                0),
+            max(
+              size.height - _size.topSize.height - _size.bottomSize.height,
+              0,
+            ),
           ),
         ),
       );
@@ -303,11 +317,16 @@ class _PlutoLayoutDelegate extends MultiChildLayoutDelegate {
 
     id = PlutoLayoutId.body;
     if (hasChild(id)) {
+      final double minSize = _size.bodyTabMenuSize.height;
+
       _size.bodySize = layoutChild(
         id,
         BoxConstraints.tight(Size(
           max(size.width - _size.leftSize.width - _size.rightSize.width, 0),
-          max(size.height - _size.topSize.height - _size.bottomSize.height, 0),
+          max(
+            size.height - _size.topSize.height - _size.bottomSize.height,
+            minSize,
+          ),
         )),
       );
       positionChild(id, Offset(_size.leftSize.width, _size.topSize.height));

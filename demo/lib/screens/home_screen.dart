@@ -1,176 +1,182 @@
 import 'package:flutter/material.dart';
-import 'package:pluto_grid/pluto_grid.dart';
-import 'package:pluto_menu_bar/pluto_menu_bar.dart';
+import 'package:pluto_layout/pluto_layout.dart';
 
 import '../example_text.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen>
-    with AutomaticKeepAliveClientMixin {
-  final List<PlutoColumn> columns = [];
-
-  final List<PlutoRow> rows = [];
-
-  final List<PlutoMenuItem> bodyMenuItems = [];
-
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
-  void initState() {
-    super.initState();
-
-    columns.addAll([
-      PlutoColumn(
-        title: 'Text',
-        field: 'text_column',
-        type: PlutoColumnType.text(),
-      ),
-      PlutoColumn(
-        title: 'Number',
-        field: 'number_column',
-        type: PlutoColumnType.number(),
-      ),
-      PlutoColumn(
-        title: 'Date',
-        field: 'date_column',
-        type: PlutoColumnType.date(),
-      ),
-      PlutoColumn(
-        title: 'Time',
-        field: 'time_column',
-        type: PlutoColumnType.time(),
-      ),
-      PlutoColumn(
-        title: 'Select',
-        field: 'select_column',
-        type: PlutoColumnType.select(
-          ['PlutoGrid', 'PlutoMenuBar', 'PlutoLayout'],
-        ),
-      ),
-    ]);
-
-    rows.addAll([
-      PlutoRow(
-        cells: {
-          'text_column': PlutoCell(value: 'Text 1'),
-          'number_column': PlutoCell(value: 12345),
-          'date_column': PlutoCell(value: '2022-01-01'),
-          'time_column': PlutoCell(value: '12:30'),
-          'select_column': PlutoCell(value: 'PlutoGrid'),
-        },
-      ),
-      PlutoRow(
-        cells: {
-          'text_column': PlutoCell(value: 'Text 2'),
-          'number_column': PlutoCell(value: 12345),
-          'date_column': PlutoCell(value: '2022-02-01'),
-          'time_column': PlutoCell(value: '05:30'),
-          'select_column': PlutoCell(value: 'PlutoMenuBar'),
-        },
-      ),
-      PlutoRow(
-        cells: {
-          'text_column': PlutoCell(value: 'Text 3'),
-          'number_column': PlutoCell(value: 12345),
-          'date_column': PlutoCell(value: '2022-03-01'),
-          'time_column': PlutoCell(value: '07:25'),
-          'select_column': PlutoCell(value: 'PlutoLayout'),
-        },
-      ),
-    ]);
-
-    bodyMenuItems.addAll([
-      PlutoMenuItem(title: 'Menu1', children: [
-        PlutoMenuItem(title: 'Menu1-1', children: [
-          PlutoMenuItem(title: 'Menu1-1-1'),
-          PlutoMenuItem(title: 'Menu1-1-2'),
-        ]),
-        PlutoMenuItem(title: 'Menu1-2'),
-      ]),
-      PlutoMenuItem(title: 'Menu2', children: [
-        PlutoMenuItem(title: 'Menu2-1', children: [
-          PlutoMenuItem(title: 'Menu2-1-1'),
-          PlutoMenuItem(title: 'Menu2-1-2'),
-        ]),
-        PlutoMenuItem(title: 'Menu2-2'),
-      ]),
-      PlutoMenuItem(title: 'Menu3', children: [
-        PlutoMenuItem(title: 'Menu3-1', children: [
-          PlutoMenuItem(title: 'Menu3-1-1'),
-          PlutoMenuItem(title: 'Menu3-1-2'),
-        ]),
-        PlutoMenuItem(title: 'Menu3-2'),
-      ]),
-    ]);
-  }
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-
-    final theme = Theme.of(context);
-
-    return SingleChildScrollView(
-      child: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 800),
-          alignment: Alignment.topCenter,
-          child: Padding(
-            padding: const EdgeInsets.all(50),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(ExampleText.bodyTitle),
-                const SizedBox(height: 15),
-                const Text(ExampleText.bodyDesc1),
-                const SizedBox(height: 50),
-                const Text(ExampleText.bodyPlutoGridTitle),
-                const SizedBox(height: 15),
-                const Text(ExampleText.bodyPlutoGridDesc1),
-                const SizedBox(height: 10),
-                SizedBox(
-                  height: 300,
-                  child: PlutoGrid(
-                    columns: columns,
-                    rows: rows,
-                    configuration: PlutoGridConfiguration(
-                      style: PlutoGridStyleConfig.dark(
-                        gridBackgroundColor: theme.dialogBackgroundColor,
-                        borderColor: theme.dividerColor,
-                        rowColor: theme.dialogBackgroundColor,
-                        activatedColor: theme.backgroundColor,
-                        activatedBorderColor: theme.toggleableActiveColor,
-                        gridBorderRadius: BorderRadius.circular(10),
+    return PlutoLayoutTabsOrChild(
+      child: SingleChildScrollView(
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(
+              minWidth: 300,
+              maxWidth: 800,
+            ),
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: const EdgeInsets.all(50),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text(ExampleText.homeTitle, style: TextStyle(fontSize: 20)),
+                  SizedBox(height: 15),
+                  Text(ExampleText.homeDesc1),
+                  SizedBox(height: 50),
+                  _FeatureContainer(
+                    title: ExampleText.homeDraggableTab,
+                    features: [
+                      _Feature(description: ExampleText.homeDraggableTabDesc),
+                    ],
+                  ),
+                  SizedBox(height: 50),
+                  _FeatureContainer(
+                    title: ExampleText.homeShortcutsTitle,
+                    features: [
+                      _Feature(description: ExampleText.homeShortcutsDesc),
+                      _Feature(
+                        title: ExampleText.homeShortcutsAlt1Title,
+                        description: ExampleText.homeShortcutsAlt1Desc,
                       ),
-                    ),
+                      _Feature(
+                        title: ExampleText.homeShortcutsAlt2Title,
+                        description: ExampleText.homeShortcutsAlt2Desc,
+                      ),
+                      _Feature(
+                        title: ExampleText.homeShortcutsShiftNTitle,
+                        description: ExampleText.homeShortcutsShiftNDesc,
+                      ),
+                      _Feature(
+                        title: ExampleText.homeShortcutsShiftWTitle,
+                        description: ExampleText.homeShortcutsShiftWDesc,
+                      ),
+                      _Feature(
+                        title: ExampleText.homeShortcutsEscapeTitle,
+                        description: ExampleText.homeShortcutsEscapeDesc,
+                      ),
+                      _Feature(
+                        title: ExampleText.homeShortcutsAltArrowUpDownTitle,
+                        description:
+                            ExampleText.homeShortcutsAltArrowUpDownDesc,
+                      ),
+                      _Feature(
+                        title: ExampleText.homeShortcutsControlArrowUpDownTitle,
+                        description:
+                            ExampleText.homeShortcutsControlArrowUpDownDesc,
+                      ),
+                      _Feature(
+                        title: ExampleText.homeShortcutsTabOrShiftTabTitle,
+                        description: ExampleText.homeShortcutsTabOrShiftTabDesc,
+                      ),
+                      _Feature(
+                        title: ExampleText
+                            .homeShortcutsControlAltArrowLeftRightTitle,
+                        description: ExampleText
+                            .homeShortcutsControlAltArrowLeftRightDesc,
+                      ),
+                      _Feature(
+                        title: ExampleText.homeShortcutsEnterTitle,
+                        description: ExampleText.homeShortcutsEnterDesc,
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 50),
-                const Text(ExampleText.bodyPlutoMenuBarTitle),
-                const SizedBox(height: 15),
-                const Text(ExampleText.bodyPlutoMenuBarDesc1),
-                const SizedBox(height: 10),
-                PlutoMenuBar(
-                  mode: PlutoMenuBarMode.hover,
-                  backgroundColor: theme.dialogBackgroundColor,
-                  moreIconColor: theme.toggleableActiveColor,
-                  textStyle: TextStyle(
-                    color: theme.primaryColorLight,
-                  ),
-                  menus: bodyMenuItems,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _FeatureContainer extends StatelessWidget {
+  const _FeatureContainer({
+    required this.title,
+    required this.features,
+  });
+
+  final String title;
+
+  final List<_Feature> features;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final lastItem = features.last;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(fontSize: 20),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: theme.dialogBackgroundColor,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final feature in features)
+                    if (lastItem != feature) ...[
+                      feature,
+                      const SizedBox(height: 15),
+                    ] else
+                      feature,
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Feature extends StatelessWidget {
+  const _Feature({
+    this.title,
+    required this.description,
+  });
+
+  final String? title;
+
+  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Wrap(
+      direction: Axis.horizontal,
+      children: [
+        if (title != null) ...[
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: theme.secondaryHeaderColor,
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(5),
+              child: Text(title!),
+            ),
+          ),
+          const SizedBox(width: 10),
+        ],
+        Text(description),
+      ],
     );
   }
 }

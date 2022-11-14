@@ -1,5 +1,4 @@
 import 'package:pluto_layout/pluto_layout.dart';
-import 'package:pluto_layout/src/events/events.dart';
 
 /// {@template pluto_layout_action_rotate_focused_tab_item_intent}
 /// Move the focus of the tab item located at [layoutId] in order.
@@ -15,6 +14,7 @@ class PlutoLayoutActionRotateFocusedTabItemIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionRotateFocusedTabItemIntent({
     this.layoutId,
     this.reverse = false,
+    super.actionsOnlyPrimaryFocus = true,
   });
 
   final PlutoLayoutId? layoutId;
@@ -24,7 +24,7 @@ class PlutoLayoutActionRotateFocusedTabItemIntent extends PlutoLayoutIntent {
 
 class PlutoLayoutActionRotateFocusedTabItemAction
     extends PlutoLayoutAction<PlutoLayoutActionRotateFocusedTabItemIntent> {
-  PlutoLayoutActionRotateFocusedTabItemAction(super.events);
+  PlutoLayoutActionRotateFocusedTabItemAction(super.events, super.focusNode);
 
   @override
   void invoke(PlutoLayoutActionRotateFocusedTabItemIntent intent) {

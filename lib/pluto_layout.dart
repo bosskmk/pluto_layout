@@ -14,6 +14,8 @@ import 'src/pluto_layout_event_stream_controller.dart';
 import 'src/pluto_layout_provider.dart';
 
 export './src/actions/actions.dart';
+export './src/events/events.dart';
+export './src/pluto_layout_event_stream_controller.dart';
 export './src/ui/ui.dart';
 export './src/widgets/widgets.dart';
 

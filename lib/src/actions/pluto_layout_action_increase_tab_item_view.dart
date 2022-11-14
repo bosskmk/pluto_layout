@@ -1,7 +1,5 @@
 import 'package:pluto_layout/pluto_layout.dart';
 
-import '../events/events.dart';
-
 /// {@template pluto_layout_action_increase_tab_item_view_intent}
 /// Increase the size of the tab item view of [itemId] located at [layoutId].
 ///
@@ -19,6 +17,9 @@ import '../events/events.dart';
 /// In the state where [layoutId] is not specified,
 /// use left, right or top, bottom with one arrow key
 /// to decrease the size according to the direction.
+///
+/// For more information, please refer to the link below.
+/// https://pluto.weblaze.dev/introduction-to-plutlayout
 /// {@endtemplate}
 class PlutoLayoutActionIncreaseTabItemViewIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionIncreaseTabItemViewIntent({
@@ -26,6 +27,7 @@ class PlutoLayoutActionIncreaseTabItemViewIntent extends PlutoLayoutIntent {
     this.itemId,
     this.size = PlutoLayoutInDecreaseTabItemViewEvent.defaultSize,
     this.reverseByDirection = false,
+    super.actionsOnlyPrimaryFocus = true,
   }) : assert(size > 0);
 
   final PlutoLayoutId? layoutId;
@@ -39,7 +41,7 @@ class PlutoLayoutActionIncreaseTabItemViewIntent extends PlutoLayoutIntent {
 
 class PlutoLayoutActionIncreaseTabItemViewAction
     extends PlutoLayoutAction<PlutoLayoutActionIncreaseTabItemViewIntent> {
-  PlutoLayoutActionIncreaseTabItemViewAction(super.events);
+  PlutoLayoutActionIncreaseTabItemViewAction(super.events, super.focusNode);
 
   @override
   void invoke(PlutoLayoutActionIncreaseTabItemViewIntent intent) {

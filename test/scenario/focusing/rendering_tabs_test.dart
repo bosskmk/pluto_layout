@@ -28,7 +28,7 @@ void main() {
             id: 'left1',
             title: 'left1',
             enabled: true,
-            tabViewBuilder: (e) => const Text('left1 view'),
+            tabViewWidget: const Text('left1 view'),
           ),
         ],
       );
@@ -49,7 +49,7 @@ void main() {
             id: 'left1',
             title: 'left1',
             enabled: false,
-            tabViewBuilder: (e) => const Text('left1 view'),
+            tabViewWidget: const Text('left1 view'),
           ),
         ],
       );
@@ -83,7 +83,7 @@ void main() {
             id: 'left1',
             title: 'left1',
             enabled: true,
-            tabViewBuilder: (e) => const Text('left1 view'),
+            tabViewWidget: const Text('left1 view'),
           ),
         ],
       );
@@ -108,7 +108,7 @@ void main() {
             id: 'left1',
             title: 'left1',
             enabled: true,
-            tabViewBuilder: (e) => const Text('left1 view'),
+            tabViewWidget: const Text('left1 view'),
           ),
         ],
       );
@@ -133,7 +133,7 @@ void main() {
             id: 'left1',
             title: 'left1',
             enabled: true,
-            tabViewBuilder: (e) => const Text('left1 view'),
+            tabViewWidget: const Text('left1 view'),
           ),
         ],
       );
@@ -170,13 +170,13 @@ void main() {
             id: 'left1',
             title: 'left1',
             enabled: true,
-            tabViewBuilder: (e) => const Text('left1 view'),
+            tabViewWidget: const Text('left1 view'),
           ),
           PlutoLayoutTabItem(
             id: 'left2',
             title: 'left2',
             enabled: true,
-            tabViewBuilder: (e) => const Text('left2 view'),
+            tabViewWidget: const Text('left2 view'),
           ),
         ],
       );
@@ -208,13 +208,13 @@ void main() {
             id: 'left1',
             title: 'left1',
             enabled: true,
-            tabViewBuilder: (e) => const Text('left1 view'),
+            tabViewWidget: const Text('left1 view'),
           ),
           PlutoLayoutTabItem(
             id: 'left2',
             title: 'left2',
             enabled: true,
-            tabViewBuilder: (e) => const Text('left2 view'),
+            tabViewWidget: const Text('left2 view'),
           ),
         ],
       );

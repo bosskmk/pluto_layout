@@ -34,22 +34,24 @@ abstract class PlutoLayoutTabItemSizeResolver {
     double remainingMinimum = minimumMaxSize;
     bool narrowing = maxSize <= minimumMaxSize;
 
-    if (!narrowing &&
-        groupByResolverType.containsKey(PlutoLayoutTabItemSizeInitial)) {
-      for (final item in groupByResolverType[PlutoLayoutTabItemSizeInitial]!) {
-        item._size = min(
-          item.sizeResolver.resolve(maxSize: maxSize, minSize: minSize),
-          remaining,
-        );
+    if (groupByResolverType.containsKey(PlutoLayoutTabItemSizeInitial)) {
+      if (!narrowing) {
+        for (final item
+            in groupByResolverType[PlutoLayoutTabItemSizeInitial]!) {
+          item._size = min(
+            item.sizeResolver.resolve(maxSize: maxSize, minSize: minSize),
+            remaining,
+          );
 
-        ++countSizedItem;
-        remaining -= item._size;
-        remainingMinimum -= minSize;
+          ++countSizedItem;
+          remaining -= item._size;
+          remainingMinimum -= minSize;
 
-        if (remaining <= remainingMinimum) {
-          item._size -= remainingMinimum;
-          narrowing = true;
-          break;
+          if (remaining <= remainingMinimum) {
+            item._size -= remainingMinimum;
+            narrowing = true;
+            break;
+          }
         }
       }
 

@@ -23,6 +23,8 @@ class _Menus extends ConsumerStatefulWidget {
 class _MenusState extends ConsumerState<_Menus> {
   late final StreamSubscription<PlutoLayoutEvent> _eventListener;
 
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -34,6 +36,8 @@ class _MenusState extends ConsumerState<_Menus> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
+
     _eventListener.cancel();
 
     super.dispose();
@@ -80,6 +84,8 @@ class _MenusState extends ConsumerState<_Menus> {
       _handleRemoveTabItemEvent(event);
     } else if (event is PlutoRotateFocusedTabItemEvent) {
       _handleRotateFocusedTabItemEvent(event);
+    } else if (event is PlutoInsertTabItemEvent) {
+      _handleInsertTabItemEvent(event);
     }
   }
 
@@ -110,7 +116,9 @@ class _MenusState extends ConsumerState<_Menus> {
       _TabsHelper.setFocus(
         ref: ref,
         layoutId: layoutId,
-        itemId: item.id,
+        item: item,
+        scrollController: _scrollController,
+        requestItemFocus: true,
       );
     }
 
@@ -217,32 +225,67 @@ class _MenusState extends ConsumerState<_Menus> {
     Object? focusedItemId = ref.read(_focusedItemIdViewProvider);
 
     Iterable<PlutoLayoutTabItem> items = event.reverse
-        ? ref.watch(_itemsProvider).reversed
-        : ref.watch(_itemsProvider);
+        ? ref.read(_itemsProvider).reversed
+        : ref.read(_itemsProvider);
 
     if (items.isEmpty) return;
 
-    Object nextFocus;
+    PlutoLayoutTabItem nextFocus;
 
     if (focusedItemId == null) {
-      nextFocus = items.first.id;
+      nextFocus = items.first;
     } else {
       final item = items.firstWhereOrNull((e) => e.id == focusedItemId);
 
       if (item == null) {
-        nextFocus = items.first.id;
+        nextFocus = items.first;
       } else {
         final found = items.skipWhile((e) => e.id != item.id);
 
-        nextFocus = found.length <= 1 ? items.first.id : found.skip(1).first.id;
+        nextFocus = found.length <= 1 ? items.first : found.skip(1).first;
       }
     }
 
     _TabsHelper.setFocus(
       ref: ref,
       layoutId: layoutId,
-      itemId: nextFocus,
+      item: nextFocus,
+      scrollController: _scrollController,
     );
+  }
+
+  void _handleInsertTabItemEvent(PlutoInsertTabItemEvent event) {
+    final eventLayoutId = event.layoutId ?? _TabsHelper.getFocusedLayoutId(ref);
+
+    if (eventLayoutId == null) return;
+
+    final layoutId = ref.read(layoutIdProvider);
+
+    if (eventLayoutId != layoutId) return;
+
+    final items = ref.read(_itemsProvider);
+
+    final resolvedItem = event.itemResolver(items: items);
+
+    int index = resolvedItem.index ?? items.length;
+
+    ref.read(_itemsProvider.notifier).insert(index, resolvedItem.item);
+
+    if (resolvedItem.item.enabled ||
+        (widget.mode.isShowOneMode &&
+            items.firstWhereOrNull(_TabsHelper.isEnabled) == null)) {
+      ref
+          .read(_itemsProvider.notifier)
+          .setEnabled(resolvedItem.item.id, true, widget.mode);
+
+      _TabsHelper.setFocus(
+        ref: ref,
+        layoutId: layoutId,
+        item: resolvedItem.item,
+        scrollController: _scrollController,
+        requestItemFocus: true,
+      );
+    }
   }
 
   @override
@@ -271,7 +314,9 @@ class _MenusState extends ConsumerState<_Menus> {
         toggleTab: toggleTab,
       );
 
-      if (!widget.draggable) return menu;
+      if (!widget.draggable) {
+        return KeyedSubtree(key: item._menuKey, child: menu);
+      }
 
       return _Draggable(
         key: ValueKey('_Draggable_${item.id}'),
@@ -296,6 +341,7 @@ class _MenusState extends ConsumerState<_Menus> {
         child: RotatedBox(
           quarterTurns: quarterTurns,
           child: SingleChildScrollView(
+            controller: _scrollController,
             reverse: widget.direction.isLeft,
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -463,7 +509,7 @@ class _Draggable extends ConsumerWidget {
         _TabsHelper.setFocus(
           ref: ref,
           layoutId: layoutId,
-          itemId: data.item.id,
+          item: data.item,
         );
       }
 
@@ -488,25 +534,28 @@ class _Draggable extends ConsumerWidget {
       );
     }
 
-    if (dragging) {
-      final theme = Theme.of(context);
-
-      return DecoratedBox(
-        key: ValueKey('_DraggableDragging_${layoutId.name}'),
-        position: DecorationPosition.foreground,
-        decoration: BoxDecoration(
-          color: Theme.of(context).dialogBackgroundColor,
-          border: Border(
-            bottom: items.where((i) => i.enabled).isEmpty
-                ? BorderSide(color: theme.dividerColor)
-                : BorderSide.none,
-          ),
-        ),
-        child: child,
-      );
+    if (!dragging) {
+      return KeyedSubtree(key: item._menuKey, child: child);
     }
 
-    return child;
+    final theme = Theme.of(context);
+
+    final border = items.where(_TabsHelper.isEnabled).isEmpty
+        ? BorderSide(color: theme.dividerColor)
+        : BorderSide.none;
+
+    return DecoratedBox(
+      key: ValueKey('_DraggableDragging_${layoutId.name}'),
+      position: DecorationPosition.foreground,
+      decoration: BoxDecoration(
+        color: Theme.of(context).dialogBackgroundColor,
+        border: Border(
+          top: layoutId.isBottom ? border : BorderSide.none,
+          bottom: layoutId.isBottom ? BorderSide.none : border,
+        ),
+      ),
+      child: child,
+    );
   }
 
   @override

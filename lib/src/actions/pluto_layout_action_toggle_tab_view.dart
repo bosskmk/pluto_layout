@@ -1,7 +1,5 @@
 import 'package:pluto_layout/pluto_layout.dart';
 
-import '../events/events.dart';
-
 /// {@template pluto_layout_action_toggle_tab_view_intent}
 /// Toggles the tab view corresponding to [itemId].
 ///
@@ -18,6 +16,7 @@ class PlutoLayoutActionToggleTabViewIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionToggleTabViewIntent({
     this.layoutId,
     this.itemId,
+    super.actionsOnlyPrimaryFocus = true,
   });
 
   final PlutoLayoutId? layoutId;
@@ -27,7 +26,7 @@ class PlutoLayoutActionToggleTabViewIntent extends PlutoLayoutIntent {
 
 class PlutoLayoutActionToggleTabViewAction
     extends PlutoLayoutAction<PlutoLayoutActionToggleTabViewIntent> {
-  PlutoLayoutActionToggleTabViewAction(super.events);
+  PlutoLayoutActionToggleTabViewAction(super.events, super.focusNode);
 
   @override
   void invoke(PlutoLayoutActionToggleTabViewIntent intent) {

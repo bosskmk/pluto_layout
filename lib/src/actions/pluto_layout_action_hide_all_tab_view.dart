@@ -1,7 +1,5 @@
 import 'package:pluto_layout/pluto_layout.dart';
 
-import '../events/events.dart';
-
 /// {@template pluto_layout_action_hide_all_tab_view_intent}
 /// Close all tabviews.
 ///
@@ -11,6 +9,7 @@ import '../events/events.dart';
 class PlutoLayoutActionHideAllTabViewIntent extends PlutoLayoutIntent {
   const PlutoLayoutActionHideAllTabViewIntent({
     this.afterFocusToBody = true,
+    super.actionsOnlyPrimaryFocus = true,
   });
 
   final bool afterFocusToBody;
@@ -18,7 +17,7 @@ class PlutoLayoutActionHideAllTabViewIntent extends PlutoLayoutIntent {
 
 class PlutoLayoutActionHideAllTabViewAction
     extends PlutoLayoutAction<PlutoLayoutActionHideAllTabViewIntent> {
-  PlutoLayoutActionHideAllTabViewAction(super.events);
+  PlutoLayoutActionHideAllTabViewAction(super.events, super.focusNode);
 
   @override
   void invoke(PlutoLayoutActionHideAllTabViewIntent intent) {

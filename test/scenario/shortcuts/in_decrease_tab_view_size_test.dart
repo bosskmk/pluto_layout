@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pluto_layout/pluto_layout.dart';
-import 'package:pluto_layout/src/events/events.dart';
 
 import '../../helper/build_widget_helper.dart';
 
@@ -29,7 +28,7 @@ void main() {
           PlutoLayoutTabItem(
             id: 'tab1',
             title: 'tab1',
-            tabViewBuilder: (c) => const Text('tab1 view'),
+            tabViewWidget: const Text('tab1 view'),
           ),
         ],
       )),
@@ -92,7 +91,7 @@ void main() {
             PlutoLayoutTabItem(
               id: 'tab1',
               title: 'tab1',
-              tabViewBuilder: (c) => const Text('tab1 view'),
+              tabViewWidget: const Text('tab1 view'),
             ),
           ],
         )),
@@ -156,7 +155,7 @@ void main() {
             PlutoLayoutTabItem(
               id: 'tab1',
               title: 'tab1',
-              tabViewBuilder: (c) => const Text('tab1 view'),
+              tabViewWidget: const Text('tab1 view'),
             ),
           ],
         )),
@@ -217,7 +216,7 @@ void main() {
           PlutoLayoutTabItem(
             id: 'tab1',
             title: 'tab1',
-            tabViewBuilder: (c) => const Text('tab1 view'),
+            tabViewWidget: const Text('tab1 view'),
           ),
         ],
       )),
@@ -280,7 +279,7 @@ void main() {
             PlutoLayoutTabItem(
               id: 'tab1',
               title: 'tab1',
-              tabViewBuilder: (c) => const Text('tab1 view'),
+              tabViewWidget: const Text('tab1 view'),
             ),
           ],
         )),
@@ -344,7 +343,7 @@ void main() {
             PlutoLayoutTabItem(
               id: 'tab1',
               title: 'tab1',
-              tabViewBuilder: (c) => const Text('tab1 view'),
+              tabViewWidget: const Text('tab1 view'),
             ),
           ],
         )),
@@ -405,7 +404,7 @@ void main() {
           PlutoLayoutTabItem(
             id: 'tab1',
             title: 'tab1',
-            tabViewBuilder: (c) => const Text('tab1 view'),
+            tabViewWidget: const Text('tab1 view'),
           ),
         ],
       )),
@@ -468,7 +467,7 @@ void main() {
             PlutoLayoutTabItem(
               id: 'tab1',
               title: 'tab1',
-              tabViewBuilder: (c) => const Text('tab1 view'),
+              tabViewWidget: const Text('tab1 view'),
             ),
           ],
         )),
@@ -532,7 +531,7 @@ void main() {
             PlutoLayoutTabItem(
               id: 'tab1',
               title: 'tab1',
-              tabViewBuilder: (c) => const Text('tab1 view'),
+              tabViewWidget: const Text('tab1 view'),
             ),
           ],
         )),
@@ -592,7 +591,7 @@ void main() {
           PlutoLayoutTabItem(
             id: 'tab1',
             title: 'tab1',
-            tabViewBuilder: (c) => const Text('tab1 view'),
+            tabViewWidget: const Text('tab1 view'),
           ),
         ],
       )),
@@ -654,7 +653,7 @@ void main() {
           PlutoLayoutTabItem(
             id: 'tab1',
             title: 'tab1',
-            tabViewBuilder: (c) => const Text('tab1 view'),
+            tabViewWidget: const Text('tab1 view'),
           ),
         ],
       )),
@@ -714,7 +713,7 @@ void main() {
           PlutoLayoutTabItem(
             id: 'tab1',
             title: 'tab1',
-            tabViewBuilder: (c) => const Text('tab1 view'),
+            tabViewWidget: const Text('tab1 view'),
           ),
         ],
       )),
@@ -776,7 +775,7 @@ void main() {
           PlutoLayoutTabItem(
             id: 'tab1',
             title: 'tab1',
-            tabViewBuilder: (c) => const Text('tab1 view'),
+            tabViewWidget: const Text('tab1 view'),
           ),
         ],
       )),
@@ -836,7 +835,7 @@ void main() {
           PlutoLayoutTabItem(
             id: 'tab1',
             title: 'tab1',
-            tabViewBuilder: (c) => const Text('tab1 view'),
+            tabViewWidget: const Text('tab1 view'),
           ),
         ],
       )),
@@ -899,7 +898,7 @@ void main() {
           PlutoLayoutTabItem(
             id: 'tab1',
             title: 'tab1',
-            tabViewBuilder: (c) => const Text('tab1 view'),
+            tabViewWidget: const Text('tab1 view'),
           ),
         ],
       )),
@@ -959,7 +958,7 @@ void main() {
           PlutoLayoutTabItem(
             id: 'tab1',
             title: 'tab1',
-            tabViewBuilder: (c) => const Text('tab1 view'),
+            tabViewWidget: const Text('tab1 view'),
           ),
         ],
       )),
@@ -1022,7 +1021,7 @@ void main() {
           PlutoLayoutTabItem(
             id: 'tab1',
             title: 'tab1',
-            tabViewBuilder: (c) => const Text('tab1 view'),
+            tabViewWidget: const Text('tab1 view'),
           ),
         ],
       )),
