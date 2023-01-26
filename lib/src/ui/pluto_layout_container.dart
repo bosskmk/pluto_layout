@@ -139,7 +139,7 @@ class _FocusedContainer extends ConsumerWidget {
         color: backgroundColor,
         border: focused
             ? Border.all(
-                strokeAlign: StrokeAlign.outside,
+                strokeAlign: BorderSide.strokeAlignOutside,
                 color: focused ? theme.highlightColor : theme.dividerColor,
               )
             : null,

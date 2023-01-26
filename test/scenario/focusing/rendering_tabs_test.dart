@@ -102,7 +102,9 @@ void main() {
     (tester) async {
       await BuildWidgetHelper.plutoLayoutWithTabs(
         tester,
-        theme: ThemeData(toggleableActiveColor: Colors.blue),
+        theme: ThemeData(
+          colorScheme: const ColorScheme.dark(secondary: Colors.blue),
+        ),
         leftItems: [
           PlutoLayoutTabItem(
             id: 'left1',
@@ -260,7 +262,9 @@ void main() {
           LogicalKeySet(LogicalKeyboardKey.tab):
               PlutoLayoutActions.rotateFocusedTabItem(),
         },
-        theme: ThemeData(toggleableActiveColor: Colors.blue),
+        theme: ThemeData(
+          colorScheme: const ColorScheme.dark(secondary: Colors.blue),
+        ),
         leftItems: [
           PlutoLayoutTabItem(id: 'left1', title: 'left1'),
           PlutoLayoutTabItem(id: 'left2', title: 'left2'),
@@ -309,7 +313,9 @@ void main() {
           LogicalKeySet(LogicalKeyboardKey.tab):
               PlutoLayoutActions.rotateFocusedTabItem(reverse: true),
         },
-        theme: ThemeData(toggleableActiveColor: Colors.blue),
+        theme: ThemeData(
+          colorScheme: const ColorScheme.dark(secondary: Colors.blue),
+        ),
         leftItems: [
           PlutoLayoutTabItem(id: 'left1', title: 'left1'),
           PlutoLayoutTabItem(id: 'left2', title: 'left2'),

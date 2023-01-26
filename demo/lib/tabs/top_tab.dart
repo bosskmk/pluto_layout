@@ -119,7 +119,7 @@ class _TopTabState extends State<TopTab> {
       mode: _isMobile ? PlutoMenuBarMode.tap : PlutoMenuBarMode.hover,
       menus: menuItems,
       backgroundColor: theme.dialogBackgroundColor,
-      moreIconColor: theme.toggleableActiveColor,
+      moreIconColor: theme.colorScheme.secondary,
       textStyle: TextStyle(
         color: theme.primaryColorLight,
       ),

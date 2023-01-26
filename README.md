@@ -1,4 +1,4 @@
-## PlutoLayout - v0.3.0
+## PlutoLayout - v1.0.0
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -140,6 +140,15 @@ class _ExamplePageState extends State<ExamplePage> {
   }
 }
 ```
+
+<br>
+
+### Flutter version compatible
+
+| Flutter         | PlutoLayout           |
+|-----------------|-----------------------|
+| 3.7.0 or higher | 1.0.0 or higher       |
+| Less than 3.3.7 | 0.x                   |
 
 <br>
 

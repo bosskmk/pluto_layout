@@ -1,3 +1,7 @@
+## 1.0.0
+
+* Updated for flutter 3.7 version.
+
 ## 0.3.0
 
 * Add showOneMust to PlutoLayoutTabMode.

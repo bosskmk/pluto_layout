@@ -430,7 +430,7 @@ class _MenuContainer extends ConsumerWidget {
             layoutId: layoutId,
             itemId: item.id,
           )
-              ? BorderSide(width: 3, color: theme.toggleableActiveColor)
+              ? BorderSide(width: 3, color: theme.colorScheme.secondary)
               : BorderSide.none,
         ),
       ),
@@ -529,7 +529,7 @@ class _Draggable extends ConsumerWidget {
   ) {
     if (candidateData.isNotEmpty || rejectedData.isNotEmpty) {
       return ColoredBox(
-        color: Theme.of(context).backgroundColor,
+        color: Theme.of(context).colorScheme.background,
         child: child,
       );
     }

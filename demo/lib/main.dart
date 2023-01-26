@@ -19,7 +19,7 @@ class DemoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(useMaterial3: true),
+      theme: ThemeData.dark(),
       home: const DemoPage(),
     );
   }
@@ -212,7 +212,7 @@ class _NewGridState extends State<_NewGrid> {
             borderColor: theme.dividerColor,
             rowColor: theme.dialogBackgroundColor,
             activatedColor: theme.focusColor,
-            activatedBorderColor: theme.toggleableActiveColor,
+            activatedBorderColor: theme.colorScheme.secondary,
           ),
         ),
       ),

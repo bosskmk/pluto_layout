@@ -58,10 +58,10 @@ void main() {
       expect(border?.left.width, 1);
       expect(border?.right.width, 1);
       expect(border?.top.width, 1);
-      expect(border?.top.strokeAlign, StrokeAlign.outside);
-      expect(border?.left.strokeAlign, StrokeAlign.outside);
-      expect(border?.right.strokeAlign, StrokeAlign.outside);
-      expect(border?.top.strokeAlign, StrokeAlign.outside);
+      expect(border?.top.strokeAlign, BorderSide.strokeAlignOutside);
+      expect(border?.left.strokeAlign, BorderSide.strokeAlignOutside);
+      expect(border?.right.strokeAlign, BorderSide.strokeAlignOutside);
+      expect(border?.top.strokeAlign, BorderSide.strokeAlignOutside);
       expect(border?.top.color, focusedColor);
       expect(border?.left.color, focusedColor);
       expect(border?.right.color, focusedColor);
